@@ -1,0 +1,32 @@
+artifacts = ["/app/report.json"]
+
+[task]
+name = "dynamo/graph-semantic-transitive-ownership"
+description = "Analyze RDF corporate knowledge graph to compute indirect ownership and propagate sanction risk."
+
+[metadata]
+category = "data_querying_and_databases"
+subcategory = "graph_and_semantic_queries"
+task_objective = ["graph_traversal_and_semantic_reasoning"]
+artifact_type = ["json_report"]
+expert_time_estimate_hours = 0.5
+model_tested = "GPT-5.4"
+agent_tested = "Terminus-2"
+difficulty_explanation = "Requires multi-path graph traversal with floating-point multiplication, circular path cycle-breaking, and conditional semantic property propagation."
+solution_explanation = "Parses RDF graph, builds an adjacency representation with ownership weights, executes simple-path enumeration up to cycle detection, and applies sanction propagation rules with explicit exemption checking."
+verification_explanation = "Asserts ground-truth values in /app/report.json including exact sorted entities, numeric tolerances, and array integrity."
+
+[verifier]
+timeout_sec = 120.0
+
+[agent]
+timeout_sec = 120.0
+
+[environment]
+build_timeout_sec = 600.0
+cpus = 1
+memory_mb = 2048
+storage_mb = 10240
+gpus = 0
+allow_internet = true
+mcp_servers = []
