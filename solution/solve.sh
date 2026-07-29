@@ -14,16 +14,32 @@ all_entities = set()
 for s in g.subjects(RDF.type, EX.Company):
     all_entities.add(s)
 
-edges = {}
+raw_edges = {}
 has_incoming = set()
 
 for s, p, o in g.triples((None, EX.owns, None)):
     target = g.value(o, EX.target)
     pct = float(g.value(o, EX.percentage))
-    if s not in edges:
-        edges[s] = []
-    edges[s].append((target, pct))
+    if s not in raw_edges:
+        raw_edges[s] = []
+    raw_edges[s].append((target, pct))
     has_incoming.add(target)
+
+# Prune cross-holding back-edges (where u->v and v->u exist, keep the dominant edge u->v)
+edges = {}
+for s, targets in raw_edges.items():
+    edges[s] = []
+    for target, pct in targets:
+        # Check if reciprocal edge exists with higher percentage
+        reciprocal_pct = 0.0
+        if target in raw_edges:
+            for r_target, r_pct in raw_edges[target]:
+                if r_target == s:
+                    reciprocal_pct = r_pct
+                    break
+        if reciprocal_pct > 0 and pct < reciprocal_pct:
+            continue  # prune minority cross-holding back-edge
+        edges[s].append((target, pct))
 
 top_parents = [e for e in all_entities if e not in has_incoming]
 
