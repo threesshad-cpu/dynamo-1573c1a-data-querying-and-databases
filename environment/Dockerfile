@@ -6,7 +6,8 @@ RUN pip install --no-cache-dir \
     pytest==8.3.4 \
     pytest-json-ctrf==0.1.0 \
     rdflib==7.1.1 \
-    networkx==3.4.2
+    networkx==3.4.2 \
+    numpy==2.2.1
 
 RUN mkdir -p /app/data /logs/verifier
 
