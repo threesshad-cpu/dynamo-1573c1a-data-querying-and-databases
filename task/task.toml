@@ -20,7 +20,7 @@ verification_explanation = "Asserts strict ground-truth values in /app/report.js
 timeout_sec = 120.0
 
 [agent]
-timeout_sec = 120.0
+timeout_sec = 600.0
 
 [environment]
 build_timeout_sec = 600.0
