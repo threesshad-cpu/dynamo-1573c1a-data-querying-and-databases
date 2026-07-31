@@ -14,7 +14,7 @@ model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
 difficulty_explanation = "Evaluates integrated corporate ownership and inherited sanctions risk on synthetic RDF Turtle graphs generated during environment build. Requires sanctions and KYC compliance analysts to model direct/indirect cross-holdings and solve linear systems V(I - C) = P for circular ownership, filter date-bounded sanctions, enforce exemption predicates, and output a sorted JSON report."
 solution_explanation = "Parses RDF graph into parent and subsidiary sets, constructs parent-to-subsidiary (P) and subsidiary-to-subsidiary (C) direct ownership matrices, computes integrated ownership V = P * (I - C)^(-1) via matrix inversion, evaluates date-bounded parent sanctions, applies explicit exemption triples, and formats output report."
-verification_explanation = "Asserts strict ground-truth values in /app/report.json including exact integrated ownership values within 0.0001 numeric tolerance, sorting, array integrity, and exemption exclusions."
+verification_explanation = "Asserts strict ground-truth values in /app/report.json including exact integrated ownership values within a 0.0001 numeric tolerance (calibrated to accommodate floating-point rounding variations for calculations rounded to 4 decimal places where underlying closed-form rational exact values exist), array sorting, key structure integrity, and exemption exclusions."
 
 [verifier]
 timeout_sec = 120.0

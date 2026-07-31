@@ -40,6 +40,7 @@ Write your final output to `/app/report.json`.
      }
    }
    ```
+   - Note: `total_entities_analyzed` is the total count of all entity nodes (`ex:Company`) in the graph, including both top-level parents and target subsidiaries.
 
 6. **Sorting and Formatting Rules:**
    - `high_risk_subsidiaries` must be sorted by `effective_ownership` in descending order. If values match, sort by `entity_id` in ascending ASCII order.
