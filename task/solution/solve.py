@@ -1,9 +1,20 @@
+import os
+import sys
 import json
+from pathlib import Path
 import numpy as np
 from rdflib import Graph, Namespace, RDF, RDFS
 
+os.makedirs("/app", exist_ok=True)
+
+ttl_path = Path("/app/data/corporate_graph.ttl")
+if not ttl_path.exists():
+    alt_path = Path(__file__).resolve().parent.parent / "data" / "corporate_graph.ttl"
+    if alt_path.exists():
+        ttl_path = alt_path
+
 g = Graph()
-g.parse("/app/data/corporate_graph.ttl", format="turtle")
+g.parse(str(ttl_path), format="turtle")
 EX = Namespace("http://example.org/entity/")
 
 all_entities = sorted(list(set(g.subjects(RDF.type, EX.Company))))
