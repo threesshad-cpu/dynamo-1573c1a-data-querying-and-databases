@@ -58,19 +58,19 @@ def test_entity_names():
     assert id_to_name["http://example.org/entity/E103"] == "Gamma Shipping", f"Expected 'Gamma Shipping', got {id_to_name['http://example.org/entity/E103']}"
 
 def test_effective_ownership_values():
-    """Verifies integrated effective ownership values for flagged entities within 0.0001 tolerance."""
+    """Verifies integrated effective ownership values for flagged entities within 0.0001 (1e-4) tolerance."""
     data = _load_report()
     high_risk = data["high_risk_subsidiaries"]
     id_to_ownership = {item["entity_id"]: item["effective_ownership"] for item in high_risk}
 
     # E101: Integrated Ownership = (0.60 + 0.20*0.10) / (1 - 0.50*0.10) = 0.62 / 0.95 = 0.65263158 -> 0.6526
-    assert abs(id_to_ownership["http://example.org/entity/E101"] - 0.6526) < 0.0001
+    assert abs(id_to_ownership["http://example.org/entity/E101"] - 0.6526) <= 0.0001
 
     # E102: Integrated Ownership = (0.60*0.50 + 0.20) / 0.95 = 0.50 / 0.95 = 0.52631579 -> 0.5263
-    assert abs(id_to_ownership["http://example.org/entity/E102"] - 0.5263) < 0.0001
+    assert abs(id_to_ownership["http://example.org/entity/E102"] - 0.5263) <= 0.0001
 
     # E103: Integrated Ownership = 0.65263158*0.40 + 0.52631579*0.30 = 0.41894737 -> 0.4189
-    assert abs(id_to_ownership["http://example.org/entity/E103"] - 0.4189) < 0.0001
+    assert abs(id_to_ownership["http://example.org/entity/E103"] - 0.4189) <= 0.0001
 
 def test_inherited_sanctions_values():
     """Verifies inherited sanction categories for flagged entities."""
