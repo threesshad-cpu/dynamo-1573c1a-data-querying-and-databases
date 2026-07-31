@@ -1,18 +1,18 @@
 artifacts = ["/app/report.json"]
 
 [task]
-name = "dynamo/graph-semantic-transitive-ownership"
+name = "dynamo/effective-ownership-risk"
 description = "Analyze RDF corporate knowledge graph using matrix-based integrated ownership (Brioschi model) and propagate sanction risk."
 
 [metadata]
 category = "data_querying_and_databases"
 subcategory = "graph_and_semantic_queries"
-task_objective = ["analyze", "generate", "implement", "transform", "validate"]
-artifact_type = ["database_or_structured_store", "generated_output_artifact", "document_or_report"]
+task_objective = ["analyze", "generate", "transform"]
+artifact_type = ["document_or_report", "generated_output_artifact"]
 expert_time_estimate_hours = 1.5
 model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
-difficulty_explanation = "Requires extracting adjacency submatrices from RDF Turtle graphs, formulating and solving Leontief-style linear systems V(I - C) = P to account for infinite circular cross-holdings, filtering sanctions by evaluation date windows, enforcing exemption predicates, and emitting precise sorted JSON structures."
+difficulty_explanation = "Evaluates integrated corporate ownership and inherited sanctions risk on synthetic RDF Turtle graphs generated during environment build. Requires sanctions and KYC compliance analysts to model direct/indirect cross-holdings and solve linear systems V(I - C) = P for circular ownership, filter date-bounded sanctions, enforce exemption predicates, and output a sorted JSON report."
 solution_explanation = "Parses RDF graph into parent and subsidiary sets, constructs parent-to-subsidiary (P) and subsidiary-to-subsidiary (C) direct ownership matrices, computes integrated ownership V = P * (I - C)^(-1) via matrix inversion, evaluates date-bounded parent sanctions, applies explicit exemption triples, and formats output report."
 verification_explanation = "Asserts strict ground-truth values in /app/report.json including exact integrated ownership values within 0.0001 numeric tolerance, sorting, array integrity, and exemption exclusions."
 

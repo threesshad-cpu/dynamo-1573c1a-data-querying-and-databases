@@ -8,15 +8,12 @@ Write your final output to `/app/report.json`.
    - Parse `/app/data/corporate_graph.ttl`.
    - Identify top-level parent entities (entities with no incoming `ex:owns` relations) and target subsidiary entities.
 
-2. **Integrated Effective Ownership Calculation ($V = P(I - C)^{-1}$):**
-   - Corporate cross-holdings require the mathematically rigorous Brioschi integrated ownership solution.
-   - Let $N$ be the number of target subsidiaries and $M$ be the number of top-level parents.
-   - Construct the $N \times N$ direct subsidiary-to-subsidiary ownership matrix $C$, where $C_{i,j}$ represents the direct ownership percentage entity $i$ holds in entity $j$.
-   - Construct the $M \times N$ direct parent-to-subsidiary ownership matrix $P$, where $P_{p,j}$ represents the direct ownership percentage parent $p$ holds in entity $j$.
-   - Compute the $M \times N$ integrated effective ownership matrix $V$ by solving the matrix equation:
-     $$V = P + V C \implies V (I - C) = P \implies V = P (I - C)^{-1}$$
-     where $I$ is the $N \times N$ identity matrix.
-   - The total effective ownership of a subsidiary $j$ is the sum of integrated effective ownerships across all top-level parents: $\sum_{p=1}^M V_{p,j}$.
+2. **Integrated Effective Ownership Calculation:**
+   - Top-level parent entities are entities with no incoming `ex:owns` relations. Target entities are subsidiary entities.
+   - Calculate the **integrated effective ownership** percentage for each top-level parent entity in each target subsidiary entity, accounting for both direct ownership relations and indirect ownership passed through corporate cross-holdings and ownership cycles.
+   - Direct holdings are specified via `ex:owns` triples containing `ex:target` and `ex:percentage`.
+   - Integrated effective ownership must account for all transitive holding chains and circular cross-holdings between entities (where an entity's integrated effective ownership in a subsidiary combines direct ownership and indirect holdings through intermediate companies).
+   - The total effective ownership of a target subsidiary is the sum of integrated effective ownerships held across all top-level parent entities.
 
 3. **Inherited Sanctions & Exemption Rules:**
    - A subsidiary inherits a sanction category from a top-level parent $p$ if and only if the integrated effective ownership $V_{p,j} \ge 0.25$ (25%) AND parent $p$ has an active sanction in that category as of `2026-07-29` (where `2026-07-29` falls between `ex:effectiveDate` and `ex:expirationDate` inclusive).
