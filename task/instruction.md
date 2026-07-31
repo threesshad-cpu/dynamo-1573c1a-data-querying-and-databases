@@ -28,9 +28,9 @@ Write your final output to `/app/report.json`.
      "evaluation_date": "2026-07-29",
      "high_risk_subsidiaries": [
        {
-         "entity_id": "http://example.org/entity/E101",
-         "entity_name": "Alpha Subsidiary",
-         "effective_ownership": 0.6526,
+         "entity_id": "http://example.org/entity/E999",
+         "entity_name": "Example Subsidiary",
+         "effective_ownership": 0.7500,
          "inherited_sanctions": ["Financial", "Trade"]
        }
      ],
