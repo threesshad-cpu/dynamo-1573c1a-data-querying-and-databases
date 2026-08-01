@@ -9,7 +9,8 @@ RUN pip install --no-cache-dir \
     networkx==3.4.2 \
     numpy==2.2.1
 
-RUN mkdir -p /app/data /logs/verifier
+RUN mkdir -p /app/data /data /logs/verifier
+
 
 COPY generate_data.py /tmp/generate_data.py
 RUN python3 /tmp/generate_data.py && rm /tmp/generate_data.py

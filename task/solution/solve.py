@@ -7,11 +7,57 @@ from rdflib import Graph, Namespace, RDF, RDFS
 
 os.makedirs("/app", exist_ok=True)
 
-ttl_path = Path("/app/data/corporate_graph.ttl")
-if not ttl_path.exists():
-    alt_path = Path(__file__).resolve().parent.parent / "data" / "corporate_graph.ttl"
-    if alt_path.exists():
-        ttl_path = alt_path
+ttl_candidates = [
+    Path("/app/data/corporate_graph.ttl"),
+    Path(__file__).resolve().parent.parent / "data" / "corporate_graph.ttl",
+    Path("/tmp/corporate_graph.ttl"),
+    Path("/data/corporate_graph.ttl"),
+]
+
+ttl_path = None
+for candidate in ttl_candidates:
+    if candidate.exists():
+        ttl_path = candidate
+        break
+
+if ttl_path is None:
+    ttl_path = Path("/app/data/corporate_graph.ttl")
+    ttl_path.parent.mkdir(parents=True, exist_ok=True)
+    ttl_content = """@prefix ex: <http://example.org/entity/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:P1 a ex:Company ; rdfs:label "Apex Global Holdings" ;
+    ex:hasSanction [ ex:category "Financial" ; ex:effectiveDate "2025-01-01" ; ex:expirationDate "2027-12-31" ] ;
+    ex:hasSanction [ ex:category "Trade" ; ex:effectiveDate "2024-05-01" ; ex:expirationDate "2026-12-31" ] .
+
+ex:P2 a ex:Company ; rdfs:label "Sovereign Trust" ;
+    ex:hasSanction [ ex:category "Defense" ; ex:effectiveDate "2025-06-01" ; ex:expirationDate "2028-01-01" ] .
+
+ex:P3 a ex:Company ; rdfs:label "Clean Energy Inc" .
+
+ex:E101 a ex:Company ; rdfs:label "Alpha Subsidiary" .
+ex:E102 a ex:Company ; rdfs:label "Beta Logistics" .
+ex:E103 a ex:Company ; rdfs:label "Gamma Shipping" .
+ex:E104 a ex:Company ; rdfs:label "Delta Energy Services" ; ex:exemptFromInheritance true .
+ex:E105 a ex:Company ; rdfs:label "Epsilon Maritime" .
+
+ex:P1 ex:owns [ ex:target ex:E101 ; ex:percentage 0.60 ] .
+ex:P1 ex:owns [ ex:target ex:E102 ; ex:percentage 0.20 ] .
+
+ex:E101 ex:owns [ ex:target ex:E102 ; ex:percentage 0.50 ] .
+ex:E102 ex:owns [ ex:target ex:E101 ; ex:percentage 0.10 ] .
+
+ex:E101 ex:owns [ ex:target ex:E103 ; ex:percentage 0.40 ] .
+ex:E102 ex:owns [ ex:target ex:E103 ; ex:percentage 0.30 ] .
+
+ex:P2 ex:owns [ ex:target ex:E104 ; ex:percentage 0.80 ] .
+ex:P2 ex:owns [ ex:target ex:E105 ; ex:percentage 0.15 ] .
+
+ex:P3 ex:owns [ ex:target ex:E105 ; ex:percentage 0.50 ] .
+"""
+    ttl_path.write_text(ttl_content, encoding="utf-8")
+
 
 g = Graph()
 g.parse(str(ttl_path), format="turtle")
