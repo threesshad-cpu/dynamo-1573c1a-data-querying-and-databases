@@ -1,15 +1,15 @@
 artifacts = ["/app/report.json"]
 
 [task]
-name = "dynamo/bom-shortage-cascade"
+name = "dynamo/effective-ownership-risk"
 description = "Analyze multi-level manufacturing bill-of-materials (BOM) DAG in SQLite and simulate sequential shared-inventory allocation across production orders."
 
 [metadata]
 category = "data_querying_and_databases"
-subcategory = "sql_querying"
+subcategory = "graph_and_semantic_queries"
 task_objective = ["analyze", "generate", "implement", "transform", "validate"]
 artifact_type = ["database_or_structured_store", "document_or_report", "generated_output_artifact"]
-expert_time_estimate_hours = 1.0
+expert_time_estimate_hours = 1.5
 model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
 difficulty_explanation = "Evaluates multi-level BOM explosion and sequential shared-inventory allocation on synthetic SQLite databases generated during environment build. Requires domain knowledge in supply chain and manufacturing operations to model DAG reconvergence (components recurring across multiple assembly paths), process orders sequentially by priority, identify limiting raw components, and track shared inventory depletion."
