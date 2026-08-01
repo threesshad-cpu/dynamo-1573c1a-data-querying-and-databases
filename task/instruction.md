@@ -1,9 +1,9 @@
 You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system.
 
 Tables:
-- `parts(part_id, name, on_hand_qty)` — `on_hand_qty` is current warehouse stock (only meaningful for raw/leaf components; sub-assemblies are built on demand and always have `on_hand_qty = 0`).
-- `bom(parent_part_id, child_part_id, qty_per)` — `qty_per` units of `child_part_id` are consumed to build 1 unit of `parent_part_id`. The BOM is a DAG: a component can appear as a child under multiple parents and at multiple levels — its total requirement per finished unit must be aggregated across every path it appears on.
-- `orders(order_id, product_part_id, requested_qty, priority)` — production orders for top-level products, all drawing from the same shared warehouse inventory in `parts.on_hand_qty`.
+- `parts(part_id, name, on_hand_qty)` - `on_hand_qty` is current warehouse stock (only meaningful for raw/leaf components; sub-assemblies are built on demand and always have `on_hand_qty = 0`).
+- `bom(parent_part_id, child_part_id, qty_per)` - `qty_per` units of `child_part_id` are consumed to build 1 unit of `parent_part_id`. The BOM is a DAG: a component can appear as a child under multiple parents and at multiple levels - its total requirement per finished unit must be aggregated across every path it appears on.
+- `orders(order_id, product_part_id, requested_qty, priority)` - production orders for top-level products, all drawing from the same shared warehouse inventory in `parts.on_hand_qty`.
 
 Process orders in ascending `priority` order (ties broken by `order_id` ascending), one at a time, against a single shared, mutable inventory pool that starts at each part's `on_hand_qty`:
 
