@@ -6,11 +6,12 @@ RUN pip install --no-cache-dir \
     pytest==8.3.4 \
     pytest-json-ctrf==0.5.3 \
     rdflib==7.1.1 \
-    networkx==3.4.2 \
     numpy==2.2.1
+
+RUN python3 -c "import plugin.Report as r, inspect; src = inspect.getfile(r); txt = open(src).read().replace('os.makedirs(dirname)', 'os.makedirs(dirname, exist_ok=True)'); open(src, 'w').write(txt)"
 
 RUN mkdir -p /app/data /data
 
-
 COPY generate_data.py /tmp/generate_data.py
 RUN python3 /tmp/generate_data.py && rm /tmp/generate_data.py
+
