@@ -23,4 +23,3 @@ jobs:
   review:
     uses: handshake-project-dynamo/handshake-orchestration-tb2/.github/workflows/dynamo-review.yml@main
     secrets: inherit
-    continue-on-error: true
