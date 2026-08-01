@@ -1,8 +1,4 @@
-import os
-from pathlib import Path
-
-
-ttl_content = """@prefix ex: <http://example.org/entity/> .
+@prefix ex: <http://example.org/entity/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -37,21 +33,3 @@ ex:P2 ex:owns [ ex:target ex:E104 ; ex:percentage 0.80 ] .
 ex:P2 ex:owns [ ex:target ex:E105 ; ex:percentage 0.15 ] .
 
 ex:P3 ex:owns [ ex:target ex:E105 ; ex:percentage 0.50 ] .
-"""
-
-ttl_path = Path("/app/data/corporate_graph.ttl")
-alt_paths = [
-    Path("/tmp/corporate_graph.ttl"),
-    Path("/data/corporate_graph.ttl"),
-    Path(__file__).resolve().parent.parent / "data" / "corporate_graph.ttl",
-    Path("/app/data/corporate_graph.ttl"),
-]
-
-for p in alt_paths:
-    try:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(ttl_content, encoding="utf-8")
-        print(f"Generated {p} successfully.")
-    except Exception as e:
-        print(f"Note: Could not write to {p}: {e}")
-

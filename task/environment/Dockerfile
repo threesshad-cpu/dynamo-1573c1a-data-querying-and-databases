@@ -4,9 +4,12 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir \
     pytest==8.3.4 \
-    pytest-json-ctrf==0.5.3
+    pytest-json-ctrf==0.5.3 \
+    rdflib==7.1.1 \
+    numpy==2.2.1
 
-RUN mkdir -p /app/data /data /app
+RUN mkdir -p /app/data /data
 
 COPY generate_data.py /tmp/generate_data.py
 RUN python3 /tmp/generate_data.py && rm /tmp/generate_data.py
+

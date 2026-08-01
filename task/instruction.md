@@ -1,33 +1,48 @@
-You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system.
+An RDF corporate structure graph is stored in Turtle format at `/app/data/corporate_graph.ttl`. Analyze this knowledge graph to evaluate entity risk and integrated effective ownership as of `2026-07-29`.
 
-Tables:
-- `parts(part_id, name, on_hand_qty)` — `on_hand_qty` is current warehouse stock (only meaningful for raw/leaf components; sub-assemblies are built on demand and always have `on_hand_qty = 0`).
-- `bom(parent_part_id, child_part_id, qty_per)` — `qty_per` units of `child_part_id` are consumed to build 1 unit of `parent_part_id`. The BOM is a DAG: a component can appear as a child under multiple parents and at multiple levels — its total requirement per finished unit must be aggregated across every path it appears on.
-- `orders(order_id, product_part_id, requested_qty, priority)` — production orders for top-level products, all drawing from the same shared warehouse inventory in `parts.on_hand_qty`.
+Write your final output to `/app/report.json`.
 
-Process orders in ascending `priority` order (ties broken by `order_id` ascending), one at a time, against a single shared, mutable inventory pool that starts at each part's `on_hand_qty`:
+### Requirements & Mathematical Model
 
-1. Explode the ordered product's full BOM (all levels) into total raw-component requirements per finished unit, correctly summing contributions from components that recur via more than one path.
-2. Given remaining inventory at the time this order is processed, compute the maximum number of complete units buildable: the largest integer N such that, for every raw component required, `N * qty_per <= remaining_on_hand` for that component.
-3. `allocated_qty` = min(requested_qty, that maximum).
-4. `shortfall_qty` = requested_qty - allocated_qty.
-5. `limiting_component` = the `part_id` of the raw component with the smallest `remaining_on_hand / qty_per` ratio if `shortfall_qty > 0`, else `null`.
-6. Deduct `allocated_qty * qty_per` of every raw component actually consumed from the shared pool before processing the next order.
+1. **Entity Extraction:**
+   - Parse `/app/data/corporate_graph.ttl`.
+   - Identify top-level parent entities (entities with no incoming `ex:owns` relations) and target subsidiary entities.
 
-Write `/app/report.json`:
-```json
-{
-  "orders": [
-    {
-      "order_id": "O0",
-      "allocated_qty": 5,
-      "shortfall_qty": 0,
-      "limiting_component": null
-    }
-  ]
-}
-```
+2. **Integrated Effective Ownership Calculation:**
+   - Top-level parent entities are entities with no incoming `ex:owns` relations. Target entities are subsidiary entities.
+   - Calculate the **integrated effective ownership** percentage for each top-level parent entity in each target subsidiary entity, accounting for both direct ownership relations and indirect ownership passed through corporate cross-holdings and ownership cycles.
+   - Direct holdings are specified via `ex:owns` triples containing `ex:target` and `ex:percentage`.
+   - Integrated effective ownership must account for all transitive holding chains and circular cross-holdings between entities (where an entity's integrated effective ownership in a subsidiary combines direct ownership and indirect holdings through intermediate companies).
+   - The total effective ownership of a target subsidiary is the sum of integrated effective ownerships held across all top-level parent entities.
 
-`orders` must be sorted by `order_id` ascending (independent of processing order). All values are integers, no rounding needed.
+3. **Inherited Sanctions & Exemption Rules:**
+   - A subsidiary inherits a sanction category from a top-level parent $p$ if and only if the integrated effective ownership $V_{p,j} \ge 0.25$ (25%) AND parent $p$ has an active sanction in that category as of `2026-07-29` (where `2026-07-29` falls between `ex:effectiveDate` and `ex:expirationDate` inclusive).
+   - **Exemption Rule:** If a subsidiary entity has the triple `ex:exemptFromInheritance true`, it does not inherit any sanctions regardless of ownership level and must be excluded from high-risk flagging.
 
-You have 300 seconds to complete this task.
+4. **Filtering and Report Generation:**
+   - Include in `high_risk_subsidiaries` only target subsidiaries where total effective ownership $\ge 0.25$ and `inherited_sanctions` is non-empty.
+
+5. **JSON Output Schema (`/app/report.json`):**
+   ```json
+   {
+     "evaluation_date": "2026-07-29",
+     "high_risk_subsidiaries": [
+       {
+         "entity_id": "http://example.org/entity/E999",
+         "entity_name": "Example Subsidiary",
+         "effective_ownership": 0.7500,
+         "inherited_sanctions": ["Financial", "Trade"]
+       }
+     ],
+     "summary": {
+       "total_entities_analyzed": 8,
+       "flagged_subsidiaries_count": 1
+     }
+   }
+   ```
+   - Note: `total_entities_analyzed` is the total count of all entity nodes (`ex:Company`) in the graph, including both top-level parents and target subsidiaries.
+
+6. **Sorting and Formatting Rules:**
+   - `high_risk_subsidiaries` must be sorted by `effective_ownership` in descending order. If values match, sort by `entity_id` in ascending ASCII order.
+   - `effective_ownership` values must be rounded to 4 decimal places.
+   - `inherited_sanctions` arrays must be sorted alphabetically in ascending ASCII order with no duplicate entries.

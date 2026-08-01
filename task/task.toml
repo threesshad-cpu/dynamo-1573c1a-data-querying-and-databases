@@ -1,26 +1,26 @@
 artifacts = ["/app/report.json"]
 
 [task]
-name = "dynamo/bom-shortage-cascade"
-description = "Analyze multi-level manufacturing bill-of-materials (BOM) DAG in SQLite and simulate sequential shared-inventory allocation across production orders."
+name = "dynamo/effective-ownership-risk"
+description = "Analyze RDF corporate knowledge graph using matrix-based integrated ownership (Brioschi model) and propagate sanction risk."
 
 [metadata]
 category = "data_querying_and_databases"
-subcategory = "sql_querying"
-task_objective = ["analyze", "generate", "transform"]
-artifact_type = ["database_or_structured_store", "document_or_report"]
-expert_time_estimate_hours = 1.0
+subcategory = "graph_and_semantic_queries"
+task_objective = ["analyze", "generate", "implement", "transform", "validate"]
+artifact_type = ["database_or_structured_store", "document_or_report", "generated_output_artifact"]
+expert_time_estimate_hours = 1.5
 model_tested = "GPT-5.4"
 agent_tested = "Terminus-2"
-difficulty_explanation = "Evaluates multi-level BOM explosion and sequential shared-inventory allocation on synthetic SQLite databases generated during environment build. Requires domain knowledge in supply chain and manufacturing operations to model DAG reconvergence (components recurring across multiple assembly paths), process orders sequentially by priority, identify limiting raw components, and track shared inventory depletion."
-solution_explanation = "Reads SQLite database, explodes product BOMs into total leaf component requirements per unit using memoized DAG traversal, sorts orders by priority and order_id, computes buildable units and bottleneck raw components against remaining shared inventory, deducts consumed stock, and writes a sorted JSON report."
-verification_explanation = "Verifies exact integer match for allocated quantities, shortfall quantities, and limiting component IDs across all orders. Checks output file existence, non-symlink status, JSON schema, array length, and order_id ascending sort order."
+difficulty_explanation = "Evaluates integrated corporate ownership and inherited sanctions risk on synthetic RDF Turtle graphs generated during environment build. Requires sanctions and KYC compliance analysts to model direct/indirect cross-holdings and solve linear systems V(I - C) = P for circular ownership, filter date-bounded sanctions, enforce exemption predicates, and output a sorted JSON report."
+solution_explanation = "Parses RDF graph into parent and subsidiary sets, constructs parent-to-subsidiary (P) and subsidiary-to-subsidiary (C) direct ownership matrices, computes integrated ownership V = P * (I - C)^(-1) via matrix inversion, evaluates date-bounded parent sanctions, applies explicit exemption triples, and formats output report."
+verification_explanation = "Verifies numeric integrated-ownership values after rounding to 4 decimal places; the report.json outputs are produced rounded to 4 decimals, therefore an absolute tolerance of 1e-4 is used (equivalent to an exact 4-decimal match). This choice bounds floating-point inversion variation (float64) while enforcing precise 4-decimal reporting. The verifier also checks ordering, array integrity, and date-bounded exemptions."
 
 [verifier]
 timeout_sec = 120.0
 
 [agent]
-timeout_sec = 300.0
+timeout_sec = 600.0
 
 [environment]
 build_timeout_sec = 600.0
