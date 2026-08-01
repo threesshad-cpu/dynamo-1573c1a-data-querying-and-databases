@@ -84,16 +84,42 @@ C = np.zeros((N, N), dtype=np.float64)
 
 for s, p, o in g.triples((None, EX.owns, None)):
     target = g.value(o, EX.target)
-    pct = float(g.value(o, EX.percentage))
+    pct_val = g.value(o, EX.percentage)
+
+    if target is None:
+        raise ValueError(f"Malformed ex:owns triple for subject {s}: missing ex:target in node {o}")
+    if pct_val is None:
+        raise ValueError(f"Malformed ex:owns triple for subject {s}: missing ex:percentage in node {o}")
+
+    try:
+        pct = float(pct_val)
+    except (ValueError, TypeError) as e:
+        raise ValueError(f"Malformed ex:owns triple for subject {s}: invalid percentage '{pct_val}' in node {o}: {e}")
+
+    if not (0.0 <= pct <= 1.0):
+        raise ValueError(f"Malformed ex:owns triple for subject {s}: percentage {pct} out of bounds [0, 1] in node {o}")
 
     if s in parent_idx and target in sub_idx:
-        P[parent_idx[s], sub_idx[target]] = pct
+        P[parent_idx[s], sub_idx[target]] += pct
     elif s in sub_idx and target in sub_idx:
-        C[sub_idx[s], sub_idx[target]] = pct
+        C[sub_idx[s], sub_idx[target]] += pct
 
-# Solve V = P * (I - C)^(-1)
+# Solve V = P * (I - C)^(-1) with conditioning guard and pseudo-inverse fallback
 I = np.eye(N, dtype=np.float64)
-V = np.matmul(P, np.linalg.inv(I - C))
+matrix_diff = I - C
+
+try:
+    cond_num = np.linalg.cond(matrix_diff)
+    if cond_num > 1e12:
+        print(f"Warning: Matrix (I - C) is ill-conditioned (cond = {cond_num:.2e}). Falling back to pseudo-inverse (pinv).")
+        inv_diff = np.linalg.pinv(matrix_diff)
+    else:
+        inv_diff = np.linalg.inv(matrix_diff)
+except np.linalg.LinAlgError as e:
+    print(f"Warning: Matrix (I - C) inversion failed ({e}). Falling back to pseudo-inverse (pinv).")
+    inv_diff = np.linalg.pinv(matrix_diff)
+
+V = np.matmul(P, inv_diff)
 
 eval_date = "2026-07-29"
 parent_sanctions = {}
@@ -110,7 +136,13 @@ for p in top_parents:
 high_risk = []
 for j, sub in enumerate(subsidiaries):
     exempt = g.value(sub, EX.exemptFromInheritance)
-    is_exempt = str(exempt).lower() == "true" if exempt else False
+    if exempt is not None:
+        if hasattr(exempt, "toPython") and isinstance(exempt.toPython(), bool):
+            is_exempt = exempt.toPython()
+        else:
+            is_exempt = str(exempt).lower() in ("true", "1")
+    else:
+        is_exempt = False
 
     label = str(g.value(sub, RDFS.label) or sub)
     total_effective_ownership = float(np.sum(V[:, j]))
@@ -142,7 +174,9 @@ report = {
     },
 }
 
-with open("/app/report.json", "w") as f:
+report_path = Path("/app/report.json")
+report_path.parent.mkdir(parents=True, exist_ok=True)
+with open(report_path, "w") as f:
     json.dump(report, f, indent=2)
 
-print("Generated /app/report.json successfully using Integrated Matrix Inversion.")
+print(f"Generated {report_path} successfully using Integrated Matrix Inversion.")

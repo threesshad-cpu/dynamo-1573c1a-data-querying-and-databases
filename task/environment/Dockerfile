@@ -8,8 +8,6 @@ RUN pip install --no-cache-dir \
     rdflib==7.1.1 \
     numpy==2.2.1
 
-RUN python3 -c "import plugin.Report as r, inspect; src = inspect.getfile(r); txt = open(src).read().replace('os.makedirs(dirname)', 'os.makedirs(dirname, exist_ok=True)'); open(src, 'w').write(txt)"
-
 RUN mkdir -p /app/data /data
 
 COPY generate_data.py /tmp/generate_data.py
