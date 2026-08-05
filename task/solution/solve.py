@@ -4,21 +4,13 @@ import sqlite3
 from pathlib import Path
 
 # Locate manufacturing.db
-db_candidates = [
-    Path("/app/manufacturing.db"),
-    Path("/tmp/manufacturing.db"),
-    Path("/data/manufacturing.db"),
-    Path(__file__).resolve().parent.parent / "data" / "manufacturing.db",
-]
-
-db_path = None
-for candidate in db_candidates:
-    if candidate.exists():
-        db_path = candidate
-        break
-
-if db_path is None or not db_path.exists():
-    db_path = Path("/app/manufacturing.db")
+db_path = Path("/app/manufacturing.db")
+if not db_path.exists():
+    local_fallback = (
+        Path(__file__).resolve().parent.parent / "data" / "manufacturing.db"
+    )
+    if local_fallback.exists():
+        db_path = local_fallback
 
 conn = sqlite3.connect(str(db_path))
 cursor = conn.cursor()

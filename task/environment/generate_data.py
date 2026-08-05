@@ -100,15 +100,12 @@ def create_database(db_path: Path):
     print(f"Generated SQLite DB at {db_path}")
 
 
-paths = [
-    Path("/app/manufacturing.db"),
-    Path("/tmp/manufacturing.db"),
-    Path("/data/manufacturing.db"),
-    Path(__file__).resolve().parent.parent / "data" / "manufacturing.db",
-]
-
-for p in paths:
+if __name__ == "__main__":
+    db_path = Path("/app/manufacturing.db")
     try:
-        create_database(p)
-    except Exception as e:
-        print(f"Note: Could not write to {p}: {e}")
+        create_database(db_path)
+    except Exception:
+        pkg_data = Path(__file__).resolve().parent.parent / "data"
+        fallback = pkg_data / "manufacturing.db"
+        print(f"Fallback to {fallback}")
+        create_database(fallback)
