@@ -57,9 +57,20 @@ if db_path is None:
     ]
     conn = sqlite3.connect(str(db_path))
     c = conn.cursor()
-    c.execute("CREATE TABLE parts (part_id TEXT PRIMARY KEY, name TEXT NOT NULL, on_hand_qty INTEGER NOT NULL)")
-    c.execute("CREATE TABLE bom (parent_part_id TEXT NOT NULL, child_part_id TEXT NOT NULL, qty_per INTEGER NOT NULL, PRIMARY KEY (parent_part_id, child_part_id))")
-    c.execute("CREATE TABLE orders (order_id TEXT PRIMARY KEY, product_part_id TEXT NOT NULL, requested_qty INTEGER NOT NULL, priority INTEGER NOT NULL)")
+    c.execute(
+        "CREATE TABLE parts (part_id TEXT PRIMARY KEY, "
+        "name TEXT NOT NULL, on_hand_qty INTEGER NOT NULL)"
+    )
+    c.execute(
+        "CREATE TABLE bom (parent_part_id TEXT NOT NULL, "
+        "child_part_id TEXT NOT NULL, qty_per INTEGER NOT NULL, "
+        "PRIMARY KEY (parent_part_id, child_part_id))"
+    )
+    c.execute(
+        "CREATE TABLE orders (order_id TEXT PRIMARY KEY, "
+        "product_part_id TEXT NOT NULL, requested_qty INTEGER NOT NULL, "
+        "priority INTEGER NOT NULL)"
+    )
     c.executemany("INSERT INTO parts VALUES (?, ?, ?)", parts_data)
     c.executemany("INSERT INTO bom VALUES (?, ?, ?)", bom_data)
     c.executemany("INSERT INTO orders VALUES (?, ?, ?, ?)", orders_data)
@@ -71,7 +82,10 @@ cursor = conn.cursor()
 
 # Load parts
 cursor.execute("SELECT part_id, name, on_hand_qty FROM parts")
-parts = {row[0]: {"name": row[1], "on_hand_qty": row[2]} for row in cursor.fetchall()}
+parts = {
+    row[0]: {"name": row[1], "on_hand_qty": row[2]}
+    for row in cursor.fetchall()
+}
 
 # Load bom relationships: parent_part_id -> [(child_part_id, qty_per), ...]
 cursor.execute("SELECT parent_part_id, child_part_id, qty_per FROM bom")
@@ -82,13 +96,19 @@ for parent, child, qty in cursor.fetchall():
     bom[parent].append((child, qty))
 
 # Load orders: list of (order_id, product_part_id, requested_qty, priority)
-cursor.execute("SELECT order_id, product_part_id, requested_qty, priority FROM orders")
+cursor.execute(
+    "SELECT order_id, product_part_id, requested_qty, priority FROM orders"
+)
 orders_raw = cursor.fetchall()
 conn.close()
 
-# Identify leaf raw components (parts with on_hand_qty > 0 or not appearing as parent in bom)
+# Identify leaf raw components (parts with on_hand_qty > 0 or not in bom)
 parents_set = set(bom.keys())
-leaf_parts = {part_id for part_id, info in parts.items() if info["on_hand_qty"] > 0 or part_id not in parents_set}
+leaf_parts = {
+    part_id
+    for part_id, info in parts.items()
+    if info["on_hand_qty"] > 0 or part_id not in parents_set
+}
 
 # Explode BOM with memoization and cycle detection
 memo = {}
@@ -122,7 +142,9 @@ def get_leaf_requirements(part_id, visiting=None):
 
 
 # Initialize shared inventory pool for leaf components
-shared_inventory = {leaf_id: parts[leaf_id]["on_hand_qty"] for leaf_id in leaf_parts}
+shared_inventory = {
+    leaf_id: parts[leaf_id]["on_hand_qty"] for leaf_id in leaf_parts
+}
 
 # Sort orders by priority ascending, then order_id ascending
 processed_orders = sorted(orders_raw, key=lambda x: (x[3], x[0]))
