@@ -18,4 +18,4 @@ Write the final output object to `/app/report.json`:
 
 Sort the `orders` list by `order_id` ascending.
 
-You have 300 seconds to complete this task.
+You have 600 seconds to complete this task.
