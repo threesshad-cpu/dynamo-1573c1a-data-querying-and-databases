@@ -1,21 +1,15 @@
-You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system.
+You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system with the following tables:
+- `parts(part_id, name, on_hand_qty)`: Current stock. Sub-assemblies and top-level products have `on_hand_qty = 0`.
+- `bom(parent_part_id, child_part_id, qty_per)`: Component requirement graph per parent unit.
+- `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for products.
 
-Database Tables:
-- `parts(part_id, name, on_hand_qty)`: Current warehouse stock. Sub-assemblies and products have `on_hand_qty = 0`.
-- `bom(parent_part_id, child_part_id, qty_per)`: Directed graph of component requirements per parent unit.
-- `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for top-level products.
+Perform a multi-level BOM explosion and simulate sequential shared-inventory allocation across all production orders in ascending `priority` order (ties broken by `order_id` ascending):
 
-Process orders sequentially in ascending `priority` order (ties broken by `order_id` ascending) against the shared inventory pool:
+- For each order, allocate as many complete units as buildable from the remaining raw inventory pool (`allocated_qty`).
+- If an order experiences a stock shortfall (`shortfall_qty > 0`), identify the bottleneck raw component (`limiting_component`) that restricts build capacity due to having the lowest remaining stock ratio (`remaining_on_hand / qty_per` per product unit). If there is a tie, pick the raw component with the ASCII-smallest `part_id`. If `shortfall_qty == 0`, set `limiting_component` to `null`.
+- Deduct consumed raw components from the shared inventory pool after fulfilling each order before processing subsequent orders.
 
-1. Aggregate total raw component requirements per product unit across all BOM paths (handling DAG reconvergence).
-2. Compute `allocated_qty` = min(requested_qty, maximum complete units buildable given current remaining inventory).
-3. Compute `shortfall_qty` = requested_qty - allocated_qty.
-4. Set `limiting_component` to the raw `part_id` with the smallest `remaining_on_hand / qty_per` ratio if `shortfall_qty > 0`, else `null` (ties broken by `part_id` ASCII ascending).
-5. Deduct consumed raw components (`allocated_qty * qty_per`) from the shared inventory pool before processing the next order.
-
-Write the final output object to `/app/report.json`:
+Write the final result to `/app/report.json` with the schema:
 `{"orders": [{"order_id": str, "allocated_qty": int, "shortfall_qty": int, "limiting_component": str|null}, ...]}`
 
-Sort the `orders` list by `order_id` ascending.
-
-You have 600 seconds to complete this task.
+Sort the `orders` array in `/app/report.json` by `order_id` ascending.
