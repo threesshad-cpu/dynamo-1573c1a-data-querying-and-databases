@@ -23,3 +23,5 @@ jobs:
   review:
     uses: handshake-project-dynamo/handshake-orchestration-tb2/.github/workflows/dynamo-review.yml@main
     secrets: inherit
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: 'true'
