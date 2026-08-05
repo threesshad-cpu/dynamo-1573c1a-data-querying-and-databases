@@ -5,10 +5,12 @@ REPORT_PATH = "/app/report.json"
 
 
 def test_file_exists_and_not_symlink():
+    """Verify that /app/report.json exists and is a regular file (not a symbolic link)."""
     assert os.path.exists(REPORT_PATH) and not os.path.islink(REPORT_PATH)
 
 
 def test_report_schema_and_keys():
+    """Verify that /app/report.json contains a top-level 'orders' array with 4 items having all expected schema keys."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert len(data.get("orders", [])) == 4
@@ -17,12 +19,14 @@ def test_report_schema_and_keys():
 
 
 def test_output_sorting():
+    """Verify that the orders array in /app/report.json is sorted by order_id in ascending order."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert [x["order_id"] for x in data["orders"]] == ["O0", "O1", "O2", "O3"]
 
 
 def test_order_allocations():
+    """Verify that sequential shared-inventory allocation results (allocated_qty, shortfall_qty, limiting_component) match the expected BOM calculation."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     m = {x["order_id"]: x for x in data["orders"]}
