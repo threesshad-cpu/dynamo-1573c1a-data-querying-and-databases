@@ -8,7 +8,7 @@ Perform a multi-level BOM explosion and simulate sequential shared-inventory all
 - Consume pre-built sub-assembly stock on hand first before exploding net sub-assembly requirements into child components.
 - Allocate `allocated_qty` as the maximum units buildable up to `requested_qty` subject to `batch_size` lot constraints (`allocated_qty` must be a multiple of `batch_size`).
 - Compute `shortfall_qty` = `requested_qty - allocated_qty`.
-- If `shortfall_qty > 0`, set `limiting_component` to the raw component restricting allocation for the next batch unit (lowest stock-to-required-quantity ratio; ties broken by ASCII-smallest `part_id`). If `shortfall_qty == 0`, set `limiting_component` to `null`.
+- If `shortfall_qty > 0`, set `limiting_component` to the raw component restricting allocation for the next batch increment of `batch_size` units (evaluated for producing `allocated_qty + batch_size` total product units from the current order's initial state). Select the raw component $L$ with the smallest remaining inventory ratio $\frac{\text{inventory}[L]}{\text{gross\_required}[L]}$, breaking ties by ASCII-smallest `part_id`. If `shortfall_qty == 0`, set `limiting_component` to `null`.
 - Deduct consumed sub-assemblies and raw components from the shared inventory pool after fulfilling each order.
 
 Write the final result to `/app/report.json` with the schema:
