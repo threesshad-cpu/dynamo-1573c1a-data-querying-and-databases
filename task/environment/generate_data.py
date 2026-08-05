@@ -2,41 +2,50 @@ import sqlite3
 from pathlib import Path
 
 parts_data = [
-    ("L1", "Bolt-M4", 500),
-    ("L2", "Bolt-M6", 300),
-    ("L3", "Steel-Plate", 40),
-    ("L4", "Rubber-Gasket", 150),
-    ("L5", "Circuit-Board", 25),
-    ("L6", "Wire-Harness", 60),
-    ("SA1", "Bracket-Assembly", 0),
-    ("SA2", "Sensor-Module", 0),
-    ("SA3", "Base-Frame", 0),
-    ("P1", "Widget-X", 0),
-    ("P2", "Widget-Y", 0),
+    ("L1", "Bolt-M4", 500, 1),
+    ("L2", "Bolt-M6", 300, 1),
+    ("L3", "Steel-Plate", 45, 1),
+    ("L4", "Rubber-Gasket", 150, 1),
+    ("L5", "Circuit-Board", 25, 1),
+    ("L6", "Wire-Harness", 60, 1),
+    ("L7", "LED-Display", 30, 1),
+    ("L8", "Power-Unit", 40, 1),
+    ("SA1", "Bracket-Assembly", 8, 1),
+    ("SA2", "Sensor-Module", 4, 1),
+    ("SA3", "Base-Frame", 0, 1),
+    ("SA4", "Control-Panel", 5, 1),
+    ("P1", "Widget-X", 0, 5),
+    ("P2", "Widget-Y", 0, 4),
+    ("P3", "Widget-Z", 0, 2),
 ]
 
 bom_data = [
-    ("SA1", "L1", 4),
-    ("SA1", "L3", 1),
-    ("SA2", "L5", 1),
-    ("SA2", "L6", 2),
-    ("SA2", "L1", 2),
-    ("SA3", "L3", 2),
-    ("SA3", "L2", 6),
-    ("SA3", "L4", 4),
-    ("P1", "SA1", 2),
-    ("P1", "SA2", 1),
-    ("P1", "L2", 4),
-    ("P2", "SA1", 1),
-    ("P2", "SA3", 1),
-    ("P2", "L4", 2),
+    ("SA1", "L1", 4, 0.0),
+    ("SA1", "L3", 1, 10.0),
+    ("SA2", "L5", 1, 0.0),
+    ("SA2", "L6", 2, 5.0),
+    ("SA2", "L1", 2, 0.0),
+    ("SA3", "L3", 2, 0.0),
+    ("SA3", "L2", 6, 0.0),
+    ("SA3", "L4", 4, 2.5),
+    ("SA4", "SA2", 1, 0.0),
+    ("SA4", "L7", 1, 0.0),
+    ("P1", "SA1", 2, 0.0),
+    ("P1", "SA2", 1, 0.0),
+    ("P1", "L2", 4, 0.0),
+    ("P2", "SA1", 1, 0.0),
+    ("P2", "SA3", 1, 0.0),
+    ("P2", "L4", 2, 0.0),
+    ("P3", "SA4", 1, 0.0),
+    ("P3", "L8", 1, 0.0),
 ]
 
 orders_data = [
-    ("O0", "P2", 5, 0),
+    ("O0", "P2", 12, 0),
     ("O1", "P1", 30, 1),
-    ("O2", "P2", 20, 2),
-    ("O3", "P1", 15, 3),
+    ("O2", "P3", 15, 2),
+    ("O3", "P2", 20, 3),
+    ("O4", "P1", 25, 4),
 ]
 
 
@@ -53,7 +62,8 @@ def create_database(db_path: Path):
         CREATE TABLE parts (
             part_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
-            on_hand_qty INTEGER NOT NULL
+            on_hand_qty INTEGER NOT NULL,
+            batch_size INTEGER NOT NULL
         )
     """
     )
@@ -64,6 +74,7 @@ def create_database(db_path: Path):
             parent_part_id TEXT NOT NULL,
             child_part_id TEXT NOT NULL,
             qty_per INTEGER NOT NULL,
+            scrap_rate_pct REAL NOT NULL,
             PRIMARY KEY (parent_part_id, child_part_id)
         )
     """
@@ -80,8 +91,8 @@ def create_database(db_path: Path):
     """
     )
 
-    cursor.executemany("INSERT INTO parts VALUES (?, ?, ?)", parts_data)
-    cursor.executemany("INSERT INTO bom VALUES (?, ?, ?)", bom_data)
+    cursor.executemany("INSERT INTO parts VALUES (?, ?, ?, ?)", parts_data)
+    cursor.executemany("INSERT INTO bom VALUES (?, ?, ?, ?)", bom_data)
     cursor.executemany("INSERT INTO orders VALUES (?, ?, ?, ?)", orders_data)
 
     conn.commit()

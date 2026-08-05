@@ -13,7 +13,7 @@ def test_report_schema_and_keys():
     """Verify schema keys in /app/report.json orders array."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    assert len(data.get("orders", [])) == 4
+    assert len(data.get("orders", [])) == 5
     keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_component"}
     assert all(
         isinstance(x, dict) and not (keys - set(x.keys()))
@@ -25,7 +25,8 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    assert [x["order_id"] for x in data["orders"]] == ["O0", "O1", "O2", "O3"]
+    expected_ids = ["O0", "O1", "O2", "O3", "O4"]
+    assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
 def test_order_allocations():
@@ -33,23 +34,29 @@ def test_order_allocations():
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     m = {x["order_id"]: x for x in data["orders"]}
+
     assert (
-        m["O0"]["allocated_qty"] == 5
+        m["O0"]["allocated_qty"] == 12
         and m["O0"]["shortfall_qty"] == 0
         and m["O0"]["limiting_component"] is None
     )
     assert (
-        m["O1"]["allocated_qty"] == 12
-        and m["O1"]["shortfall_qty"] == 18
+        m["O1"]["allocated_qty"] == 20
+        and m["O1"]["shortfall_qty"] == 10
         and m["O1"]["limiting_component"] == "L3"
     )
     assert (
-        m["O2"]["allocated_qty"] == 0
-        and m["O2"]["shortfall_qty"] == 20
-        and m["O2"]["limiting_component"] == "L3"
+        m["O2"]["allocated_qty"] == 14
+        and m["O2"]["shortfall_qty"] == 1
+        and m["O2"]["limiting_component"] == "L5"
     )
     assert (
-        m["O3"]["allocated_qty"] == 0
-        and m["O3"]["shortfall_qty"] == 15
+        m["O3"]["allocated_qty"] == 12
+        and m["O3"]["shortfall_qty"] == 8
         and m["O3"]["limiting_component"] == "L3"
+    )
+    assert (
+        m["O4"]["allocated_qty"] == 20
+        and m["O4"]["shortfall_qty"] == 5
+        and m["O4"]["limiting_component"] == "L3"
     )

@@ -13,9 +13,9 @@ artifact_type = ["document_or_report", "generated_output_artifact"]
 expert_time_estimate_hours = 1.5
 model_tested = "Opus-4.8"
 agent_tested = "Terminus-2"
-difficulty_explanation = "Evaluates multi-level BOM explosion and sequential shared-inventory allocation on synthetic SQLite databases generated during environment build. Requires domain knowledge in supply chain and manufacturing operations to model DAG reconvergence (components recurring across multiple assembly paths), process orders sequentially by priority, identify limiting raw components, and track shared inventory depletion."
-solution_explanation = "Reads SQLite database, explodes product BOMs into total leaf component requirements per unit using memoized DAG traversal, sorts orders by priority and order_id, computes buildable units and bottleneck raw components against remaining shared inventory, deducts consumed stock, and writes a sorted JSON report."
-verification_explanation = "Verifies exact integer match for allocated quantities, shortfall quantities, and limiting component IDs across all orders. Checks output file existence, non-symlink status, JSON schema, array length, and order_id ascending sort order."
+difficulty_explanation = "Evaluates multi-level BOM explosion and sequential shared-inventory allocation on synthetic SQLite databases. Requires modeling top-down pre-built sub-assembly stock consumption, non-linear ceiling scrap/yield loss calculations across DAG paths, lot size batch constraints, sequential priority allocation, bottleneck raw component identification, and shared stock depletion."
+solution_explanation = "Reads SQLite database, simulates top-down BOM explosion consuming pre-built sub-assembly stock first and calculating ceil scrap losses, enforces batch_size lot rounding, identifies bottleneck raw components for shortfalls, deducts consumed inventory, and writes a sorted JSON report."
+verification_explanation = "Verifies exact integer match for allocated quantities, shortfall quantities, and limiting component IDs across 5 orders. Checks output file existence, non-symlink status, JSON schema, array length, and order_id ascending sort order."
 
 [verifier]
 timeout_sec = 120.0
