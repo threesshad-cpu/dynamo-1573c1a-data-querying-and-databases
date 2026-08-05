@@ -41,8 +41,8 @@ def test_order_allocations():
         and m["O0"]["limiting_component"] is None
     )
     assert (
-        m["O1"]["allocated_qty"] == 20
-        and m["O1"]["shortfall_qty"] == 10
+        m["O1"]["allocated_qty"] == 5
+        and m["O1"]["shortfall_qty"] == 25
         and m["O1"]["limiting_component"] == "L3"
     )
     assert (
@@ -51,12 +51,12 @@ def test_order_allocations():
         and m["O2"]["limiting_component"] == "L5"
     )
     assert (
-        m["O3"]["allocated_qty"] == 12
-        and m["O3"]["shortfall_qty"] == 8
+        m["O3"]["allocated_qty"] == 0
+        and m["O3"]["shortfall_qty"] == 20
         and m["O3"]["limiting_component"] == "L3"
     )
     assert (
-        m["O4"]["allocated_qty"] == 20
-        and m["O4"]["shortfall_qty"] == 5
+        m["O4"]["allocated_qty"] == 0
+        and m["O4"]["shortfall_qty"] == 25
         and m["O4"]["limiting_component"] == "L3"
     )

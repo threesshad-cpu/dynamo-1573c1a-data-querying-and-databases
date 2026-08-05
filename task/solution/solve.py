@@ -142,6 +142,10 @@ for order_id, product_id, requested_qty, priority in processed_orders:
         for p, qty in best_consumed.items():
             inventory[p] -= qty
 
+    if best_needed:
+        for p, qty in best_needed.items():
+            inventory[p] -= qty
+
     results.append(
         {
             "order_id": order_id,
