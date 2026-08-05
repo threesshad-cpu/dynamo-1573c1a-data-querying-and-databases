@@ -21,7 +21,7 @@ verification_explanation = "Verifies exact integer match for allocated quantitie
 timeout_sec = 120.0
 
 [agent]
-timeout_sec = 600.0
+timeout_sec = 900.0
 
 [environment]
 build_timeout_sec = 600.0

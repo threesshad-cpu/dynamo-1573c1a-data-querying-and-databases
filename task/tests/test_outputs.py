@@ -10,15 +10,29 @@ def test_file_exists_and_not_symlink():
 
 
 def test_report_schema_and_keys():
-    """Verify schema keys in /app/report.json orders array."""
+    """Verify exact schema keys and value types in report.json."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    assert len(data.get("orders", [])) == 5
-    keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_component"}
-    assert all(
-        isinstance(x, dict) and not (keys - set(x.keys()))
-        for x in data["orders"]
-    )
+    orders = data.get("orders", [])
+    assert len(orders) == 5
+    expected_keys = {
+        "order_id",
+        "allocated_qty",
+        "shortfall_qty",
+        "limiting_component",
+    }
+    for x in orders:
+        assert isinstance(x, dict) and set(x.keys()) == expected_keys
+        assert isinstance(x["order_id"], str)
+        assert isinstance(x["allocated_qty"], int) and not isinstance(
+            x["allocated_qty"], bool
+        )
+        assert isinstance(x["shortfall_qty"], int) and not isinstance(
+            x["shortfall_qty"], bool
+        )
+        assert x["limiting_component"] is None or isinstance(
+            x["limiting_component"], str
+        )
 
 
 def test_output_sorting():
