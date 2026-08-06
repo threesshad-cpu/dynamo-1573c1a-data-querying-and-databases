@@ -47,38 +47,49 @@ def test_output_sorting():
 def test_order_allocations():
     """Verify sequential shared-inventory allocation results.
 
-    Dataset: L3 Steel-Plate=37 on-hand; SA1->L3 scrap_rate=5.5%.
-    Order sequence by priority: O0(P2x8), O1(P1x10), O2(P3x15), O3(P2x20), O4(P1x25).
+    Dataset: L3 Steel-Plate=81 on-hand; SA1->L3 scrap_rate=5.5%.
+    Order sequence by priority: O0(P2x12), O1(P1x30), O2(P3x15), O3(P2x20), O4(P1x25).
 
-    O0 (P2 x 8): SA1 stock=8 covers all 8 SA1 needed (no explosion), SA3 x 8 consumes
-    L3=16 (8*2, no scrap). Fully allocated. limiting_component=None.
+    O0 (P2 x 12): SA1 stock=8 covers 8 of 12 SA1 needed; 4 SA1 exploded.
+    L3 from SA1: ceil(4*1*1.055)=ceil(4.22)=5. L3 from 12 SA3: 24. Total=29.
+    L3 remaining after O0: 81-29=52. O0 fully allocated.
 
-    O1 (P1 x 10, batch=5): needs 20 SA1 (SA1 stock=0 post-O0); gross L3 per ceil scrap=
-    ceil(20 * 1 * 1.055) = ceil(21.1) = 22 > L3_remaining=21 -> can only build 5 P1
-    (10 SA1, ceil(10*1.055)=ceil(10.55)=11 <= 21). limiting=L3 (min ratio).
+    O1 (P1 x 30, batch=5): needs 60 SA1 (SA1 stock=0). Tries 30 first:
+    L3=ceil(60*1.055)=ceil(63.3)=64 > 52 -> fail. Tries 25:
+    L3=ceil(50*1.055)=ceil(52.75)=53 > 52 -> fail. Tries 20:
+    L3=ceil(40*1.055)=ceil(42.2)=43 <= 52 -> success. allocated=20, shortfall=10.
+    For next batch=25: L3=ceil(52.75)=53, available=9 (81-29-43). L3 ratio=9/53=0.17.
+    L5 ratio=9/25=0.36. L3 has smallest ratio -> limiting=L3.
 
-    O2 (P3 x 15, batch=2): max=14; P3->SA4->SA2 path. 5 SA4 prebuilt consumed, 9 SA4
-    exploded; 9 SA2 exploded; L5 ratio 16/11 = 1.45 is binding. limiting=L5.
+    O2 (P3 x 15, batch=2): max=14. P3->SA4->SA2 path. 5 SA4 prebuilt consumed,
+    9 SA4 exploded; 9 SA2 exploded (SA2 stock=0 post-O1); L5=9 consumed, available=9 exactly.
+    allocated=14, shortfall=1. For next batch=16: L5 available=0, needed=11 -> ratio=0.
+    limiting=L5.
 
-    O3 (P2 x 20): L3 exhausted after O1; all batch sizes fail. limiting=L3.
+    O3 (P2 x 20): L3 remaining=9 (81-29-43). All batch sizes need more L3.
+    4 P2: ceil(4*1.055)=5 SA1-L3 + 8 SA3-L3 = 13 > 9 -> fail. allocated=0, shortfall=20.
+    limiting=L3 (ratio 9/13=0.69, minimum among binding components).
 
-    O4 (P1 x 25): L3 still 0; all fail. limiting=L3.
+    O4 (P1 x 25): L5=0 (all consumed by O2). 5 P1 needs 1 SA2 (exploded): L5=1 > 0 -> fail.
+    allocated=0, shortfall=25. limiting=L5 (ratio 0/1=0, minimum).
 
-    Scrap sensitivity: replacing math.ceil with math.floor gives O1 allocated_qty=10
-    (floor(21.1)=21 <= 21 succeeds) -- a fundamentally wrong answer, caught by this test.
+    Scrap sensitivity: replacing math.ceil with math.floor changes 3 output fields:
+    O1 gets allocated=25 (floor(52.75)=52 <= 53 L3 available via floor path),
+    O2 gets allocated=8 (L5 depleted sooner), O4 limiting changes L5->L3.
+    All three differences are caught by this test.
     """
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     m = {x["order_id"]: x for x in data["orders"]}
 
     assert (
-        m["O0"]["allocated_qty"] == 8
+        m["O0"]["allocated_qty"] == 12
         and m["O0"]["shortfall_qty"] == 0
         and m["O0"]["limiting_component"] is None
     )
     assert (
-        m["O1"]["allocated_qty"] == 5
-        and m["O1"]["shortfall_qty"] == 5
+        m["O1"]["allocated_qty"] == 20
+        and m["O1"]["shortfall_qty"] == 10
         and m["O1"]["limiting_component"] == "L3"
     )
     assert (
@@ -94,5 +105,5 @@ def test_order_allocations():
     assert (
         m["O4"]["allocated_qty"] == 0
         and m["O4"]["shortfall_qty"] == 25
-        and m["O4"]["limiting_component"] == "L3"
+        and m["O4"]["limiting_component"] == "L5"
     )
