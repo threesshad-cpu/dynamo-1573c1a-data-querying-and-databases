@@ -15,7 +15,7 @@ def test_report_schema_and_keys():
         data = json.load(f)
     assert set(data.keys()) == {"orders"}, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 5
+    assert len(orders) == 7
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -40,68 +40,66 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O0", "O1", "O2", "O3", "O4"]
+    expected_ids = ["O0", "O1", "O2", "O3", "O4", "O5", "O6"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
 def test_order_allocations():
     """Verify sequential shared-inventory allocation results.
 
-    Dataset: L1=250, L3=90 (Steel-Plate), SA1->L3 scrap=5.5%.
-    L1 (Bolt-M4) is a DIAMOND dependency: consumed via SA1 (4 per unit)
-    AND via SA2 (2 per unit). P1 requires BOTH SA1 and SA2, so total L1
-    per P1 = 2*4 + 1*2 = 10. Incorrect summation (e.g. taking max path)
-    yields the wrong limiting_component.
+    Dataset: L1=250, L3=88 (Steel-Plate), SA1->L3 scrap=5.5%.
+    Seven production orders processed in ascending priority order.
 
-    Order sequence by priority: O0(P2x12), O1(P1x30), O2(P3x15), O3(P2x20), O4(P1x25).
+    L1 is a diamond dependency via two BOM paths for P1:
+      SA1 (x2 per P1): L1 x4 per SA1 = 8 L1 per P1 via SA1
+      SA2 (x1 per P1): L1 x2 per SA2 = 2 L1 per P1 via SA2
+      Total L1 per P1 = 10 (must sum both paths, not take max).
 
-    O0 (P2 x 12): SA1 stock=8 covers 8 of 12 needed; 4 SA1 exploded.
-    L3 from SA1: ceil(4*1.055)=ceil(4.22)=5. L3 from 12 SA3: 24. Total L3=29.
-    L1 from 4 SA1: 4*4=16. Fully allocated; sf=0, limiting=None.
-    Inventory after O0: L1=234, L3=61, SA1=0, SA2=4 (unchanged).
+    O0 (P2 x 12): SA1 stock=8 covers 8 of 12; 4 SA1 exploded.
+    L3 = ceil(4*1.055)=5 from SA1 + 24 from 12 SA3 = 29 total.
+    L1 from 4 SA1 = 16. L4 = ceil(48*1.025)+24 = 74. Full alloc.
 
     O1 (P1 x 30, batch=5): SA1 stock=0, SA2 stock=4.
-    Tries 30: 60 SA1. L3=ceil(63.3)=64 > 61 -> fail.
-    Tries 25: 50 SA1. L3=ceil(52.75)=53 <= 61. L1=50*4=200, plus 21 SA2
-    exploded (25-4=21). L1 from 21 SA2=42. Total L1=242 > 234 -> fail.
-    Tries 20: 40 SA1. L3=ceil(42.2)=43 <= 61. L1=40*4=160, plus 16 SA2
-    exploded (20-4=16). L1 from 16 SA2=32. Total L1=192 <= 234. Pass.
-    allocated=20, shortfall=10.
-    For next batch (25 P1): L1 ratio=234/242=0.967 vs L3 ratio=61/53=1.15.
-    L1 ratio < L3 ratio -> limiting=L1.
+    25 P1: 50 SA1 (L3=ceil(52.75)=53<=59, L1=200); 21 SA2 explode
+    (25-4=21; L1=42, L5=21>25-0=25? 21<=25 OK). L1 total=242>234 FAIL.
+    20 P1: 40 SA1 (L3=ceil(42.2)=43<=59); 16 SA2 explode (L1=32).
+    L1=160+32=192<=234. Pass. allocated=20, sf=10.
+    Bottleneck for next 25 P1: L1 ratio=234/242=0.967 < L3 ratio=59/53=1.11.
+    limiting=L1.
 
-    O2 (P3 x 15, batch=2): max=14. SA4 stock=5 (use 5, explode 9).
-    SA2=4 used, then 5 more from 9 SA4 -> wait SA2 stock is 4 left (O1 used
-    them all; after O1=20 P1 with 4 SA2 used and 16 exploded: SA2=0).
-    So 9 SA4 exploded, 9 SA2 exploded from stock=0. L5=9, L1 from 9 SA2=18.
-    All checks pass for 14 P3. sf=1. For next=16 P3: L5 consumed=9, available=16.
-    L5 ratio=16/11=1.45. L1 from 11 SA2=22, available=42. L1 ratio=42/22=1.91.
-    L5 < L1 -> limiting=L5.
+    O2 (P3 x 15, batch=2): SA4 stock=5 (use 5, explode 9).
+    SA2 stock=0 post-O1; explode 9 SA2. L5=9 consumed; L1=18 from SA2.
+    14 P3 fully allocable. sf=1. Next batch (16 P3): L5 ratio=16/11=1.45
+    < other ratios. limiting=L5.
 
-    O3 (P2 x 20, batch=4): SA1 stock=0, SA3 stock=0.
-    4 P2: 4 SA1 explode (L3=5, L1=16), 4 SA3 (L3=8). Total L3=13. L3=61-43=18.
-    13 <= 18 pass. L1=16 <= 42. Also L4=ceil(4*4*1.025)+4*2=17+8=25, L4=76. Pass.
-    allocated=4, shortfall=16.
-    For next=8 P2: 8 SA1 (L3=ceil(8.44)=9, L1=32), 8 SA3 (L3=16, L4=ceil(32.8)=33,
-    L2=48). Total L3=25 > 18 -> L3 ratio=18/25=0.72. Total L1=32, available=26.
-    L1 ratio=26/32=0.813. L3 ratio(0.72) < L1 ratio(0.813) -> limiting=L3.
+    O3 (P2 x 20, batch=4): SA1 stock=0; 4 P2 explodes 4 SA1.
+    L3 from SA1=ceil(4.22)=5; L3 from 4 SA3=8. Total L3=13 <= 16.
+    L1 from 4 SA1=16 <= 24. 4 P2 fits. 8 P2: L3=ceil(8.44)+16=26 > 16 FAIL.
+    allocated=4, sf=16. Next batch (8 P2): L3 ratio=16/26=0.615 < L1 ratio.
+    limiting=L3.
 
-    O4 (P1 x 25, batch=5): L5 stock=25-9=16. L3=18-13=5 (after O3=4 P2).
-    5 P1: 10 SA1 (L3=ceil(10.55)=11 > 5) -> fail. 0 P1.
-    sf=25. For next=5 P1: L3=11 > 5. L3 ratio=5/11=0.455.
-    L5 from 1 SA2 (5-4=1 exploded, SA2=0): L5=1, available=16. L5 ratio=16/1=16.
-    L1=10*4+1*2=42, available=26-32=? wait let me recount.
-    After O3=4 P2: L1=42-16=26. For 5 P1: L1=10*4+1*2=42, available=26. L1 ratio=26/42=0.619.
-    L3 ratio=0.455 < L1 ratio=0.619 < L5 ratio=16 -> limiting=L3.
+    O4 (P1 x 25, batch=5): L5=9-9=0 (used by O2). SA1=0.
+    5 P1: 10 SA1 (L3=ceil(10.55)=11 > 3 = L3 remaining after O3). FAIL.
+    allocated=0, sf=25. Next 5 P1: L3=11>3, L5=5>0.
+    L5 ratio=0/5=0 (minimum). limiting=L5.
 
-    Scrap sensitivity: ceil->floor changes O3 limiting_component from L3 to L1.
-    The floor path: O0 uses L3=28 (floor(4.22)=4), leaving L3=62 after O0.
-    O1=20 still (L3=43<=62, L1=192<=234). O3: for 8 P2, L3=25<=19... wait
-    floor(42.2)=42, L3=62-42=20, for 8 P2 L3=25>20 still? Yes, floor path:
-    after O1: L3=62-42=20. O3 for 8 P2: 8 SA1 floor(8.44)=8 L3, 8 SA3 L3=16. Total=24>20. fail.
-    For 4 P2: 4 SA1 floor(4.22)=4 L3, 4 SA3 L3=8. Total=12<=20. pass.
-    allocated=4, sf=16. For 8 P2: L3=12/24 ratio... actually floor changes which
-    component is the bottleneck -- L1 becomes limiting instead of L3 for O3.
+    O5 (P3 x 25, batch=2): SA4 stock=0 (used by O2). L5=0.
+    2 P3: SA4=2 explode (SA2=2 explode; L5=2>0). FAIL.
+    allocated=0, sf=25. Next 2 P3: L5=2>0. L5 ratio=0/2=0. limiting=L5.
+
+    O6 (P2 x 20, batch=4): SA1 stock=0. L3=3 remaining.
+    4 P2: 4 SA1 explode (L3=5>3). FAIL. allocated=0, sf=20.
+    Next 4 P2: L3=13>3. L3 ratio=3/13=0.231 < L1 ratio=8/16=0.5.
+    limiting=L3.
+
+    Scrap sensitivity: ceil->floor changes O3 and O6 limiting_component.
+    floor path: O0 uses ceil(4*1.055)=5->4 L3, leaving L3=59 after O0.
+    O1 still allocates 20 (43<=59 ceil; 42<=59 floor -- same). But after O1,
+    L3 remaining under floor=59-42=17 (vs ceil 59-43=16).
+    O3 for 4 P2: ceil L3=5+8=13<=16, floor L3=4+8=12<=17. Both fit alloc=4.
+    For 8 P2: ceil L3=9+16=25>16 (limiting=L3). floor L3=8+16=24>17 (L3 ratio=17/24=0.708).
+    Under floor, L1 ratio=8/16=0.5 < L3 ratio=0.708, so limiting=L1.
+    Similarly O6: floor leaves more L3, but L1 becomes limiting first.
     """
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -131,4 +129,14 @@ def test_order_allocations():
         m["O4"]["allocated_qty"] == 0
         and m["O4"]["shortfall_qty"] == 25
         and m["O4"]["limiting_component"] == "L5"
+    )
+    assert (
+        m["O5"]["allocated_qty"] == 0
+        and m["O5"]["shortfall_qty"] == 25
+        and m["O5"]["limiting_component"] == "L5"
+    )
+    assert (
+        m["O6"]["allocated_qty"] == 0
+        and m["O6"]["shortfall_qty"] == 20
+        and m["O6"]["limiting_component"] == "L3"
     )

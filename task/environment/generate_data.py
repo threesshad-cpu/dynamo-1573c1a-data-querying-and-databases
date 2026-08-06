@@ -4,7 +4,7 @@ from pathlib import Path
 parts_data = [
     ("L1", "Bolt-M4", 250, 1),
     ("L2", "Bolt-M6", 300, 1),
-    ("L3", "Steel-Plate", 90, 1),
+    ("L3", "Steel-Plate", 88, 1),
     ("L4", "Rubber-Gasket", 150, 1),
     ("L5", "Circuit-Board", 25, 1),
     ("L6", "Wire-Harness", 60, 1),
@@ -46,6 +46,8 @@ orders_data = [
     ("O2", "P3", 15, 2),
     ("O3", "P2", 20, 3),
     ("O4", "P1", 25, 4),
+    ("O5", "P3", 25, 5),
+    ("O6", "P2", 20, 6),
 ]
 
 
