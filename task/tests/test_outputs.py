@@ -47,59 +47,40 @@ def test_output_sorting():
 def test_order_allocations():
     """Verify sequential shared-inventory allocation results.
 
-    Dataset: L1=250, L3=88 (Steel-Plate), SA1->L3 scrap=5.5%.
+    Dataset: L1=320, L3=95, L5=31, L6=58; SA1(stock=4, bs=5), SA2(stock=2, bs=4), SA4(stock=2, bs=5).
     Seven production orders processed in ascending priority order.
 
-    L1 is a diamond dependency via two BOM paths for P1:
-      SA1 (x2 per P1): L1 x4 per SA1 = 8 L1 per P1 via SA1
-      SA2 (x1 per P1): L1 x2 per SA2 = 2 L1 per P1 via SA2
-      Total L1 per P1 = 10 (must sum both paths, not take max).
+    Sub-assembly lot sizing constraint:
+    When exploding net sub-assembly demand N > 0, build_qty = ceil(N / batch_size) * batch_size.
+    Excess produced sub-assemblies (build_qty - N) are credited to on-hand inventory.
 
-    O0 (P2 x 12): SA1 stock=8 covers 8 of 12; 4 SA1 exploded.
-    L3 = ceil(4*1.055)=5 from SA1 + 24 from 12 SA3 = 29 total.
-    L1 from 4 SA1 = 16. L4 = ceil(48*1.025)+24 = 74. Full alloc.
+    O0 (P2 x 12): SA1 stock=4 covers 4 of 12; 8 SA1 exploded. SA1 batch_size=5 -> build 10 SA1.
+    2 SA1 excess credited to inventory (SA1 stock becomes 2). L3=ceil(10*1.055)=11 from SA1 + 24 from 12 SA3 = 35 total.
+    L1 from 10 SA1 = 40. Fully allocated (alloc=12, sf=0, limiting=None).
 
-    O1 (P1 x 30, batch=5): SA1 stock=0, SA2 stock=4.
-    25 P1: 50 SA1 (L3=ceil(52.75)=53<=59, L1=200); 21 SA2 explode
-    (25-4=21; L1=42, L5=21>25-0=25? 21<=25 OK). L1 total=242>234 FAIL.
-    20 P1: 40 SA1 (L3=ceil(42.2)=43<=59); 16 SA2 explode (L1=32).
-    L1=160+32=192<=234. Pass. allocated=20, sf=10.
-    Bottleneck for next 25 P1: L1 ratio=234/242=0.967 < L3 ratio=59/53=1.11.
-    limiting=L1.
+    O1 (P1 x 30, batch=5): SA1 stock=2, SA2 stock=2.
+    Allocates 25 P1 (needs 50 SA1, 25 SA2).
+    50 SA1 -> 2 stock used, 48 exploded. SA1 bs=5 -> build 50 SA1. 2 SA1 excess credited.
+    25 SA2 -> 2 stock used, 23 exploded. SA2 bs=4 -> build 24 SA2. 1 SA2 excess credited.
+    L3=ceil(50*1.055)=53 (<= 60 remaining). L5=24 (<= 31 remaining). L6=ceil(24*2.1)=51 (<= 58 remaining).
+    Allocates 25 P1 (alloc=25, sf=5, limiting=L3).
 
-    O2 (P3 x 15, batch=2): SA4 stock=5 (use 5, explode 9).
-    SA2 stock=0 post-O1; explode 9 SA2. L5=9 consumed; L1=18 from SA2.
-    14 P3 fully allocable. sf=1. Next batch (16 P3): L5 ratio=16/11=1.45
-    < other ratios. limiting=L5.
+    O2 (P3 x 15, batch=2): SA4 stock=2, bs=5. L5 remaining = 7. L6 remaining = 7.
+    Allocates 2 P3 (needs 2 SA4 -> 2 stock used, 0 exploded).
+    Tries 4 P3 (needs 4 SA4 -> 2 stock used, 2 exploded). SA4 bs=5 -> build 5 SA4.
+    5 SA4 needs 5 SA2 -> 2 SA2 used (1 excess from O1 + 1 stock), 3 exploded. SA2 bs=4 -> build 4 SA2.
+    4 SA2 needs 4 L5, 4*2.1=9 L6 > 7 L6 remaining -> FAILS due to L6 restriction.
+    Allocates 2 P3 (alloc=2, sf=13, limiting=L6).
 
-    O3 (P2 x 20, batch=4): SA1 stock=0; 4 P2 explodes 4 SA1.
-    L3 from SA1=ceil(4.22)=5; L3 from 4 SA3=8. Total L3=13 <= 16.
-    L1 from 4 SA1=16 <= 24. 4 P2 fits. 8 P2: L3=ceil(8.44)+16=26 > 16 FAIL.
-    allocated=4, sf=16. Next batch (8 P2): L3 ratio=16/26=0.615 < L1 ratio.
-    limiting=L3.
+    O3 (P2 x 20): alloc=0, sf=20, limiting=L3.
+    O4 (P1 x 25): alloc=0, sf=25, limiting=L3.
+    O5 (P3 x 25): alloc=0, sf=25, limiting=L6.
+    O6 (P2 x 20): alloc=0, sf=20, limiting=L3.
 
-    O4 (P1 x 25, batch=5): L5=9-9=0 (used by O2). SA1=0.
-    5 P1: 10 SA1 (L3=ceil(10.55)=11 > 3 = L3 remaining after O3). FAIL.
-    allocated=0, sf=25. Next 5 P1: L3=11>3, L5=5>0.
-    L5 ratio=0/5=0 (minimum). limiting=L5.
-
-    O5 (P3 x 25, batch=2): SA4 stock=0 (used by O2). L5=0.
-    2 P3: SA4=2 explode (SA2=2 explode; L5=2>0). FAIL.
-    allocated=0, sf=25. Next 2 P3: L5=2>0. L5 ratio=0/2=0. limiting=L5.
-
-    O6 (P2 x 20, batch=4): SA1 stock=0. L3=3 remaining.
-    4 P2: 4 SA1 explode (L3=5>3). FAIL. allocated=0, sf=20.
-    Next 4 P2: L3=13>3. L3 ratio=3/13=0.231 < L1 ratio=8/16=0.5.
-    limiting=L3.
-
-    Scrap sensitivity: ceil->floor changes O3 and O6 limiting_component.
-    floor path: O0 uses ceil(4*1.055)=5->4 L3, leaving L3=59 after O0.
-    O1 still allocates 20 (43<=59 ceil; 42<=59 floor -- same). But after O1,
-    L3 remaining under floor=59-42=17 (vs ceil 59-43=16).
-    O3 for 4 P2: ceil L3=5+8=13<=16, floor L3=4+8=12<=17. Both fit alloc=4.
-    For 8 P2: ceil L3=9+16=25>16 (limiting=L3). floor L3=8+16=24>17 (L3 ratio=17/24=0.708).
-    Under floor, L1 ratio=8/16=0.5 < L3 ratio=0.708, so limiting=L1.
-    Similarly O6: floor leaves more L3, but L1 becomes limiting first.
+    Sensitivity:
+    - Ignoring sub-assembly batch_size changes O2 allocated_qty from 2 to 6.
+    - Ignoring leftover sub-assembly stock changes O4 limiting_component from L3 to L6.
+    - Using floor instead of ceil for scrap changes O1 limiting_component from L3 to L1.
     """
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -111,29 +92,29 @@ def test_order_allocations():
         and m["O0"]["limiting_component"] is None
     )
     assert (
-        m["O1"]["allocated_qty"] == 20
-        and m["O1"]["shortfall_qty"] == 10
-        and m["O1"]["limiting_component"] == "L1"
+        m["O1"]["allocated_qty"] == 25
+        and m["O1"]["shortfall_qty"] == 5
+        and m["O1"]["limiting_component"] == "L3"
     )
     assert (
-        m["O2"]["allocated_qty"] == 14
-        and m["O2"]["shortfall_qty"] == 1
-        and m["O2"]["limiting_component"] == "L5"
+        m["O2"]["allocated_qty"] == 2
+        and m["O2"]["shortfall_qty"] == 13
+        and m["O2"]["limiting_component"] == "L6"
     )
     assert (
-        m["O3"]["allocated_qty"] == 4
-        and m["O3"]["shortfall_qty"] == 16
+        m["O3"]["allocated_qty"] == 0
+        and m["O3"]["shortfall_qty"] == 20
         and m["O3"]["limiting_component"] == "L3"
     )
     assert (
         m["O4"]["allocated_qty"] == 0
         and m["O4"]["shortfall_qty"] == 25
-        and m["O4"]["limiting_component"] == "L5"
+        and m["O4"]["limiting_component"] == "L3"
     )
     assert (
         m["O5"]["allocated_qty"] == 0
         and m["O5"]["shortfall_qty"] == 25
-        and m["O5"]["limiting_component"] == "L5"
+        and m["O5"]["limiting_component"] == "L6"
     )
     assert (
         m["O6"]["allocated_qty"] == 0
