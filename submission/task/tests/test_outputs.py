@@ -53,10 +53,10 @@ def _get_orders_map():
 
 
 def test_order_O01_allocation():
-    """Verify O01 allocation (P2 x 12): Fully buildable. alloc=12, sf=0, limiting=None."""
+    """Verify O01 allocation (P2 x 14, batch=4): Floored build to batch multiple 12. alloc=12, sf=2, limiting=None."""
     m = _get_orders_map()
     assert m["O01"]["allocated_qty"] == 12
-    assert m["O01"]["shortfall_qty"] == 0
+    assert m["O01"]["shortfall_qty"] == 2
     assert m["O01"]["limiting_resource"] is None
 
 
