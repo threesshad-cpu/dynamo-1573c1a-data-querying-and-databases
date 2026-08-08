@@ -141,9 +141,13 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
                     )
 
     for leaf_id, req_qty in needed_parts.items():
+        if req_qty > 0:
+            gross_leaf_demand[leaf_id] = gross_leaf_demand.get(leaf_id, 0) + req_qty
+
+    leaf_feasible = True
+    for leaf_id, req_qty in needed_parts.items():
         if req_qty <= 0:
             continue
-        gross_leaf_demand[leaf_id] = gross_leaf_demand.get(leaf_id, 0) + req_qty
 
         rem_req = req_qty
         avail_prim = inv_snapshot.get(leaf_id, 0) - inv_consumed[leaf_id]
@@ -164,14 +168,17 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
                     break
 
         if rem_req > 0:
-            return (
-                False,
-                inv_consumed,
-                sub_created,
-                wc_consumed,
-                gross_leaf_demand,
-                gross_wc_demand,
-            )
+            leaf_feasible = False
+
+    if not leaf_feasible:
+        return (
+            False,
+            inv_consumed,
+            sub_created,
+            wc_consumed,
+            gross_leaf_demand,
+            gross_wc_demand,
+        )
 
     for wc_id, req_h in wc_consumed.items():
         if req_h > current_wc_hours.get(wc_id, 0.0) + 1e-9:

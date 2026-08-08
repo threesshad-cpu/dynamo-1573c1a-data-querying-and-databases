@@ -46,68 +46,72 @@ def test_output_sorting():
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
-def test_order_allocations():
-    """Verify multi-level MRP allocation with routing, workcenter capacity, setup scrap, and substitute parts.
-
-    Dataset: Eight production orders processed in ascending priority order (O01 to O08).
-
-    - O01 (P2 x 12): Fully buildable. alloc=12, sf=0, limiting=None.
-    - O02 (P1 x 30, batch=5): Assembly line WC2 available hours (40.0) restrict build to 25 units.
-      alloc=25, sf=5, limiting=WC2.
-    - O03 (P3 x 15, batch=2): Restricted by circuit board L5 inventory (drawing on substitutes).
-      alloc=6, sf=9, limiting=L5.
-    - O04 (P2 x 20, batch=4): Restricted by bolt L1 inventory. alloc=0, sf=20, limiting=L1.
-    - O05 (P1 x 25, batch=5): Restricted by workcenter WC2. alloc=0, sf=25, limiting=WC2.
-    - O06 (P3 x 25, batch=2): Restricted by leaf component L5. alloc=0, sf=25, limiting=L5.
-    - O07 (P2 x 20, batch=4): Restricted by leaf component L1. alloc=0, sf=20, limiting=L1.
-    - O08 (P1 x 15, batch=5): Restricted by workcenter WC2. alloc=0, sf=15, limiting=WC2.
-
-    Sensitivity:
-    - Ignoring workcenter routing capacity changes O02 allocated_qty from 25 to 30.
-    - Ignoring substitute parts changes O03 allocation or bottleneck ratio.
-    - Ignoring setup scrap changes component demand and bottleneck ratios.
-    """
+def _get_orders_map():
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    m = {x["order_id"]: x for x in data["orders"]}
+    return {x["order_id"]: x for x in data["orders"]}
 
-    assert (
-        m["O01"]["allocated_qty"] == 12
-        and m["O01"]["shortfall_qty"] == 0
-        and m["O01"]["limiting_resource"] is None
-    )
-    assert (
-        m["O02"]["allocated_qty"] == 25
-        and m["O02"]["shortfall_qty"] == 5
-        and m["O02"]["limiting_resource"] == "WC2"
-    )
-    assert (
-        m["O03"]["allocated_qty"] == 6
-        and m["O03"]["shortfall_qty"] == 9
-        and m["O03"]["limiting_resource"] == "L5"
-    )
-    assert (
-        m["O04"]["allocated_qty"] == 0
-        and m["O04"]["shortfall_qty"] == 20
-        and m["O04"]["limiting_resource"] == "L1"
-    )
-    assert (
-        m["O05"]["allocated_qty"] == 0
-        and m["O05"]["shortfall_qty"] == 25
-        and m["O05"]["limiting_resource"] == "WC2"
-    )
-    assert (
-        m["O06"]["allocated_qty"] == 0
-        and m["O06"]["shortfall_qty"] == 25
-        and m["O06"]["limiting_resource"] == "L5"
-    )
-    assert (
-        m["O07"]["allocated_qty"] == 0
-        and m["O07"]["shortfall_qty"] == 20
-        and m["O07"]["limiting_resource"] == "L1"
-    )
-    assert (
-        m["O08"]["allocated_qty"] == 0
-        and m["O08"]["shortfall_qty"] == 15
-        and m["O08"]["limiting_resource"] == "WC2"
-    )
+
+def test_order_O01_allocation():
+    """Verify O01 allocation (P2 x 12): Fully buildable. alloc=12, sf=0, limiting=None."""
+    m = _get_orders_map()
+    assert m["O01"]["allocated_qty"] == 12
+    assert m["O01"]["shortfall_qty"] == 0
+    assert m["O01"]["limiting_resource"] is None
+
+
+def test_order_O02_allocation():
+    """Verify O02 allocation (P1 x 30, batch=5): Assembly line WC2 available hours (40.0) restrict build to 25 units. alloc=25, sf=5, limiting=WC2."""
+    m = _get_orders_map()
+    assert m["O02"]["allocated_qty"] == 25
+    assert m["O02"]["shortfall_qty"] == 5
+    assert m["O02"]["limiting_resource"] == "WC2"
+
+
+def test_order_O03_allocation():
+    """Verify O03 allocation (P3 x 15, batch=2): Restricted by circuit board L5 inventory (drawing on substitutes). alloc=6, sf=9, limiting=L5."""
+    m = _get_orders_map()
+    assert m["O03"]["allocated_qty"] == 6
+    assert m["O03"]["shortfall_qty"] == 9
+    assert m["O03"]["limiting_resource"] == "L5"
+
+
+def test_order_O04_allocation():
+    """Verify O04 allocation (P2 x 20, batch=4): Restricted by bolt L1 inventory. alloc=0, sf=20, limiting=L1."""
+    m = _get_orders_map()
+    assert m["O04"]["allocated_qty"] == 0
+    assert m["O04"]["shortfall_qty"] == 20
+    assert m["O04"]["limiting_resource"] == "L1"
+
+
+def test_order_O05_allocation():
+    """Verify O05 allocation (P1 x 25, batch=5): Restricted by workcenter WC2. alloc=0, sf=25, limiting=WC2."""
+    m = _get_orders_map()
+    assert m["O05"]["allocated_qty"] == 0
+    assert m["O05"]["shortfall_qty"] == 25
+    assert m["O05"]["limiting_resource"] == "WC2"
+
+
+def test_order_O06_allocation():
+    """Verify O06 allocation (P3 x 25, batch=2): Restricted by leaf component L6. alloc=0, sf=25, limiting=L6."""
+    m = _get_orders_map()
+    assert m["O06"]["allocated_qty"] == 0
+    assert m["O06"]["shortfall_qty"] == 25
+    assert m["O06"]["limiting_resource"] == "L6"
+
+
+def test_order_O07_allocation():
+    """Verify O07 allocation (P2 x 20, batch=4): Restricted by leaf component L1. alloc=0, sf=20, limiting=L1."""
+    m = _get_orders_map()
+    assert m["O07"]["allocated_qty"] == 0
+    assert m["O07"]["shortfall_qty"] == 20
+    assert m["O07"]["limiting_resource"] == "L1"
+
+
+def test_order_O08_allocation():
+    """Verify O08 allocation (P1 x 15, batch=5): Restricted by workcenter WC2. alloc=0, sf=15, limiting=WC2."""
+    m = _get_orders_map()
+    assert m["O08"]["allocated_qty"] == 0
+    assert m["O08"]["shortfall_qty"] == 15
+    assert m["O08"]["limiting_resource"] == "WC2"
+

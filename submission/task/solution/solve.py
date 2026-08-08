@@ -26,13 +26,40 @@ parts = {
 }
 
 cursor.execute(
-    "SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct FROM bom"
+    "SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty FROM bom"
 )
 bom = {}
-for parent, child, qty, scrap in cursor.fetchall():
+for parent, child, qty, scrap, setup_scrap in cursor.fetchall():
     if parent not in bom:
         bom[parent] = []
-    bom[parent].append((child, qty, scrap))
+    bom[parent].append((child, qty, scrap, setup_scrap))
+
+cursor.execute("SELECT workcenter_id, name, available_hours FROM workcenters")
+workcenters = {
+    row[0]: {
+        "name": row[1],
+        "available_hours": row[2],
+    }
+    for row in cursor.fetchall()
+}
+
+cursor.execute(
+    "SELECT parent_part_id, workcenter_id, setup_hours, run_hours_per_unit FROM routing"
+)
+routing = {}
+for parent, wc, setup_h, run_h in cursor.fetchall():
+    if parent not in routing:
+        routing[parent] = []
+    routing[parent].append((wc, setup_h, run_h))
+
+cursor.execute(
+    "SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes ORDER BY preference_rank ASC"
+)
+substitutes = {}
+for prim, sub, ratio, rank in cursor.fetchall():
+    if prim not in substitutes:
+        substitutes[prim] = []
+    substitutes[prim].append((sub, ratio, rank))
 
 cursor.execute(
     "SELECT order_id, product_part_id, requested_qty, priority FROM orders"
@@ -40,122 +67,215 @@ cursor.execute(
 orders_raw = cursor.fetchall()
 conn.close()
 
-# Identify leaf raw components (parts that never appear as a parent in bom)
 parents_set = set(bom.keys())
 leaf_parts = {part_id for part_id in parts if part_id not in parents_set}
 
-# Current remaining inventory pool for all parts
-inventory = {part_id: parts[part_id]["on_hand_qty"] for part_id in parts}
 
+def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
+    if target_units == 0:
+        return True, {}, {}, {}, {}, {}
 
-def get_requirements_for_units(product_id, target_units, inv_snapshot):
-    """Simulate top-down BOM explosion consuming pre-built sub-assembly stock
-    first and enforcing sub-assembly batch_size lot constraints."""
+    inv_snapshot = dict(current_inv)
+    wc_consumed = {w: 0.0 for w in workcenters}
+    inv_consumed = {p: 0 for p in parts}
+    sub_created = {p: 0 for p in parts}
+
     needed_parts = {product_id: target_units}
-    consumed_inv = {p: 0 for p in parts}
-    created_sub_stock = {p: 0 for p in parts}
+
+    gross_leaf_demand = {p: 0 for p in leaf_parts}
+    gross_wc_demand = {w: 0.0 for w in workcenters}
+
+    if product_id in routing:
+        for wc_id, setup_h, run_h in routing[product_id]:
+            req_h = setup_h + (target_units * run_h)
+            wc_consumed[wc_id] += req_h
+            gross_wc_demand[wc_id] += req_h
 
     while True:
         non_leaf_needed = {
-            p: q for p, q in needed_parts.items()
-            if p in bom and q > 0
+            p: q for p, q in needed_parts.items() if p in bom and q > 0
         }
         if not non_leaf_needed:
             break
 
         for parent_id, qty_needed in non_leaf_needed.items():
-            avail = inv_snapshot.get(parent_id, 0) - consumed_inv[parent_id]
-            use_prebuilt = min(avail, qty_needed)
-            consumed_inv[parent_id] += use_prebuilt
-            qty_to_explode = qty_needed - use_prebuilt
-
             del needed_parts[parent_id]
 
-            if qty_to_explode > 0:
-                bs = parts[parent_id]["batch_size"]
-                build_qty = math.ceil(qty_to_explode / bs) * bs
-                leftover = build_qty - qty_to_explode
-                created_sub_stock[parent_id] += leftover
+            avail_primary = inv_snapshot.get(parent_id, 0) - inv_consumed[parent_id]
+            use_primary = min(avail_primary, qty_needed)
+            inv_consumed[parent_id] += use_primary
+            rem_needed = qty_needed - use_primary
 
-                for child_id, qty_per, scrap_pct in bom.get(parent_id, []):
-                    gross_qty = math.ceil(
+            if rem_needed > 0 and parent_id in substitutes:
+                for sub_id, ratio, rank in substitutes[parent_id]:
+                    avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
+                    buildable = math.floor(avail_sub / ratio)
+                    use_sub_units = min(rem_needed, buildable)
+                    if use_sub_units > 0:
+                        sub_qty_consumed = use_sub_units * ratio
+                        inv_consumed[sub_id] += sub_qty_consumed
+                        rem_needed -= use_sub_units
+                    if rem_needed == 0:
+                        break
+
+            if rem_needed > 0:
+                bs = parts[parent_id]["batch_size"]
+                build_qty = math.ceil(rem_needed / bs) * bs
+                excess = build_qty - rem_needed
+                sub_created[parent_id] += excess
+
+                if parent_id in routing:
+                    for wc_id, setup_h, run_h in routing[parent_id]:
+                        req_h = setup_h + (build_qty * run_h)
+                        wc_consumed[wc_id] += req_h
+                        gross_wc_demand[wc_id] += req_h
+
+                for child_id, qty_per, scrap_pct, setup_scrap in bom.get(
+                    parent_id, []
+                ):
+                    gross_qty = setup_scrap + math.ceil(
                         build_qty * qty_per * (1.0 + scrap_pct / 100.0)
                     )
                     needed_parts[child_id] = (
                         needed_parts.get(child_id, 0) + gross_qty
                     )
 
-    # Check raw component sufficiency
-    for leaf_id, raw_qty in needed_parts.items():
-        avail = inv_snapshot.get(leaf_id, 0) - consumed_inv[leaf_id]
-        if avail < raw_qty:
-            return False, consumed_inv, created_sub_stock, needed_parts, leaf_id
+    for leaf_id, req_qty in needed_parts.items():
+        if req_qty > 0:
+            gross_leaf_demand[leaf_id] = gross_leaf_demand.get(leaf_id, 0) + req_qty
 
-    return True, consumed_inv, created_sub_stock, needed_parts, None
+    leaf_feasible = True
+    for leaf_id, req_qty in needed_parts.items():
+        if req_qty <= 0:
+            continue
+
+        rem_req = req_qty
+        avail_prim = inv_snapshot.get(leaf_id, 0) - inv_consumed[leaf_id]
+        use_prim = min(avail_prim, rem_req)
+        inv_consumed[leaf_id] += use_prim
+        rem_req -= use_prim
+
+        if rem_req > 0 and leaf_id in substitutes:
+            for sub_id, ratio, rank in substitutes[leaf_id]:
+                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
+                buildable = math.floor(avail_sub / ratio)
+                use_sub_units = min(rem_req, buildable)
+                if use_sub_units > 0:
+                    sub_qty_consumed = use_sub_units * ratio
+                    inv_consumed[sub_id] += sub_qty_consumed
+                    rem_req -= use_sub_units
+                if rem_req == 0:
+                    break
+
+        if rem_req > 0:
+            leaf_feasible = False
+
+    if not leaf_feasible:
+        return (
+            False,
+            inv_consumed,
+            sub_created,
+            wc_consumed,
+            gross_leaf_demand,
+            gross_wc_demand,
+        )
+
+    for wc_id, req_h in wc_consumed.items():
+        if req_h > current_wc_hours.get(wc_id, 0.0) + 1e-9:
+            return (
+                False,
+                inv_consumed,
+                sub_created,
+                wc_consumed,
+                gross_leaf_demand,
+                gross_wc_demand,
+            )
+
+    return (
+        True,
+        inv_consumed,
+        sub_created,
+        wc_consumed,
+        gross_leaf_demand,
+        gross_wc_demand,
+    )
 
 
-processed_orders = sorted(orders_raw, key=lambda x: (x[3], x[0]))
+curr_inv = {p: parts[p]["on_hand_qty"] for p in parts}
+curr_wc_hours = {w: workcenters[w]["available_hours"] for w in workcenters}
+
+sorted_orders = sorted(orders_raw, key=lambda x: (x[3], x[0]))
+
 results = []
-
-for order_id, product_id, requested_qty, priority in processed_orders:
-    batch_size = parts[product_id]["batch_size"]
-    max_batch_units = (requested_qty // batch_size) * batch_size
+for order_id, product_id, requested_qty, priority in sorted_orders:
+    bs = parts[product_id]["batch_size"]
+    max_units = (requested_qty // bs) * bs
 
     allocated_qty = 0
-    best_consumed = None
-    best_created = None
-    best_needed = None
-    limiting_component = None
+    best_inv_cons = None
+    best_sub_created = None
+    best_wc_cons = None
 
-    for u in range(max_batch_units, -1, -batch_size):
-        possible, cons, created, needed, bottleneck = (
-            get_requirements_for_units(product_id, u, inventory)
+    for u in range(max_units, -1, -bs):
+        possible, inv_cons, sub_created, wc_cons, _, _ = simulate_explosion(
+            product_id, u, curr_inv, curr_wc_hours
         )
         if possible:
             allocated_qty = u
-            best_consumed = cons
-            best_created = created
-            best_needed = needed
+            best_inv_cons = inv_cons
+            best_sub_created = sub_created
+            best_wc_cons = wc_cons
             break
 
     shortfall_qty = requested_qty - allocated_qty
+    limiting_resource = None
 
     if shortfall_qty > 0:
-        next_target = allocated_qty + batch_size
-        _, _, _, needed_next, _ = get_requirements_for_units(
-            product_id, next_target, inventory
+        next_target = allocated_qty + bs
+        _, _, _, _, leaf_req, wc_req = simulate_explosion(
+            product_id, next_target, curr_inv, curr_wc_hours
         )
 
         ratios = []
+
         for leaf_id in leaf_parts:
-            req = needed_next.get(leaf_id, 0)
-            avail = inventory.get(leaf_id, 0)
+            req = leaf_req.get(leaf_id, 0)
             if req > 0:
-                ratio = avail / req
-                ratios.append((ratio, leaf_id))
+                eff_avail = curr_inv.get(leaf_id, 0)
+                if leaf_id in substitutes:
+                    for sub_id, ratio, rank in substitutes[leaf_id]:
+                        eff_avail += math.floor(curr_inv.get(sub_id, 0) / ratio)
+                ratio_val = eff_avail / req
+                ratios.append((ratio_val, leaf_id))
 
-        if ratios:
-            ratios.sort(key=lambda x: (x[0], x[1]))
-            limiting_component = ratios[0][1]
+        for wc_id in workcenters:
+            req_h = wc_req.get(wc_id, 0.0)
+            if req_h > 0:
+                avail_h = curr_wc_hours.get(wc_id, 0.0)
+                ratio_val = avail_h / req_h
+                ratios.append((ratio_val, wc_id))
 
-    if best_consumed:
-        for p, qty in best_consumed.items():
-            inventory[p] -= qty
+        constrained_ratios = [r for r in ratios if r[0] < 1.0 - 1e-9]
+        if constrained_ratios:
+            constrained_ratios.sort(key=lambda x: (x[0], x[1]))
+            limiting_resource = constrained_ratios[0][1]
 
-    if best_created:
-        for p, qty in best_created.items():
-            inventory[p] += qty
-
-    if best_needed:
-        for p, qty in best_needed.items():
-            inventory[p] -= qty
+    if best_inv_cons:
+        for p, q in best_inv_cons.items():
+            curr_inv[p] -= q
+    if best_sub_created:
+        for p, q in best_sub_created.items():
+            curr_inv[p] += q
+    if best_wc_cons:
+        for w, h in best_wc_cons.items():
+            curr_wc_hours[w] -= h
 
     results.append(
         {
             "order_id": order_id,
             "allocated_qty": allocated_qty,
             "shortfall_qty": shortfall_qty,
-            "limiting_component": limiting_component,
+            "limiting_resource": limiting_resource,
         }
     )
 
