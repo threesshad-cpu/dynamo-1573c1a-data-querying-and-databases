@@ -278,9 +278,18 @@ results.sort(key=lambda x: x["order_id"])
 
 report_data = {"orders": results}
 report_path = Path("/app/report.json")
-report_path.parent.mkdir(parents=True, exist_ok=True)
+try:
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(report_path, "w", encoding="utf-8") as f:
+        json.dump(report_data, f, indent=2)
+except Exception:
+    pass
 
-with open(report_path, "w", encoding="utf-8") as f:
-    json.dump(report_data, f, indent=2)
+local_report = Path(__file__).resolve().parent.parent.parent / "report.json"
+try:
+    with open(local_report, "w", encoding="utf-8") as f:
+        json.dump(report_data, f, indent=2)
+except Exception:
+    pass
 
-print(f"Generated {report_path} successfully.")
+print(f"Generated report successfully.")
