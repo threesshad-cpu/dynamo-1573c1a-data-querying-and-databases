@@ -177,11 +177,11 @@ def create_database(db_path: Path):
 
 
 if __name__ == "__main__":
-    db_path = Path("/app/manufacturing.db")
+    app_db = Path("/app/manufacturing.db")
     try:
-        create_database(db_path)
+        create_database(app_db)
     except Exception:
-        pkg_data = Path(__file__).resolve().parent.parent / "data"
-        fallback = pkg_data / "manufacturing.db"
-        print(f"Fallback to {fallback}")
-        create_database(fallback)
+        pass
+
+    local_db = Path(__file__).resolve().parent.parent / "data" / "manufacturing.db"
+    create_database(local_db)
