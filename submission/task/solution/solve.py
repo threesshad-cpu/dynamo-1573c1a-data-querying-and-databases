@@ -85,11 +85,6 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
     gross_leaf_demand = {p: 0 for p in leaf_parts}
     gross_wc_demand = {w: 0.0 for w in workcenters}
 
-    if product_id in routing:
-        for wc_id, setup_h, run_h in routing[product_id]:
-            req_h = setup_h + (target_units * run_h)
-            wc_consumed[wc_id] += req_h
-            gross_wc_demand[wc_id] += req_h
 
     while True:
         non_leaf_needed = {
