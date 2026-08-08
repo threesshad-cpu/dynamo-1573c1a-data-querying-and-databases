@@ -1,18 +1,32 @@
-You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system with the following tables:
-- `parts(part_id, name, on_hand_qty, batch_size)`: Inventory stock for raw components, sub-assemblies, and products (`on_hand_qty >= 0`), and minimum build lot size constraint (`batch_size`).
-- `bom(parent_part_id, child_part_id, qty_per, scrap_rate_pct)`: Component graph per parent unit with scrap/yield loss percentage (`scrap_rate_pct`). Gross child requirement for $U$ parent units is $\lceil U \times \text{qty\_per} \times (1 + \text{scrap\_rate\_pct}/100) \rceil$.
-- `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for products.
+You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system with routing, workcenter capacity, setup scrap, and substitute part rules across the following tables:
 
-Perform a multi-level BOM explosion and simulate sequential shared-inventory allocation across production orders in ascending `priority` order (ties broken by `order_id` ascending):
+- `parts(part_id, name, on_hand_qty, batch_size)`: Inventory stock for raw leaf components, sub-assemblies, and finished products (`on_hand_qty >= 0`), and minimum build lot size constraint (`batch_size`).
+- `bom(parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty)`: Component graph per parent unit. When building $U$ units of parent part, the gross child requirement is:
+  $\text{gross\_qty} = \text{setup\_scrap\_qty} + \lceil U \times \text{qty\_per} \times (1 + \text{scrap\_rate\_pct}/100) \rceil$.
+- `workcenters(workcenter_id, name, available_hours)`: Finite capacity pool of available labor/machine hours (`available_hours >= 0`).
+- `routing(parent_part_id, workcenter_id, setup_hours, run_hours_per_unit)`: Workcenter hours required to build parent parts. Building $U > 0$ units of `parent_part_id` incurs $\text{setup\_hours} + (U \times \text{run\_hours\_per\_unit})$ hours on `workcenter_id`.
+- `substitutes(primary_part_id, substitute_part_id, qty_ratio, preference_rank)`: Substitute parts that can replace `primary_part_id` if primary stock on hand is insufficient. 1 unit of `primary_part_id` requires `qty_ratio` units of `substitute_part_id`. Lower `preference_rank` is used first. Primary stock on hand is always consumed before any substitutes.
+- `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for finished products.
 
-- Consume pre-built sub-assembly stock on hand first before exploding net sub-assembly requirements into child components.
-- Sub-assemblies and products must be produced in integer multiples of their respective `batch_size` (lot size). When exploding a net sub-assembly requirement $N > 0$, the build quantity is rounded up: $\text{build\_qty} = \lceil N / \text{batch\_size} \rceil \times \text{batch\_size}$. Gross child requirements are computed from $\text{build\_qty}$, and any excess sub-assemblies produced $(\text{build\_qty} - N)$ enter on-hand inventory for subsequent orders.
-- Allocate `allocated_qty` as the maximum units buildable up to `requested_qty` subject to product `batch_size` lot constraints (`allocated_qty` must be a multiple of `batch_size`).
-- Compute `shortfall_qty` = `requested_qty - allocated_qty`.
-- If `shortfall_qty > 0`, set `limiting_component` to the raw leaf component restricting allocation for the next batch increment of product `batch_size` units (evaluated by running the same stock-aware BOM explosion for `allocated_qty + batch_size` total product units from the current order's initial inventory state). Select the raw leaf component $L$ with the smallest remaining inventory ratio $\frac{\text{inventory}[L]}{\text{gross\_required}[L]}$, where $\text{gross\_required}[L]$ is the net raw-leaf demand computed by that explosion. Break ties by ASCII-smallest `part_id`. If `shortfall_qty == 0`, set `limiting_component` to `null`.
-- Deduct consumed sub-assemblies and raw components from the shared inventory pool (and credit excess sub-assemblies produced) after fulfilling each order.
+Perform a multi-level BOM explosion with routing and substitute stock allocation sequentially across production orders in ascending `priority` order (ties broken by `order_id` ascending):
+
+1. **Stock & Substitute Consumption**:
+   - For sub-assemblies and raw components, consume available primary stock on hand first before exploding net requirements into child components or using substitute part stock.
+   - If pre-built primary stock of component $X$ is insufficient for required quantity $Q$, check substitute parts $S$ in ascending `preference_rank`. Up to $\lfloor \text{avail}[S] / \text{qty\_ratio} \rfloor$ units of primary demand $X$ can be satisfied using substitute stock $S$ (deducting $\text{units\_satisfied} \times \text{qty\_ratio}$ from $S$'s stock).
+2. **Manufacturing Lot Sizing & Routing**:
+   - Sub-assemblies and products must be built in integer multiples of their respective `batch_size`. When exploding a net sub-assembly requirement $N > 0$, the build quantity is rounded up: $\text{build\_qty} = \lceil N / \text{batch\_size} \rceil \times \text{batch\_size}$. Gross child requirements use $\text{build\_qty}$, and any excess sub-assemblies $(\text{build\_qty} - N)$ enter on-hand inventory for subsequent orders.
+   - Manufacturing $\text{build\_qty}$ of parent $X$ consumes $\text{setup\_hours} + (\text{build\_qty} \times \text{run\_hours\_per\_unit})$ from the shared `available_hours` pool of each mapped workcenter in `routing`. Routing setup hours are also incurred when manufacturing finished products.
+3. **Order Allocation**:
+   - Allocate `allocated_qty` as the maximum units buildable up to `requested_qty` subject to product `batch_size` lot constraints (`allocated_qty` must be a multiple of `batch_size` and cannot exceed available raw materials, substitute stocks, or workcenter capacity).
+   - Compute `shortfall_qty` = `requested_qty - allocated_qty`.
+   - If `shortfall_qty > 0`, set `limiting_resource` to the resource ID (`part_id` or `workcenter_id`) restricting allocation for the next batch increment (`allocated_qty + batch_size` total product units from the order's initial state).
+     - Evaluate fulfillment ratio $\text{ratio}[R] = \frac{\text{available}[R]}{\text{required}[R]}$ for all required candidate leaf components and workcenters.
+     - For raw leaf component $L$, effective available stock is $\text{avail}[L] + \sum_S \lfloor \text{avail}[S] / \text{qty\_ratio} \rfloor$.
+     - For workcenter $W$, ratio is $\frac{\text{available\_hours}[W]}{\text{required\_hours}[W]}$.
+     - Select the candidate resource $R$ with ratio $< 1.0$ having the smallest ratio. Break ties by ASCII-smallest resource ID (e.g. `"L1"` < `"WC1"`). If `shortfall_qty == 0`, set `limiting_resource` to `null`.
+4. **Pool Update**: Deduct consumed inventory (primary and substitute) and workcenter hours (and credit excess sub-assemblies created) after fulfilling each order.
 
 Write the final result to `/app/report.json` with the schema:
-`{"orders": [{"order_id": str, "allocated_qty": int, "shortfall_qty": int, "limiting_component": str|null}, ...]}`
+`{"orders": [{"order_id": str, "allocated_qty": int, "shortfall_qty": int, "limiting_resource": str|null}, ...]}`
 
 Sort the `orders` array in `/app/report.json` by `order_id` ascending.
