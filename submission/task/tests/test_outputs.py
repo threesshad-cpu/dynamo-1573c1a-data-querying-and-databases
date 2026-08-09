@@ -76,11 +76,11 @@ def test_order_O02_allocation():
 
 
 def test_order_O03_allocation():
-    """Verify O03 allocation (P3 x 15, batch=2): Restricted by assembly line WC2 capacity. alloc=2, sf=13, limiting=WC2."""
+    """Verify O03 allocation (P3 x 15, batch=2): Tied minimum fulfillment ratio (0.50) between L5 and WC2, tie-broken by ASCII order to L5. alloc=2, sf=13, limiting=L5."""
     m = _get_orders_map()
     assert m["O03"]["allocated_qty"] == 2
     assert m["O03"]["shortfall_qty"] == 13
-    assert m["O03"]["limiting_resource"] == "WC2"
+    assert m["O03"]["limiting_resource"] == "L5"
 
 
 def test_order_O04_allocation():
@@ -100,11 +100,11 @@ def test_order_O05_allocation():
 
 
 def test_order_O06_allocation():
-    """Verify O06 allocation (P3 x 25, batch=2): Restricted by assembly line WC2 capacity. alloc=0, sf=25, limiting=WC2."""
+    """Verify O06 allocation (P3 x 25, batch=2): Restricted by Circuit-Board L5 inventory. alloc=0, sf=25, limiting=L5."""
     m = _get_orders_map()
     assert m["O06"]["allocated_qty"] == 0
     assert m["O06"]["shortfall_qty"] == 25
-    assert m["O06"]["limiting_resource"] == "WC2"
+    assert m["O06"]["limiting_resource"] == "L5"
 
 
 def test_order_O07_allocation():

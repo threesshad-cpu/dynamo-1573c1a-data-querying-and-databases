@@ -7,7 +7,7 @@ parts_data = [
     ("L2", "Bolt-M6", 300, 1),
     ("L3", "Steel-Plate", 95, 1),
     ("L4", "Rubber-Gasket", 150, 1),
-    ("L5", "Circuit-Board", 31, 1),
+    ("L5", "Circuit-Board", 26, 1),
     ("L6", "Wire-Harness", 58, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
@@ -50,7 +50,7 @@ bom_data = [
 
 workcenters_data = [
     ("WC1", "Stamping-Press", 50.0),
-    ("WC2", "Assembly-Line", 23.0),
+    ("WC2", "Assembly-Line", 23.05),
     ("WC3", "Testing-Station", 18.0),
 ]
 
