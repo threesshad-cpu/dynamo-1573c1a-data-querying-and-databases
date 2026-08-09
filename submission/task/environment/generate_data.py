@@ -180,7 +180,7 @@ if __name__ == "__main__":
     app_db = Path("/app/manufacturing.db")
     try:
         create_database(app_db)
-    except Exception:
+    except (PermissionError, OSError):
         pass
 
     local_db = Path(__file__).resolve().parent.parent / "data" / "manufacturing.db"

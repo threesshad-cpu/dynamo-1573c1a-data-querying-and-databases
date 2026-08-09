@@ -87,53 +87,66 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
 
 
     while True:
-        non_leaf_needed = {
+        active_parents = {
             p: q for p, q in needed_parts.items() if p in bom and q > 0
         }
-        if not non_leaf_needed:
+        if not active_parents:
             break
 
-        for parent_id, qty_needed in non_leaf_needed.items():
-            del needed_parts[parent_id]
+        top_level = []
+        for p in active_parents:
+            has_parent = False
+            for other_p in active_parents:
+                if other_p == p:
+                    continue
+                children_of_other = [c[0] for c in bom.get(other_p, [])]
+                if p in children_of_other:
+                    has_parent = True
+                    break
+            if not has_parent:
+                top_level.append(p)
 
-            avail_primary = inv_snapshot.get(parent_id, 0) - inv_consumed[parent_id]
-            use_primary = min(avail_primary, qty_needed)
-            inv_consumed[parent_id] += use_primary
-            rem_needed = qty_needed - use_primary
+        parent_id = sorted(top_level)[0]
+        qty_needed = needed_parts.pop(parent_id)
 
-            if rem_needed > 0 and parent_id in substitutes:
-                for sub_id, ratio, rank in substitutes[parent_id]:
-                    avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
-                    buildable = math.floor(avail_sub / ratio)
-                    use_sub_units = min(rem_needed, buildable)
-                    if use_sub_units > 0:
-                        sub_qty_consumed = use_sub_units * ratio
-                        inv_consumed[sub_id] += sub_qty_consumed
-                        rem_needed -= use_sub_units
-                    if rem_needed == 0:
-                        break
+        avail_primary = inv_snapshot.get(parent_id, 0) - inv_consumed[parent_id]
+        use_primary = min(avail_primary, qty_needed)
+        inv_consumed[parent_id] += use_primary
+        rem_needed = qty_needed - use_primary
 
-            if rem_needed > 0:
-                bs = parts[parent_id]["batch_size"]
-                build_qty = math.ceil(rem_needed / bs) * bs
-                excess = build_qty - rem_needed
-                sub_created[parent_id] += excess
+        if rem_needed > 0 and parent_id in substitutes:
+            for sub_id, ratio, rank in substitutes[parent_id]:
+                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
+                buildable = math.floor(avail_sub / ratio)
+                use_sub_units = min(rem_needed, buildable)
+                if use_sub_units > 0:
+                    sub_qty_consumed = use_sub_units * ratio
+                    inv_consumed[sub_id] += sub_qty_consumed
+                    rem_needed -= use_sub_units
+                if rem_needed == 0:
+                    break
 
-                if parent_id in routing:
-                    for wc_id, setup_h, run_h in routing[parent_id]:
-                        req_h = setup_h + (build_qty * run_h)
-                        wc_consumed[wc_id] += req_h
-                        gross_wc_demand[wc_id] += req_h
+        if rem_needed > 0:
+            bs = parts[parent_id]["batch_size"]
+            build_qty = math.ceil(rem_needed / bs) * bs
+            excess = build_qty - rem_needed
+            sub_created[parent_id] += excess
 
-                for child_id, qty_per, scrap_pct, setup_scrap in bom.get(
-                    parent_id, []
-                ):
-                    gross_qty = setup_scrap + math.ceil(
-                        build_qty * qty_per * (1.0 + scrap_pct / 100.0)
-                    )
-                    needed_parts[child_id] = (
-                        needed_parts.get(child_id, 0) + gross_qty
-                    )
+            if parent_id in routing:
+                for wc_id, setup_h, run_h in routing[parent_id]:
+                    req_h = setup_h + (build_qty * run_h)
+                    wc_consumed[wc_id] += req_h
+                    gross_wc_demand[wc_id] += req_h
+
+            for child_id, qty_per, scrap_pct, setup_scrap in bom.get(
+                parent_id, []
+            ):
+                gross_qty = setup_scrap + math.ceil(
+                    build_qty * qty_per * (1.0 + scrap_pct / 100.0)
+                )
+                needed_parts[child_id] = (
+                    needed_parts.get(child_id, 0) + gross_qty
+                )
 
     for leaf_id, req_qty in needed_parts.items():
         if req_qty > 0:
@@ -277,19 +290,24 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
 results.sort(key=lambda x: x["order_id"])
 
 report_data = {"orders": results}
-report_path = Path("/app/report.json")
-try:
-    report_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(report_path, "w", encoding="utf-8") as f:
-        json.dump(report_data, f, indent=2)
-except Exception:
-    pass
+written_file = None
+for report_path in [
+    Path("/app/report.json"),
+    Path(__file__).resolve().parent.parent.parent / "report.json",
+]:
+    try:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(report_path, "w", encoding="utf-8") as f:
+            json.dump(report_data, f, indent=2)
+        if report_path.exists() and report_path.is_file():
+            written_file = report_path
+            break
+    except (PermissionError, OSError):
+        continue
 
-local_report = Path(__file__).resolve().parent.parent.parent / "report.json"
-try:
-    with open(local_report, "w", encoding="utf-8") as f:
-        json.dump(report_data, f, indent=2)
-except Exception:
-    pass
+if not written_file:
+    raise RuntimeError(
+        "Failed to generate report.json at /app/report.json or local fallback"
+    )
 
-print(f"Generated report successfully.")
+print(f"Generated report successfully at {written_file}.")
