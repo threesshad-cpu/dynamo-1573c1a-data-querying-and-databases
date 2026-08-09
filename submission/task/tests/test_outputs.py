@@ -1,14 +1,7 @@
 import json
 import os
 
-REPORT_PATH = "/app/report.json"
-if not os.path.exists(REPORT_PATH):
-    local_fallback = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        "report.json",
-    )
-    if os.path.exists(local_fallback):
-        REPORT_PATH = local_fallback
+REPORT_PATH = os.environ.get("TEST_REPORT_PATH", "/app/report.json")
 
 
 def test_file_exists_and_not_symlink():
