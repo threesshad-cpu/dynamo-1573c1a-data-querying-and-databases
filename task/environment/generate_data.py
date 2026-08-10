@@ -1,3 +1,7 @@
+
+
+
+
 import sqlite3
 from pathlib import Path
 
@@ -84,7 +88,9 @@ orders_data = [
     ("O05", "P4", 5, 5),
     ("O06", "P1", 25, 6),
     ("O07", "P3", 10, 7),
+    ("O08", "P2", 16, 8),
 ]
+
 
 
 
