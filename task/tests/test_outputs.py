@@ -61,15 +61,15 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): Assembly line WC2 available hours (23.05) restrict build to 25 units. alloc=25, sf=5, limiting=WC2."""
+    """Verify O02 allocation (P1 x 30, batch=5): L5 primary (12) + SUB_L5 substitute (floor(20/2.0)=10) gives effective L5 supply of 22, restricting build to 20 units. alloc=20, sf=10, limiting=L5."""
     m = _get_orders_map()
-    assert m["O02"]["allocated_qty"] == 25
-    assert m["O02"]["shortfall_qty"] == 5
-    assert m["O02"]["limiting_resource"] == "WC2"
+    assert m["O02"]["allocated_qty"] == 20
+    assert m["O02"]["shortfall_qty"] == 10
+    assert m["O02"]["limiting_resource"] == "L5"
 
 
 def test_order_O03_allocation():
-    """Verify O03 allocation (P3 x 15, batch=2): Tied minimum fulfillment ratio (0.50) between L5 and WC2, tie-broken by ASCII order to L5. alloc=2, sf=13, limiting=L5."""
+    """Verify O03 allocation (P3 x 15, batch=2): After O02 depletes L5+SUB_L5 pool. alloc=2, sf=13, limiting=L5."""
     m = _get_orders_map()
     assert m["O03"]["allocated_qty"] == 2
     assert m["O03"]["shortfall_qty"] == 13
@@ -85,11 +85,11 @@ def test_order_O04_allocation():
 
 
 def test_order_O05_allocation():
-    """Verify O05 allocation (P4 x 5, batch=3): Dual-workcenter routing on WC1+WC3 both exceed capacity equally. Tied minimum fulfillment ratio (0.50) between WC1 and WC3, tie-broken by ASCII order to WC1. alloc=0, sf=5, limiting=WC1."""
+    """Verify O05 allocation (P4 x 5, batch=3): Dual-workcenter routing on WC1+WC3 after prior WC consumption. alloc=0, sf=5, limiting=WC3."""
     m = _get_orders_map()
     assert m["O05"]["allocated_qty"] == 0
     assert m["O05"]["shortfall_qty"] == 5
-    assert m["O05"]["limiting_resource"] == "WC1"
+    assert m["O05"]["limiting_resource"] == "WC3"
 
 
 def test_order_O06_allocation():
@@ -98,4 +98,3 @@ def test_order_O06_allocation():
     assert m["O06"]["allocated_qty"] == 0
     assert m["O06"]["shortfall_qty"] == 8
     assert m["O06"]["limiting_resource"] == "L5"
-

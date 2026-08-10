@@ -11,12 +11,13 @@ parts_data = [
     ("L2", "Bolt-M6", 300, 1),
     ("L3", "Steel-Plate", 95, 1),
     ("L4", "Rubber-Gasket", 150, 1),
-    ("L5", "Circuit-Board", 26, 1),
+    ("L5", "Circuit-Board", 12, 1),
     ("L6", "Wire-Harness", 58, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
     ("SUB_L3", "Alloy-Plate", 30, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
     ("SUB_L6", "Flex-Cable", 10, 1),      # Substitute for L6 (ratio 1.0: 1 L6 needs 1 SUB_L6)
+    ("SUB_L5", "Alt-Board", 20, 1),       # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
 
     # Sub-assemblies
     ("SA1", "Bracket-Assembly", 4, 5),
@@ -78,7 +79,9 @@ substitutes_data = [
     # primary_part_id, substitute_part_id, qty_ratio, preference_rank
     ("L3", "SUB_L3", 2.0, 1),
     ("L6", "SUB_L6", 1.0, 1),
+    ("L5", "SUB_L5", 2.0, 1),
 ]
+
 
 orders_data = [
     ("O01", "P2", 14, 1),
