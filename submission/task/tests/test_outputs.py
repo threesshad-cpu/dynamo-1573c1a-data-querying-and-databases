@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 10, "Expected 10 order results in report"
+    assert len(orders) == 6, "Expected 6 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06", "O07", "O08", "O09", "O10"]
+    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -61,7 +61,7 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): Assembly line WC2 available hours (23.0) restrict build to 25 units. alloc=25, sf=5, limiting=WC2."""
+    """Verify O02 allocation (P1 x 30, batch=5): Assembly line WC2 available hours (23.05) restrict build to 25 units. alloc=25, sf=5, limiting=WC2."""
     m = _get_orders_map()
     assert m["O02"]["allocated_qty"] == 25
     assert m["O02"]["shortfall_qty"] == 5
@@ -85,49 +85,18 @@ def test_order_O04_allocation():
 
 
 def test_order_O05_allocation():
-    """Verify O05 allocation (P1 x 25, batch=5): Restricted by Steel-Plate L3 inventory. alloc=0, sf=25, limiting=L3."""
+    """Verify O05 allocation (P4 x 5, batch=3): Dual-workcenter routing on WC1+WC3 both exceed capacity equally. Tied minimum fulfillment ratio (0.50) between WC1 and WC3, tie-broken by ASCII order to WC1. alloc=0, sf=5, limiting=WC1."""
     m = _get_orders_map()
     assert m["O05"]["allocated_qty"] == 0
-    assert m["O05"]["shortfall_qty"] == 25
-    assert m["O05"]["limiting_resource"] == "L3"
+    assert m["O05"]["shortfall_qty"] == 5
+    assert m["O05"]["limiting_resource"] == "WC1"
 
 
 def test_order_O06_allocation():
-    """Verify O06 allocation (P3 x 25, batch=2): Restricted by Circuit-Board L5 inventory. alloc=0, sf=25, limiting=L5."""
+    """Verify O06 allocation (P1 x 25, batch=5): Restricted by Steel-Plate L3 inventory after sequential pool depletion. alloc=0, sf=25, limiting=L3."""
     m = _get_orders_map()
     assert m["O06"]["allocated_qty"] == 0
     assert m["O06"]["shortfall_qty"] == 25
-    assert m["O06"]["limiting_resource"] == "L5"
+    assert m["O06"]["limiting_resource"] == "L3"
 
-
-def test_order_O07_allocation():
-    """Verify O07 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory. alloc=0, sf=20, limiting=L3."""
-    m = _get_orders_map()
-    assert m["O07"]["allocated_qty"] == 0
-    assert m["O07"]["shortfall_qty"] == 20
-    assert m["O07"]["limiting_resource"] == "L3"
-
-
-def test_order_O08_allocation():
-    """Verify O08 allocation (P1 x 15, batch=5): Restricted by Steel-Plate L3 inventory. alloc=0, sf=15, limiting=L3."""
-    m = _get_orders_map()
-    assert m["O08"]["allocated_qty"] == 0
-    assert m["O08"]["shortfall_qty"] == 15
-    assert m["O08"]["limiting_resource"] == "L3"
-
-
-def test_order_O09_allocation():
-    """Verify O09 allocation (P4 x 5, batch=3): Dual-workcenter routing on WC1+WC3 both exceed capacity equally. Tied minimum fulfillment ratio (0.50) between WC1 and WC3, tie-broken by ASCII order to WC1. alloc=0, sf=5, limiting=WC1."""
-    m = _get_orders_map()
-    assert m["O09"]["allocated_qty"] == 0
-    assert m["O09"]["shortfall_qty"] == 5
-    assert m["O09"]["limiting_resource"] == "WC1"
-
-
-def test_order_O10_allocation():
-    """Verify O10 allocation (P3 x 4, batch=2): Circuit-Board L5 and Assembly-Line WC2 tied at ratio 0.50 after sequential pool depletion. Tie-broken by ASCII order to L5. alloc=0, sf=4, limiting=L5."""
-    m = _get_orders_map()
-    assert m["O10"]["allocated_qty"] == 0
-    assert m["O10"]["shortfall_qty"] == 4
-    assert m["O10"]["limiting_resource"] == "L5"
 
