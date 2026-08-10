@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 6, "Expected 6 order results in report"
+    assert len(orders) == 7, "Expected 7 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06", "O07"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -98,5 +98,14 @@ def test_order_O06_allocation():
     assert m["O06"]["allocated_qty"] == 0
     assert m["O06"]["shortfall_qty"] == 25
     assert m["O06"]["limiting_resource"] == "L3"
+
+
+def test_order_O07_allocation():
+    """Verify O07 allocation (P3 x 10, batch=2): Restricted by Circuit-Board L5 inventory after sequential pool depletion. alloc=0, sf=10, limiting=L5."""
+    m = _get_orders_map()
+    assert m["O07"]["allocated_qty"] == 0
+    assert m["O07"]["shortfall_qty"] == 10
+    assert m["O07"]["limiting_resource"] == "L5"
+
 
 
