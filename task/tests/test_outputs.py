@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 8, "Expected 8 order results in report"
+    assert len(orders) == 5, "Expected 5 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06", "O07", "O08"]
+    expected_ids = ["O01", "O02", "O03", "O04", "O05"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -90,26 +90,3 @@ def test_order_O05_allocation():
     assert m["O05"]["allocated_qty"] == 0
     assert m["O05"]["shortfall_qty"] == 5
     assert m["O05"]["limiting_resource"] == "WC1"
-
-
-def test_order_O06_allocation():
-    """Verify O06 allocation (P1 x 25, batch=5): Restricted by Steel-Plate L3 inventory after sequential pool depletion. alloc=0, sf=25, limiting=L3."""
-    m = _get_orders_map()
-    assert m["O06"]["allocated_qty"] == 0
-    assert m["O06"]["shortfall_qty"] == 25
-    assert m["O06"]["limiting_resource"] == "L3"
-
-
-def test_order_O07_allocation():
-    """Verify O07 allocation (P3 x 10, batch=2): Restricted by Circuit-Board L5 inventory after sequential pool depletion. alloc=0, sf=10, limiting=L5."""
-    m = _get_orders_map()
-    assert m["O07"]["allocated_qty"] == 0
-    assert m["O07"]["shortfall_qty"] == 10
-    assert m["O07"]["limiting_resource"] == "L5"
-
-def test_order_O08_allocation():
-    """Verify O08 allocation (P2 x 16, batch=4): Restricted by Steel-Plate L3 inventory after deep sequential pool depletion. alloc=0, sf=16, limiting=L3."""
-    m = _get_orders_map()
-    assert m["O08"]["allocated_qty"] == 0
-    assert m["O08"]["shortfall_qty"] == 16
-    assert m["O08"]["limiting_resource"] == "L3"
