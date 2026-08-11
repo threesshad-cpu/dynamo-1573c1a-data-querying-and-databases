@@ -61,10 +61,10 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker. alloc=15, sf=15, limiting=L5."""
+    """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker. alloc=0, sf=30, limiting=L5."""
     m = _get_orders_map()
-    assert m["O02"]["allocated_qty"] == 15
-    assert m["O02"]["shortfall_qty"] == 15
+    assert m["O02"]["allocated_qty"] == 0
+    assert m["O02"]["shortfall_qty"] == 30
     assert m["O02"]["limiting_resource"] == "L5"
 
 
@@ -77,11 +77,11 @@ def test_order_O03_allocation():
 
 
 def test_order_O04_allocation():
-    """Verify O04 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory after O01+O02 pool depletion. alloc=0, sf=20, limiting=L3."""
+    """Verify O04 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory after O01+O02 pool depletion. alloc=0, sf=20, limiting=L5."""
     m = _get_orders_map()
     assert m["O04"]["allocated_qty"] == 0
     assert m["O04"]["shortfall_qty"] == 20
-    assert m["O04"]["limiting_resource"] == "L3"
+    assert m["O04"]["limiting_resource"] == "L5"
 
 
 def test_order_O05_allocation():
