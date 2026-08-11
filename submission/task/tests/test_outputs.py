@@ -61,26 +61,26 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): L5 primary (12) + SUB_L5 substitute (floor(20/2.0)=10) gives effective L5 supply of 22, restricting build to 20 units. alloc=20, sf=10, limiting=L5."""
+    """Verify O02 allocation (P1 x 30, batch=5): Multi-level BOM with leftover SA1 subassembly inventory credit from O01. alloc=25, sf=5, limiting=L3."""
     m = _get_orders_map()
-    assert m["O02"]["allocated_qty"] == 20
-    assert m["O02"]["shortfall_qty"] == 10
-    assert m["O02"]["limiting_resource"] == "L5"
+    assert m["O02"]["allocated_qty"] == 25
+    assert m["O02"]["shortfall_qty"] == 5
+    assert m["O02"]["limiting_resource"] == "L3"
 
 
 def test_order_O03_allocation():
-    """Verify O03 allocation (P3 x 15, batch=2): After O02 depletes L5+SUB_L5 pool. alloc=2, sf=13, limiting=L5."""
+    """Verify O03 allocation (P3 x 15, batch=2): After O02 product-level routing depletes WC2 capacity. alloc=2, sf=13, limiting=WC2."""
     m = _get_orders_map()
     assert m["O03"]["allocated_qty"] == 2
     assert m["O03"]["shortfall_qty"] == 13
-    assert m["O03"]["limiting_resource"] == "L5"
+    assert m["O03"]["limiting_resource"] == "WC2"
 
 
 def test_order_O04_allocation():
-    """Verify O04 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory. alloc=4, sf=16, limiting=L3."""
+    """Verify O04 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory after O01+O02 pool depletion. alloc=0, sf=20, limiting=L3."""
     m = _get_orders_map()
-    assert m["O04"]["allocated_qty"] == 4
-    assert m["O04"]["shortfall_qty"] == 16
+    assert m["O04"]["allocated_qty"] == 0
+    assert m["O04"]["shortfall_qty"] == 20
     assert m["O04"]["limiting_resource"] == "L3"
 
 
@@ -93,8 +93,8 @@ def test_order_O05_allocation():
 
 
 def test_order_O06_allocation():
-    """Verify O06 allocation (P3 x 8, batch=2): Restricted by Circuit-Board L5 inventory after sequential pool depletion. alloc=0, sf=8, limiting=L5."""
+    """Verify O06 allocation (P3 x 8, batch=2): Restricted by WC2 capacity after sequential pool depletion. alloc=0, sf=8, limiting=WC2."""
     m = _get_orders_map()
     assert m["O06"]["allocated_qty"] == 0
     assert m["O06"]["shortfall_qty"] == 8
-    assert m["O06"]["limiting_resource"] == "L5"
+    assert m["O06"]["limiting_resource"] == "WC2"

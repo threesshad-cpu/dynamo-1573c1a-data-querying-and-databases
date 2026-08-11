@@ -9,18 +9,18 @@ parts_data = [
     # Leaf raw materials
     ("L1", "Bolt-M4", 350, 1),
     ("L2", "Bolt-M6", 300, 1),
-    ("L3", "Steel-Plate", 95, 1),
+    ("L3", "Steel-Plate", 55, 1),
     ("L4", "Rubber-Gasket", 150, 1),
     ("L5", "Circuit-Board", 12, 1),
     ("L6", "Wire-Harness", 58, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
-    ("SUB_L3", "Alloy-Plate", 30, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
+    ("SUB_L3", "Alloy-Plate", 20, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
     ("SUB_L6", "Flex-Cable", 10, 1),      # Substitute for L6 (ratio 1.0: 1 L6 needs 1 SUB_L6)
-    ("SUB_L5", "Alt-Board", 20, 1),       # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
+    ("SUB_L5", "Alt-Board", 32, 1),       # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
 
     # Sub-assemblies
-    ("SA1", "Bracket-Assembly", 4, 5),
+    ("SA1", "Bracket-Assembly", 2, 4),
     ("SA2", "Sensor-Module", 2, 4),
     ("SA3", "Base-Frame", 0, 6),
     ("SA4", "Control-Panel", 2, 5),
@@ -44,7 +44,7 @@ bom_data = [
     ("SA3", "L4", 4, 2.5, 0),
     ("SA4", "SA2", 1, 0.0, 0),
     ("SA4", "L7", 1, 0.0, 0),
-    ("P1", "SA1", 2, 0.0, 0),
+    ("P1", "SA1", 1, 0.0, 0),
     ("P1", "SA2", 1, 0.0, 0),
     ("P1", "L2", 4, 0.0, 0),
     ("P2", "SA1", 1, 0.0, 0),
