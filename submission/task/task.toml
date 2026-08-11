@@ -21,7 +21,7 @@ verification_explanation = "Verifies exact match for allocated_qty, shortfall_qt
 timeout_sec = 120.0
 
 [agent]
-timeout_sec = 300.0
+timeout_sec = 600.0
 
 
 [environment]
