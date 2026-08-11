@@ -77,7 +77,7 @@ def test_order_O03_allocation():
 
 
 def test_order_O04_allocation():
-    """Verify O04 allocation (P2 x 20, batch=4): Restricted by Steel-Plate L3 inventory after O01+O02 pool depletion. alloc=0, sf=20, limiting=L5."""
+    """Verify O04 allocation (P2 x 20, batch=4): SA1 requires SA2 which needs L5 — fully depleted by O01+O03. alloc=0, sf=20, limiting=L5."""
     m = _get_orders_map()
     assert m["O04"]["allocated_qty"] == 0
     assert m["O04"]["shortfall_qty"] == 20
@@ -93,7 +93,7 @@ def test_order_O05_allocation():
 
 
 def test_order_O06_allocation():
-    """Verify O06 allocation (P3 x 8, batch=2): Restricted by L5 after O02 consumed it. alloc=2, sf=6, limiting=L5."""
+    """Verify O06 allocation (P3 x 8, batch=2): Uses 3 excess SA4 from O03 lot rounding to build 2; next batch needs SA2 build requiring depleted L5. alloc=2, sf=6, limiting=L5."""
     m = _get_orders_map()
     assert m["O06"]["allocated_qty"] == 2
     assert m["O06"]["shortfall_qty"] == 6
