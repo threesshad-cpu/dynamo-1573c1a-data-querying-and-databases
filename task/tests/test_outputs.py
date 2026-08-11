@@ -61,19 +61,19 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): Multi-level BOM with L3 primary + SUB_L3 substitute pooling constraint. alloc=20, sf=10, limiting=L3."""
+    """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker. alloc=15, sf=15, limiting=L5."""
     m = _get_orders_map()
-    assert m["O02"]["allocated_qty"] == 20
-    assert m["O02"]["shortfall_qty"] == 10
-    assert m["O02"]["limiting_resource"] == "L3"
+    assert m["O02"]["allocated_qty"] == 15
+    assert m["O02"]["shortfall_qty"] == 15
+    assert m["O02"]["limiting_resource"] == "L5"
 
 
 def test_order_O03_allocation():
-    """Verify O03 allocation (P3 x 15, batch=2): After O02 product routing depletes WC2 capacity. alloc=6, sf=9, limiting=WC2."""
+    """Verify O03 allocation (P3 x 15, batch=2): Processed BEFORE O02 due to order_id descending tie-breaker. alloc=14, sf=1, limiting=None."""
     m = _get_orders_map()
-    assert m["O03"]["allocated_qty"] == 6
-    assert m["O03"]["shortfall_qty"] == 9
-    assert m["O03"]["limiting_resource"] == "WC2"
+    assert m["O03"]["allocated_qty"] == 14
+    assert m["O03"]["shortfall_qty"] == 1
+    assert m["O03"]["limiting_resource"] is None
 
 
 def test_order_O04_allocation():
@@ -93,8 +93,8 @@ def test_order_O05_allocation():
 
 
 def test_order_O06_allocation():
-    """Verify O06 allocation (P3 x 8, batch=2): Restricted by WC2 capacity after sequential pool depletion. alloc=0, sf=8, limiting=WC2."""
+    """Verify O06 allocation (P3 x 8, batch=2): Restricted by L5 after O02 consumed it. alloc=2, sf=6, limiting=L5."""
     m = _get_orders_map()
-    assert m["O06"]["allocated_qty"] == 0
-    assert m["O06"]["shortfall_qty"] == 8
-    assert m["O06"]["limiting_resource"] == "WC2"
+    assert m["O06"]["allocated_qty"] == 2
+    assert m["O06"]["shortfall_qty"] == 6
+    assert m["O06"]["limiting_resource"] == "L5"

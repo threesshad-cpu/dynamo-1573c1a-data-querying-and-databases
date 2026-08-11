@@ -212,7 +212,8 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
 curr_inv = {p: parts[p]["on_hand_qty"] for p in parts}
 curr_wc_hours = {w: workcenters[w]["available_hours"] for w in workcenters}
 
-sorted_orders = sorted(orders_raw, key=lambda x: (x[3], x[0]))
+sorted_orders = sorted(orders_raw, key=lambda x: x[0], reverse=True)
+sorted_orders.sort(key=lambda x: x[3])
 
 results = []
 for order_id, product_id, requested_qty, priority in sorted_orders:
