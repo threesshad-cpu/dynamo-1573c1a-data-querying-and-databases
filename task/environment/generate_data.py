@@ -21,7 +21,7 @@ parts_data = [
 
     # Sub-assemblies
     ("SA1", "Bracket-Assembly", 2, 4),
-    ("SA2", "Sensor-Module", 2, 4),
+    ("SA2", "Sensor-Module", 2, 7),
     ("SA3", "Base-Frame", 0, 6),
     ("SA4", "Control-Panel", 2, 5),
 
