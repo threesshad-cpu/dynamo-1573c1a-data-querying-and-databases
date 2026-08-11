@@ -15,7 +15,7 @@ parts_data = [
     ("L6", "Wire-Harness", 58, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
-    ("SUB_L3", "Alloy-Plate", 20, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
+    ("SUB_L3", "Alloy-Plate", 18, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
     ("SUB_L6", "Flex-Cable", 10, 1),      # Substitute for L6 (ratio 1.0: 1 L6 needs 1 SUB_L6)
     ("SUB_L5", "Alt-Board", 32, 1),       # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
 
@@ -35,7 +35,7 @@ parts_data = [
 bom_data = [
     # parent, child, qty_per, scrap_rate_pct, setup_scrap_qty
     ("SA1", "L1", 4, 0.0, 2),
-    ("SA1", "L3", 1, 5.5, 1),
+    ("SA1", "L3", 1, 5.0, 3),
     ("SA2", "L5", 1, 0.0, 0),
     ("SA2", "L6", 2, 5.0, 1),
     ("SA2", "L1", 2, 0.0, 0),
@@ -58,7 +58,7 @@ bom_data = [
 
 workcenters_data = [
     ("WC1", "Stamping-Press", 50.0),
-    ("WC2", "Assembly-Line", 23.05),
+    ("WC2", "Assembly-Line", 21.0),
     ("WC3", "Testing-Station", 18.0),
 ]
 
