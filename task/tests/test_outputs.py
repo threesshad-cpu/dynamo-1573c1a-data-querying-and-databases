@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 13, "Expected 13 order results in report"
+    assert len(orders) == 16, "Expected 16 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -153,3 +153,26 @@ def test_order_O00_G_allocation():
     assert m["O00_G"]["allocated_qty"] == 0
     assert m["O00_G"]["shortfall_qty"] == 1
     assert m["O00_G"]["limiting_resource"] == "WC5"
+
+def test_order_O00_H_allocation():
+    """Verifies that O00_H fails with correct limiting resource, distinguishing INITIAL vs LEFTOVER calculation."""
+    m = _get_orders_map()
+    assert m["O00_H"]["allocated_qty"] == 1
+    assert m["O00_H"]["shortfall_qty"] == 1
+    assert m["O00_H"]["limiting_resource"] == "L15"
+
+
+def test_order_O00_I_allocation():
+    """Verifies O00_I allocates correctly with substitute integer conversion constraints."""
+    m = _get_orders_map()
+    assert m["O00_I"]["allocated_qty"] == 2
+    assert m["O00_I"]["shortfall_qty"] == 1
+    assert m["O00_I"]["limiting_resource"] == "L16"
+
+
+def test_order_O00_J_allocation():
+    """Verifies O00_J consumes leftover substitute correctly if O00_I did not over-consume."""
+    m = _get_orders_map()
+    assert m["O00_J"]["allocated_qty"] == 1
+    assert m["O00_J"]["shortfall_qty"] == 0
+    assert m["O00_J"]["limiting_resource"] is None
