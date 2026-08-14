@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 11, "Expected 11 order results in report"
+    assert len(orders) == 13, "Expected 13 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -138,3 +138,18 @@ def test_order_O00_E_allocation():
     assert m["O00_E"]["shortfall_qty"] == 0
     assert m["O00_E"]["limiting_resource"] is None
 
+
+def test_order_O00_F_allocation():
+    """Verifies that O00_F fails allocation due to scrap rate requirement on L13."""
+    m = _get_orders_map()
+    assert m["O00_F"]["allocated_qty"] == 0
+    assert m["O00_F"]["shortfall_qty"] == 1
+    assert m["O00_F"]["limiting_resource"] == "L13"
+
+
+def test_order_O00_G_allocation():
+    """Verifies that O00_G fails allocation due to setup and run hours on WC5."""
+    m = _get_orders_map()
+    assert m["O00_G"]["allocated_qty"] == 0
+    assert m["O00_G"]["shortfall_qty"] == 1
+    assert m["O00_G"]["limiting_resource"] == "WC5"

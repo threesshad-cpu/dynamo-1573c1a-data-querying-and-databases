@@ -33,8 +33,8 @@ parts_data = [
     ("L10", "Trap-Plate", 0, 1),
     ("L11", "Trap-Wire", 100, 1),
     ("L12", "Trap-Sensor", 0, 1),
-    ("L13", "Trap-Metal", 14, 1),
-    ("SUB_L10", "Sub-Trap-Plate", 14, 1),
+    ("L13", "Trap-Metal", 25, 1),
+    ("SUB_L10", "Sub-Trap-Plate", 5, 1),
     ("SUB_L12_A", "Sub-Sensor-A", 7, 1),
     ("SUB_L12_B", "Sub-Sensor-B", 10, 1),
     ("SA5", "Trap-Assembly", 0, 10),
@@ -45,6 +45,8 @@ parts_data = [
     ("P7", "Test-Pref-Followup", 0, 1),
     ("P8", "Product-8", 0, 1),
     ("P9", "Product-9", 0, 1),
+    ("P10", "Test-Setup", 0, 1),
+    ("L14", "Test-Setup-Leaf", 100, 1),
 ]
 
 bom_data = [
@@ -80,6 +82,7 @@ bom_data = [
     ("P8", "SA8", 1, 0.0, 0),
     ("P9", "SA8", 1, 0.0, 0),
     ("SA8", "L13", 1, 12.5, 2),
+    ("P10", "L14", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -87,6 +90,7 @@ workcenters_data = [
     ("WC2", "Assembly-Line", 21.0),
     ("WC3", "Testing-Station", 18.0),
     ("WC4", "Trap-Station", 2.75),
+    ("WC5", "Setup-Test", 10.0),
 ]
 
 routing_data = [
@@ -103,6 +107,7 @@ routing_data = [
     ("P5", "WC4", 2.0, 1.0),
     ("SA5", "WC4", 1.0, 0.5),
     ("SA6", "WC4", 0.5, 0.2),
+    ("P10", "WC5", 2.0, 9.0),
 ]
 
 substitutes_data = [
@@ -122,6 +127,8 @@ orders_data = [
     ("O00_C", "P7", 3, 2),
     ("O00_D", "P8", 1, 3),
     ("O00_E", "P9", 9, 4),
+    ("O00_F", "P8", 1, 5),
+    ("O00_G", "P10", 1, 6),
     ("O01", "P2", 14, 11),
     ("O02", "P1", 30, 12),
     ("O03", "P3", 15, 12),
