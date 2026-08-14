@@ -49,6 +49,14 @@ parts_data = [
     ("P11", "Trap-Initial", 0, 1),
     ("P12", "Trap-Sub-Int1", 0, 1),
     ("P13", "Trap-Sub-Int2", 0, 1),
+    ("P15", "Trap-SA-Lim", 0, 1),
+    ("P16", "Trap-WC-Batch", 0, 1),
+    ("P17", "Trap-Scrap-Ceil", 0, 1),
+    ("SA10", "Trap-SA-Lim-SA", 1, 1),
+    ("SA11", "Trap-WC-Batch-SA", 0, 5),
+    ("L20", "Trap-SA-Lim-Leaf", 100, 1),
+    ("L21", "Trap-Scrap-Leaf", 1, 1),
+    ("L22", "Trap-WC-Batch-Leaf", 100, 1),
     ("L15", "Trap-Initial-Leaf", 9, 1),
     ("L16", "Trap-Sub-Leaf1", 0, 1),
     ("L17", "Trap-Sub-Leaf2", 0, 1),
@@ -93,6 +101,11 @@ bom_data = [
     ("P11", "L15", 5, 0.0, 0),
     ("P12", "L16", 1, 0.0, 0),
     ("P13", "L17", 1, 0.0, 0),
+    ("P15", "SA10", 1, 0.0, 0),
+    ("SA10", "L20", 1, 0.0, 0),
+    ("P16", "SA11", 1, 0.0, 0),
+    ("P17", "L21", 1, 1.0, 0),
+    ("SA11", "L22", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -102,6 +115,8 @@ workcenters_data = [
     ("WC4", "Trap-Station", 2.75),
     ("WC5", "Setup-Test", 10.0),
     ("WC6", "Trap-Initial-WC", 8.2),
+    ("WC10", "Trap-SA-Lim-WC", 2.0),
+    ("WC11", "Trap-WC-Batch-WC", 4.0),
 ]
 
 routing_data = [
@@ -120,6 +135,8 @@ routing_data = [
     ("SA6", "WC4", 0.5, 0.2),
     ("P10", "WC5", 2.0, 9.0),
     ("P11", "WC6", 5.0, 2.0),
+    ("P15", "WC10", 0.0, 1.0),
+    ("SA11", "WC11", 0.0, 1.0),
 ]
 
 substitutes_data = [
@@ -146,6 +163,9 @@ orders_data = [
     ("O00_H", "P11", 2, 7),
     ("O00_I", "P12", 3, 8),
     ("O00_J", "P13", 1, 9),
+    ("O00_K", "P15", 3, 20),
+    ("O00_L", "P16", 1, 21),
+    ("O00_M", "P17", 1, 22),
     ("O01", "P2", 14, 11),
     ("O02", "P1", 30, 12),
     ("O03", "P3", 15, 12),

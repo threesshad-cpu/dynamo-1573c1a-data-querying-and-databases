@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 16, "Expected 16 order results in report"
+    assert len(orders) == 19, "Expected 19 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -176,3 +176,26 @@ def test_order_O00_J_allocation():
     assert m["O00_J"]["allocated_qty"] == 1
     assert m["O00_J"]["shortfall_qty"] == 0
     assert m["O00_J"]["limiting_resource"] is None
+
+def test_order_O00_K_allocation():
+    """Verifies O00_K correctly ignores Sub-Assemblies when finding limiting resources."""
+    m = _get_orders_map()
+    assert m["O00_K"]["allocated_qty"] == 2
+    assert m["O00_K"]["shortfall_qty"] == 1
+    assert m["O00_K"]["limiting_resource"] == "WC10"
+
+
+def test_order_O00_L_allocation():
+    """Verifies O00_L applies batch size rounding to child sub-assembly run hours."""
+    m = _get_orders_map()
+    assert m["O00_L"]["allocated_qty"] == 0
+    assert m["O00_L"]["shortfall_qty"] == 1
+    assert m["O00_L"]["limiting_resource"] == "WC11"
+
+
+def test_order_O00_M_allocation():
+    """Verifies O00_M applies math.ceil() on the scrap percentage calculation."""
+    m = _get_orders_map()
+    assert m["O00_M"]["allocated_qty"] == 0
+    assert m["O00_M"]["shortfall_qty"] == 1
+    assert m["O00_M"]["limiting_resource"] == "L21"
