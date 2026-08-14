@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 6, "Expected 6 order results in report"
+    assert len(orders) == 11, "Expected 11 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -98,3 +98,38 @@ def test_order_O06_allocation():
     assert m["O06"]["allocated_qty"] == 2
     assert m["O06"]["shortfall_qty"] == 6
     assert m["O06"]["limiting_resource"] == "L5"
+
+def test_order_O00_A_allocation():
+    m = _get_orders_map()
+    assert m["O00_A"]["allocated_qty"] == 0
+    assert m["O00_A"]["shortfall_qty"] == 3
+    assert m["O00_A"]["limiting_resource"] == "L10"
+
+
+def test_order_O00_B_allocation():
+    m = _get_orders_map()
+    assert m["O00_B"]["allocated_qty"] == 10
+    assert m["O00_B"]["shortfall_qty"] == 0
+    assert m["O00_B"]["limiting_resource"] is None
+
+
+def test_order_O00_C_allocation():
+    m = _get_orders_map()
+    assert m["O00_C"]["allocated_qty"] == 3
+    assert m["O00_C"]["shortfall_qty"] == 0
+    assert m["O00_C"]["limiting_resource"] is None
+
+
+def test_order_O00_D_allocation():
+    m = _get_orders_map()
+    assert m["O00_D"]["allocated_qty"] == 1
+    assert m["O00_D"]["shortfall_qty"] == 0
+    assert m["O00_D"]["limiting_resource"] is None
+
+
+def test_order_O00_E_allocation():
+    m = _get_orders_map()
+    assert m["O00_E"]["allocated_qty"] == 9
+    assert m["O00_E"]["shortfall_qty"] == 0
+    assert m["O00_E"]["limiting_resource"] is None
+
