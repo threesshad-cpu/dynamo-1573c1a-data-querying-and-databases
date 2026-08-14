@@ -100,6 +100,7 @@ def test_order_O06_allocation():
     assert m["O06"]["limiting_resource"] == "L5"
 
 def test_order_O00_A_allocation():
+    """Verifies that O00_A fails allocation due to L10 shortage with the correct limiting resource."""
     m = _get_orders_map()
     assert m["O00_A"]["allocated_qty"] == 0
     assert m["O00_A"]["shortfall_qty"] == 3
@@ -107,6 +108,7 @@ def test_order_O00_A_allocation():
 
 
 def test_order_O00_B_allocation():
+    """Verifies that O00_B is successfully allocated fully."""
     m = _get_orders_map()
     assert m["O00_B"]["allocated_qty"] == 10
     assert m["O00_B"]["shortfall_qty"] == 0
@@ -114,6 +116,7 @@ def test_order_O00_B_allocation():
 
 
 def test_order_O00_C_allocation():
+    """Verifies that O00_C is successfully allocated fully."""
     m = _get_orders_map()
     assert m["O00_C"]["allocated_qty"] == 3
     assert m["O00_C"]["shortfall_qty"] == 0
@@ -121,6 +124,7 @@ def test_order_O00_C_allocation():
 
 
 def test_order_O00_D_allocation():
+    """Verifies that O00_D is successfully allocated fully."""
     m = _get_orders_map()
     assert m["O00_D"]["allocated_qty"] == 1
     assert m["O00_D"]["shortfall_qty"] == 0
@@ -128,6 +132,7 @@ def test_order_O00_D_allocation():
 
 
 def test_order_O00_E_allocation():
+    """Verifies that O00_E is successfully allocated fully."""
     m = _get_orders_map()
     assert m["O00_E"]["allocated_qty"] == 9
     assert m["O00_E"]["shortfall_qty"] == 0
