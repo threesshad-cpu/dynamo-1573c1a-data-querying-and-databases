@@ -1,0 +1,1047 @@
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# clear
+[?2004l[H[J[3J[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db ".tables"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db ".schema"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM parts LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM bom LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM workcenters LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM routing LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM substitutes LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# sqlite3 /app/manufacturing.db "SELECT * FROM orders LIMIT 20;"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, json
+[?2004l[?2004h> conn=sqlite3.connect('/app/manufacturing.db')
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> cur.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+[?2004l[?2004h> print('TABLES', cur.fetchall())
+[?2004l[?2004h> for table in ['parts','bom','workcenters','routing','substitutes','orders']:
+[?2004l[?2004h>     print('\nSCHEMA FOR', table)
+[?2004l[?2004h>     cur.execute(f"SELECT sql FROM sqlite_master WHERE type='table' AND name='{table}'")
+[?2004l[?2004h>     print(cur.fetchone())
+[?2004l[?2004h>     print('DATA', table)
+[?2004l[?2004h>     cur.execute(f'SELECT * FROM {table} ORDER BY 1 LIMIT 50')
+[?2004l[?2004h>     cols=[d[0] for d in cur.description]
+[?2004l[?2004h>     print(cols)
+[?2004l[?2004h>     for row in cur.fetchall():
+[?2004l[?2004h>         print(row)
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> PY
+[?2004lTABLES [('bom',), ('orders',), ('parts',), ('routing',), ('substitutes',), ('workcenters',)]
+
+SCHEMA FOR parts
+('CREATE TABLE parts (\n            part_id TEXT PRIMARY KEY,\n            name TEXT NOT NULL,\n            on_hand_qty INTEGER NOT NULL,\n            batch_size INTEGER NOT NULL\n        )',)
+DATA parts
+['part_id', 'name', 'on_hand_qty', 'batch_size']
+('L1', 'Bolt-M4', 350, 1)
+('L10', 'Trap-Plate', 0, 1)
+('L11', 'Trap-Wire', 100, 1)
+('L12', 'Trap-Sensor', 0, 1)
+('L13', 'Trap-Metal', 25, 1)
+('L14', 'Test-Setup-Leaf', 100, 1)
+('L15', 'Trap-Initial-Leaf', 9, 1)
+('L16', 'Trap-Sub-Leaf1', 0, 1)
+('L17', 'Trap-Sub-Leaf2', 0, 1)
+('L2', 'Bolt-M6', 300, 1)
+('L20', 'Trap-SA-Lim-Leaf', 100, 1)
+('L21', 'Trap-Scrap-Leaf', 1, 1)
+('L22', 'Trap-WC-Batch-Leaf', 100, 1)
+('L3', 'Steel-Plate', 55, 1)
+('L30', 'Net-Leaf', 109, 1)
+('L4', 'Rubber-Gasket', 150, 1)
+('L40', 'Float-Trap-Leaf', 10, 1)
+('L5', 'Circuit-Board', 12, 1)
+('L50', 'Sub-Leftover-Leaf', 0, 1)
+('L6', 'Wire-Harness', 58, 1)
+('L7', 'LED-Display', 30, 1)
+('L70', 'DFS-Trap-Leaf', 100, 1)
+('L8', 'Power-Unit', 40, 1)
+('P1', 'Widget-X', 0, 5)
+('P10', 'Test-Setup', 0, 1)
+('P11', 'Trap-Initial', 0, 1)
+('P12', 'Trap-Sub-Int1', 0, 1)
+('P13', 'Trap-Sub-Int2', 0, 1)
+('P15', 'Trap-SA-Lim', 0, 1)
+('P16', 'Trap-WC-Batch', 0, 1)
+('P17', 'Trap-Scrap-Ceil', 0, 1)
+('P18', 'Tie-Break-Prod', 0, 1)
+('P2', 'Widget-Y', 0, 4)
+('P3', 'Widget-Z', 0, 2)
+('P30', 'Net-Prod', 0, 1)
+('P4', 'Gadget-Q', 0, 3)
+('P40', 'Float-Trap-Prod', 0, 1)
+('P5', 'Trap-Product', 0, 2)
+('P50', 'Sub-Leftover-Prod1', 0, 1)
+('P51', 'Sub-Leftover-Prod2', 0, 1)
+('P6', 'Test-Pref', 0, 1)
+('P7', 'Test-Pref-Followup', 0, 1)
+('P70', 'DFS-Trap-Prod', 0, 1)
+('P8', 'Product-8', 0, 1)
+('P9', 'Product-9', 0, 1)
+('SA1', 'Bracket-Assembly', 2, 4)
+('SA10', 'Trap-SA-Lim-SA', 1, 1)
+('SA11', 'Trap-WC-Batch-SA', 0, 5)
+('SA2', 'Sensor-Module', 2, 7)
+('SA3', 'Base-Frame', 0, 6)
+
+SCHEMA FOR bom
+('CREATE TABLE bom (\n            parent_part_id TEXT NOT NULL,\n            child_part_id TEXT NOT NULL,\n            qty_per INTEGER NOT NULL,\n            scrap_rate_pct REAL NOT NULL,\n            setup_scrap_qty INTEGER NOT NULL,\n            PRIMARY KEY (parent_part_id, child_part_id)\n        )',)
+DATA bom
+['parent_part_id', 'child_part_id', 'qty_per', 'scrap_rate_pct', 'setup_scrap_qty']
+('P1', 'L2', 4, 0.0, 0)
+('P1', 'SA1', 1, 0.0, 0)
+('P1', 'SA2', 2, 0.0, 0)
+('P10', 'L14', 1, 0.0, 0)
+('P11', 'L15', 5, 0.0, 0)
+('P12', 'L16', 1, 0.0, 0)
+('P13', 'L17', 1, 0.0, 0)
+('P15', 'SA10', 1, 0.0, 0)
+('P16', 'SA11', 1, 0.0, 0)
+('P17', 'L21', 1, 1.0, 0)
+('P18', 'Z10', 1, 0.0, 0)
+('P18', 'Z9', 1, 0.0, 0)
+('P2', 'L4', 2, 0.0, 0)
+('P2', 'SA1', 1, 0.0, 0)
+('P2', 'SA3', 1, 0.0, 0)
+('P3', 'L8', 1, 0.0, 0)
+('P3', 'SA4', 1, 0.0, 0)
+('P30', 'SA30', 2, 0.0, 0)
+('P4', 'L1', 1, 0.0, 0)
+('P4', 'L4', 1, 0.0, 0)
+('P40', 'L40', 1, 0.0, 0)
+('P5', 'SA5', 1, 0.0, 0)
+('P50', 'L50', 2, 0.0, 0)
+('P51', 'SUB_50', 1, 0.0, 0)
+('P6', 'L12', 1, 0.0, 0)
+('P7', 'SUB_L12_B', 1, 0.0, 0)
+('P70', 'SA70', 1, 0.0, 0)
+('P70', 'SA71', 1, 0.0, 0)
+('P8', 'SA8', 1, 0.0, 0)
+('P9', 'SA8', 1, 0.0, 0)
+('SA1', 'L1', 4, 0.0, 2)
+('SA1', 'L3', 1, 5.0, 3)
+('SA1', 'SA2', 1, 0.0, 0)
+('SA10', 'L20', 1, 0.0, 0)
+('SA11', 'L22', 1, 0.0, 0)
+('SA2', 'L1', 2, 0.0, 0)
+('SA2', 'L5', 1, 0.0, 0)
+('SA2', 'L6', 2, 5.0, 1)
+('SA3', 'L2', 6, 0.0, 2)
+('SA3', 'L3', 2, 0.0, 0)
+('SA3', 'L4', 4, 2.5, 0)
+('SA30', 'L30', 10, 0.0, 0)
+('SA4', 'L7', 1, 0.0, 0)
+('SA4', 'SA2', 1, 0.0, 0)
+('SA5', 'L10', 2, 0.0, 0)
+('SA5', 'SA6', 1, 0.0, 0)
+('SA6', 'L11', 1, 0.0, 0)
+('SA6', 'L12', 1, 0.0, 0)
+('SA70', 'SA72', 1, 0.0, 0)
+('SA71', 'SA72', 1, 0.0, 0)
+
+SCHEMA FOR workcenters
+('CREATE TABLE workcenters (\n            workcenter_id TEXT PRIMARY KEY,\n            name TEXT NOT NULL,\n            available_hours REAL NOT NULL\n        )',)
+DATA workcenters
+['workcenter_id', 'name', 'available_hours']
+('WC1', 'Stamping-Press', 50.0)
+('WC10', 'Trap-SA-Lim-WC', 2.0)
+('WC11', 'Trap-WC-Batch-WC', 4.0)
+('WC2', 'Assembly-Line', 21.0)
+('WC3', 'Testing-Station', 18.0)
+('WC30', 'Net-WC', 33.0)
+('WC31', 'Net-WC31', 100.0)
+('WC4', 'Trap-Station', 2.75)
+('WC40', 'Float-Trap-WC', 0.3)
+('WC5', 'Setup-Test', 10.0)
+('WC6', 'Trap-Initial-WC', 8.2)
+('WC70', 'DFS-Trap-WC', 15.0)
+
+SCHEMA FOR routing
+('CREATE TABLE routing (\n            parent_part_id TEXT NOT NULL,\n            workcenter_id TEXT NOT NULL,\n            setup_hours REAL NOT NULL,\n            run_hours_per_unit REAL NOT NULL,\n            PRIMARY KEY (parent_part_id, workcenter_id)\n        )',)
+DATA routing
+['parent_part_id', 'workcenter_id', 'setup_hours', 'run_hours_per_unit']
+('P1', 'WC2', 2.0, 0.5)
+('P10', 'WC5', 2.0, 9.0)
+('P11', 'WC6', 5.0, 2.0)
+('P15', 'WC10', 0.0, 1.0)
+('P2', 'WC1', 1.0, 0.3)
+('P3', 'WC3', 1.2, 0.6)
+('P30', 'WC30', 0.0, 10.0)
+('P4', 'WC1', 1.0, 11.0)
+('P4', 'WC3', 0.6, 10.2)
+('P40', 'WC40', 0.1, 0.2)
+('P5', 'WC4', 2.0, 1.0)
+('SA1', 'WC1', 1.0, 0.2)
+('SA11', 'WC11', 0.0, 1.0)
+('SA2', 'WC2', 0.5, 0.3)
+('SA3', 'WC1', 1.5, 0.4)
+('SA30', 'WC31', 0.0, 1.0)
+('SA4', 'WC3', 0.8, 0.25)
+('SA5', 'WC4', 1.0, 0.5)
+('SA6', 'WC4', 0.5, 0.2)
+('SA72', 'WC70', 10.0, 1.0)
+
+SCHEMA FOR substitutes
+('CREATE TABLE substitutes (\n            primary_part_id TEXT NOT NULL,\n            substitute_part_id TEXT NOT NULL,\n            qty_ratio REAL NOT NULL,\n            preference_rank INTEGER NOT NULL,\n            PRIMARY KEY (primary_part_id, substitute_part_id)\n        )',)
+DATA substitutes
+['primary_part_id', 'substitute_part_id', 'qty_ratio', 'preference_rank']
+('L10', 'SUB_L10', 3.0, 1)
+('L12', 'SUB_L12_A', 2.0, 1)
+('L12', 'SUB_L12_B', 1.0, 2)
+('L16', 'SUB_L16', 2.0, 1)
+('L17', 'SUB_L16', 1.0, 1)
+('L3', 'SUB_L3', 2.0, 1)
+('L5', 'SUB_L5', 2.0, 1)
+('L50', 'SUB_50', 1.5, 1)
+('L6', 'SUB_L6', 1.0, 1)
+
+SCHEMA FOR orders
+('CREATE TABLE orders (\n            order_id TEXT PRIMARY KEY,\n            product_part_id TEXT NOT NULL,\n            requested_qty INTEGER NOT NULL,\n            priority INTEGER NOT NULL\n        )',)
+DATA orders
+['order_id', 'product_part_id', 'requested_qty', 'priority']
+('O00_A', 'P5', 3, 0)
+('O00_B', 'P6', 10, 1)
+('O00_C', 'P7', 3, 2)
+('O00_D', 'P8', 1, 3)
+('O00_E', 'P9', 9, 4)
+('O00_F', 'P8', 1, 5)
+('O00_G', 'P10', 1, 6)
+('O00_H', 'P11', 2, 7)
+('O00_I', 'P12', 3, 8)
+('O00_J', 'P13', 1, 9)
+('O00_K', 'P15', 3, 20)
+('O00_L', 'P16', 1, 21)
+('O00_M', 'P17', 1, 22)
+('O00_N', 'P18', 20, 23)
+('O00_O', 'P30', 3, 24)
+('O00_P', 'P30', 1, 25)
+('O00_Q', 'P40', 1, 26)
+('O00_R1', 'P50', 1, 27)
+('O00_R2', 'P51', 1, 28)
+('O00_S2', 'P70', 1, 29)
+('O01', 'P2', 14, 11)
+('O02', 'P1', 30, 12)
+('O03', 'P3', 15, 12)
+('O04', 'P2', 20, 14)
+('O05', 'P4', 5, 15)
+('O06', 'P3', 8, 16)
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3
+[?2004l[?2004h> conn=sqlite3.connect('/app/manufacturing.db')
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> for table in ['parts','bom','workcenters','routing','substitutes','orders']:
+[?2004l[?2004h>     cur.execute(f'SELECT COUNT(*) FROM {table}')
+[?2004l[?2004h>     print(f'COUNT {table}:', cur.fetchone()[0])
+[?2004l[?2004h> print('\nALL PARTS')
+[?2004l[?2004h> cur.execute('SELECT * FROM parts ORDER BY part_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> print('\nALL BOM')
+[?2004l[?2004h> cur.execute('SELECT * FROM bom ORDER BY parent_part_id,child_part_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> print('\nALL WORKCENTERS')
+[?2004l[?2004h> cur.execute('SELECT * FROM workcenters ORDER BY workcenter_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> print('\nALL ROUTING')
+[?2004l[?2004h> cur.execute('SELECT * FROM routing ORDER BY parent_part_id,workcenter_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> print('\nALL SUBSTITUTES')
+[?2004l[?2004h> cur.execute('SELECT * FROM substitutes ORDER BY primary_part_id,preference_rank,substitute_part_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> print('\nALL ORDERS')
+[?2004l[?2004h> cur.execute('SELECT * FROM orders ORDER BY priority, order_id DESC')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     print(r)
+[?2004l[?2004h> # detect child parts not in parts
+[?2004l[?2004h> cur.execute('SELECT DISTINCT child_part_id FROM bom')
+[?2004l[?2004h> children={r[0] for r in cur.fetchall()}
+[?2004l[?2004h> cur.execute('SELECT part_id FROM parts')
+[?2004l[?2004h> part_ids={r[0] for r in cur.fetchall()}
+[?2004l[?2004h> print('\nBOM children missing from parts:', sorted(children-part_ids))
+[?2004l[?2004h> cur.execute('SELECT DISTINCT parent_part_id FROM bom')
+[?2004l[?2004h> parents={r[0] for r in cur.fetchall()}
+[?2004l[?2004h> print('BOM parents missing from parts:', sorted(parents-part_ids))
+[?2004l[?2004h> cur.execute('SELECT DISTINCT substitute_part_id FROM substitutes')
+[?2004l[?2004h> subs={r[0] for r in cur.fetchall()}
+[?2004l[?2004h> print('Substitutes missing from parts:', sorted(subs-part_ids))
+[?2004l[?2004h> cur.execute('SELECT DISTINCT primary_part_id FROM substitutes')
+[?2004l[?2004h> prims={r[0] for r in cur.fetchall()}
+[?2004l[?2004h> print('Sub primary missing from parts:', sorted(prims-part_ids))
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> PY
+[?2004lCOUNT parts: 68
+COUNT bom: 52
+COUNT workcenters: 12
+COUNT routing: 20
+COUNT substitutes: 9
+COUNT orders: 26
+
+ALL PARTS
+('L1', 'Bolt-M4', 350, 1)
+('L10', 'Trap-Plate', 0, 1)
+('L11', 'Trap-Wire', 100, 1)
+('L12', 'Trap-Sensor', 0, 1)
+('L13', 'Trap-Metal', 25, 1)
+('L14', 'Test-Setup-Leaf', 100, 1)
+('L15', 'Trap-Initial-Leaf', 9, 1)
+('L16', 'Trap-Sub-Leaf1', 0, 1)
+('L17', 'Trap-Sub-Leaf2', 0, 1)
+('L2', 'Bolt-M6', 300, 1)
+('L20', 'Trap-SA-Lim-Leaf', 100, 1)
+('L21', 'Trap-Scrap-Leaf', 1, 1)
+('L22', 'Trap-WC-Batch-Leaf', 100, 1)
+('L3', 'Steel-Plate', 55, 1)
+('L30', 'Net-Leaf', 109, 1)
+('L4', 'Rubber-Gasket', 150, 1)
+('L40', 'Float-Trap-Leaf', 10, 1)
+('L5', 'Circuit-Board', 12, 1)
+('L50', 'Sub-Leftover-Leaf', 0, 1)
+('L6', 'Wire-Harness', 58, 1)
+('L7', 'LED-Display', 30, 1)
+('L70', 'DFS-Trap-Leaf', 100, 1)
+('L8', 'Power-Unit', 40, 1)
+('P1', 'Widget-X', 0, 5)
+('P10', 'Test-Setup', 0, 1)
+('P11', 'Trap-Initial', 0, 1)
+('P12', 'Trap-Sub-Int1', 0, 1)
+('P13', 'Trap-Sub-Int2', 0, 1)
+('P15', 'Trap-SA-Lim', 0, 1)
+('P16', 'Trap-WC-Batch', 0, 1)
+('P17', 'Trap-Scrap-Ceil', 0, 1)
+('P18', 'Tie-Break-Prod', 0, 1)
+('P2', 'Widget-Y', 0, 4)
+('P3', 'Widget-Z', 0, 2)
+('P30', 'Net-Prod', 0, 1)
+('P4', 'Gadget-Q', 0, 3)
+('P40', 'Float-Trap-Prod', 0, 1)
+('P5', 'Trap-Product', 0, 2)
+('P50', 'Sub-Leftover-Prod1', 0, 1)
+('P51', 'Sub-Leftover-Prod2', 0, 1)
+('P6', 'Test-Pref', 0, 1)
+('P7', 'Test-Pref-Followup', 0, 1)
+('P70', 'DFS-Trap-Prod', 0, 1)
+('P8', 'Product-8', 0, 1)
+('P9', 'Product-9', 0, 1)
+('SA1', 'Bracket-Assembly', 2, 4)
+('SA10', 'Trap-SA-Lim-SA', 1, 1)
+('SA11', 'Trap-WC-Batch-SA', 0, 5)
+('SA2', 'Sensor-Module', 2, 7)
+('SA3', 'Base-Frame', 0, 6)
+('SA30', 'Net-SA', 0, 5)
+('SA4', 'Control-Panel', 2, 5)
+('SA5', 'Trap-Assembly', 0, 10)
+('SA6', 'Core-Assembly', 0, 5)
+('SA70', 'DFS-Trap-SA1', 0, 1)
+('SA71', 'DFS-Trap-SA2', 0, 1)
+('SA72', 'DFS-Trap-SA-Shared', 0, 1)
+('SA8', 'Trap-Sub-8', 0, 10)
+('SUB_50', 'Sub-Leftover-Sub', 4, 1)
+('SUB_L10', 'Sub-Trap-Plate', 5, 1)
+('SUB_L12_A', 'Sub-Sensor-A', 7, 1)
+('SUB_L12_B', 'Sub-Sensor-B', 10, 1)
+('SUB_L16', 'Trap-Sub-Stock', 5, 1)
+('SUB_L3', 'Alloy-Plate', 18, 1)
+('SUB_L5', 'Alt-Board', 32, 1)
+('SUB_L6', 'Flex-Cable', 10, 1)
+('Z10', 'Tie-Break-10', 10, 1)
+('Z9', 'Tie-Break-9', 10, 1)
+
+ALL BOM
+('P1', 'L2', 4, 0.0, 0)
+('P1', 'SA1', 1, 0.0, 0)
+('P1', 'SA2', 2, 0.0, 0)
+('P10', 'L14', 1, 0.0, 0)
+('P11', 'L15', 5, 0.0, 0)
+('P12', 'L16', 1, 0.0, 0)
+('P13', 'L17', 1, 0.0, 0)
+('P15', 'SA10', 1, 0.0, 0)
+('P16', 'SA11', 1, 0.0, 0)
+('P17', 'L21', 1, 1.0, 0)
+('P18', 'Z10', 1, 0.0, 0)
+('P18', 'Z9', 1, 0.0, 0)
+('P2', 'L4', 2, 0.0, 0)
+('P2', 'SA1', 1, 0.0, 0)
+('P2', 'SA3', 1, 0.0, 0)
+('P3', 'L8', 1, 0.0, 0)
+('P3', 'SA4', 1, 0.0, 0)
+('P30', 'SA30', 2, 0.0, 0)
+('P4', 'L1', 1, 0.0, 0)
+('P4', 'L4', 1, 0.0, 0)
+('P40', 'L40', 1, 0.0, 0)
+('P5', 'SA5', 1, 0.0, 0)
+('P50', 'L50', 2, 0.0, 0)
+('P51', 'SUB_50', 1, 0.0, 0)
+('P6', 'L12', 1, 0.0, 0)
+('P7', 'SUB_L12_B', 1, 0.0, 0)
+('P70', 'SA70', 1, 0.0, 0)
+('P70', 'SA71', 1, 0.0, 0)
+('P8', 'SA8', 1, 0.0, 0)
+('P9', 'SA8', 1, 0.0, 0)
+('SA1', 'L1', 4, 0.0, 2)
+('SA1', 'L3', 1, 5.0, 3)
+('SA1', 'SA2', 1, 0.0, 0)
+('SA10', 'L20', 1, 0.0, 0)
+('SA11', 'L22', 1, 0.0, 0)
+('SA2', 'L1', 2, 0.0, 0)
+('SA2', 'L5', 1, 0.0, 0)
+('SA2', 'L6', 2, 5.0, 1)
+('SA3', 'L2', 6, 0.0, 2)
+('SA3', 'L3', 2, 0.0, 0)
+('SA3', 'L4', 4, 2.5, 0)
+('SA30', 'L30', 10, 0.0, 0)
+('SA4', 'L7', 1, 0.0, 0)
+('SA4', 'SA2', 1, 0.0, 0)
+('SA5', 'L10', 2, 0.0, 0)
+('SA5', 'SA6', 1, 0.0, 0)
+('SA6', 'L11', 1, 0.0, 0)
+('SA6', 'L12', 1, 0.0, 0)
+('SA70', 'SA72', 1, 0.0, 0)
+('SA71', 'SA72', 1, 0.0, 0)
+('SA72', 'L70', 1, 0.0, 0)
+('SA8', 'L13', 1, 12.5, 2)
+
+ALL WORKCENTERS
+('WC1', 'Stamping-Press', 50.0)
+('WC10', 'Trap-SA-Lim-WC', 2.0)
+('WC11', 'Trap-WC-Batch-WC', 4.0)
+('WC2', 'Assembly-Line', 21.0)
+('WC3', 'Testing-Station', 18.0)
+('WC30', 'Net-WC', 33.0)
+('WC31', 'Net-WC31', 100.0)
+('WC4', 'Trap-Station', 2.75)
+('WC40', 'Float-Trap-WC', 0.3)
+('WC5', 'Setup-Test', 10.0)
+('WC6', 'Trap-Initial-WC', 8.2)
+('WC70', 'DFS-Trap-WC', 15.0)
+
+ALL ROUTING
+('P1', 'WC2', 2.0, 0.5)
+('P10', 'WC5', 2.0, 9.0)
+('P11', 'WC6', 5.0, 2.0)
+('P15', 'WC10', 0.0, 1.0)
+('P2', 'WC1', 1.0, 0.3)
+('P3', 'WC3', 1.2, 0.6)
+('P30', 'WC30', 0.0, 10.0)
+('P4', 'WC1', 1.0, 11.0)
+('P4', 'WC3', 0.6, 10.2)
+('P40', 'WC40', 0.1, 0.2)
+('P5', 'WC4', 2.0, 1.0)
+('SA1', 'WC1', 1.0, 0.2)
+('SA11', 'WC11', 0.0, 1.0)
+('SA2', 'WC2', 0.5, 0.3)
+('SA3', 'WC1', 1.5, 0.4)
+('SA30', 'WC31', 0.0, 1.0)
+('SA4', 'WC3', 0.8, 0.25)
+('SA5', 'WC4', 1.0, 0.5)
+('SA6', 'WC4', 0.5, 0.2)
+('SA72', 'WC70', 10.0, 1.0)
+
+ALL SUBSTITUTES
+('L10', 'SUB_L10', 3.0, 1)
+('L12', 'SUB_L12_A', 2.0, 1)
+('L12', 'SUB_L12_B', 1.0, 2)
+('L16', 'SUB_L16', 2.0, 1)
+('L17', 'SUB_L16', 1.0, 1)
+('L3', 'SUB_L3', 2.0, 1)
+('L5', 'SUB_L5', 2.0, 1)
+('L50', 'SUB_50', 1.5, 1)
+('L6', 'SUB_L6', 1.0, 1)
+
+ALL ORDERS
+('O00_A', 'P5', 3, 0)
+('O00_B', 'P6', 10, 1)
+('O00_C', 'P7', 3, 2)
+('O00_D', 'P8', 1, 3)
+('O00_E', 'P9', 9, 4)
+('O00_F', 'P8', 1, 5)
+('O00_G', 'P10', 1, 6)
+('O00_H', 'P11', 2, 7)
+('O00_I', 'P12', 3, 8)
+('O00_J', 'P13', 1, 9)
+('O01', 'P2', 14, 11)
+('O03', 'P3', 15, 12)
+('O02', 'P1', 30, 12)
+('O04', 'P2', 20, 14)
+('O05', 'P4', 5, 15)
+('O06', 'P3', 8, 16)
+('O00_K', 'P15', 3, 20)
+('O00_L', 'P16', 1, 21)
+('O00_M', 'P17', 1, 22)
+('O00_N', 'P18', 20, 23)
+('O00_O', 'P30', 3, 24)
+('O00_P', 'P30', 1, 25)
+('O00_Q', 'P40', 1, 26)
+('O00_R1', 'P50', 1, 27)
+('O00_R2', 'P51', 1, 28)
+('O00_S2', 'P70', 1, 29)
+
+BOM children missing from parts: []
+BOM parents missing from parts: []
+Substitutes missing from parts: []
+Sub primary missing from parts: []
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# python3 - <<'PY'
+[?2004l
+for p in sorted(all_part_ids, key=lambda x:(level[x],x)):
+    print(f'{p}: {level[p]}')
+print('Topo len', len(topo))
+
+sorted_parts_by_level=[p for p in sorted(all_part_ids, key=lambda x:(level[x], x))]
+
+def deep_copy_state(inv, wcav):
+    return (dict(inv), dict(wcav))
+
+def attempt_build(product_id, total_qty, state_inv, state_wc):
+    # state_inv and state_wc are mutated; returns bool success
+    inv = state_inv
+    wcav = state_wc
+    demands = defaultdict(float)
+    demands[product_id] += total_qty
+    for p in sorted_parts_by_level:
+        qty = demands.get(p, 0.0)
+        if qty <= 1e-12:
+            continue
+        # consume primary stock
+        avail = inv[p]
+        consume = min(qty, avail)
+        inv[p] = avail - consume
+        rem = qty - consume
+        if rem <= 1e-12:
+            continue
+        if p in parents or p in routing:
+            # manufactured part
+            batch = parts[p]['batch_size']
+            build_qty = int(math.ceil(rem / batch - 1e-12)) * batch
+            # route hours
+            for rt in routing[p]:
+                wc = rt['workcenter_id']
+                hrs = rt['setup_hours'] + build_qty * rt['run_hours_per_unit']
+                if hrs > wcav[wc] + 1e-9:
+                    return False
+                wcav[wc] -= hrs
+            # child requirements
+            for b in bom[p]:
+                child=b['child_part_id']
+                base=b['qty_per'] * build_qty
+                adj = math.ceil(base * (1.0 + b['scrap_rate_pct']/100.0) - 1e-12) + b['setup_scrap_qty']
+                demands[child] += adj
+            # excess credit
+            if build_qty > rem:
+                inv[p] += build_qty - rem
+        else:
+            # leaf; use substitutes for rem
+            for s in subs[p]:
+                sub_id=s['substitute_part_id']
+                ratio=s['qty_ratio']
+                sub_inv=inv[sub_id]
+                cover=int(sub_inv // ratio) if ratio>0 else 0
+                take=min(rem, cover)
+                if take<=0:
+                    continue
+               [?2004h> import sqlite3, math, copy, json
+[?2004l  [?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004l [?2004h> DB='/app/manufacturing.db'
+[?2004l[?2004h> conn=sqlite3.connect(DB)
+[?2004l[?2004h> conn.row_factory=sqlite3.Row
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> 
+[?2004ll[?2004h> parts = {}
+[?2004lh[?2004h> cur.execute('SELECT * FROM parts')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r)
+[?2004l[?2004h>     parts[d['part_id']]={'name':d['name'],'on_hand_qty':d['on_hand_qty'],'batch_size':d['batch_size']}
+[?2004l[?2004h> 
+[?2004l[?2004h> bom = defaultdict(list)
+[?2004lv[?2004h> parents=set()
+[?2004l [?2004h> children=set()
+[?2004le[?2004h> cur.execute('SELECT * FROM bom')
+[?2004la[?2004h> for r in cur.fetchall():
+[?2004l'[?2004h>     d=dict(r)
+[?2004l[?2004h>     bom[d['parent_part_id']].append(d)
+[?2004l[?2004h>     parents.add(d['parent_part_id'])
+[?2004l [?2004h>     children.add(d['child_part_id'])
+[?2004l[?2004h> 
+[?2004lg[?2004h> workcenters={}
+[?2004l[?2004h> cur.execute('SELECT * FROM workcenters')
+[?2004ln[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r)
+[?2004l[?2004h>     workcenters[d['workcenter_id']]=d['available_hours']
+[?2004l[?2004h> 
+[?2004ld[?2004h> routing = defaultdict(list)
+[?2004l[?2004h> cur.execute('SELECT * FROM routing')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r)
+[?2004lm[?2004h>     routing[d['parent_part_id']].append(d)
+[?2004le[?2004h> 
+[?2004l[?2004h> subs = defaultdict(list)
+[?2004l, [?2004h> cur.execute('SELECT * FROM substitutes ORDER BY primary_part_id, preference_rank, substitute_part_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l   [?2004h>     d=dict(r)
+[?2004ld[?2004h>     subs[d['primary_part_id']].append(d)
+[?2004l[?2004h> 
+[?2004l[?2004h> orders=[]
+[?2004l[?2004h> cur.execute('SELECT * FROM orders ORDER BY priority ASC, order_id DESC')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l [?2004h>     d=dict(r)
+[?2004l[?2004h>     orders.append(d)
+[?2004lch[?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004lv[?2004h> all_part_ids=list(parts.keys())
+[?2004l[?2004h> # compute low-level codes: top-level parts = not children
+[?2004li[?2004h> level={p:0 for p in all_part_ids}
+[?2004l[?2004h> # Kahn topological: parents -> children
+[?2004l[?2004h> indeg={p:0 for p in all_part_ids}
+[?2004l#[?2004h> graph=defaultdict(list)
+[?2004l[?2004h> for p,childlist in bom.items():
+[?2004lte
+[?2004h>     for b in childlist:
+[?2004l[?2004h>         child=b['child_part_id']
+[?2004l[?2004h>         graph[p].append(child)
+[?2004l[?2004h>         indeg[child]+=1
+[?2004l[?2004h> queue=[p for p in all_part_ids if indeg[p]==0]
+[?2004l[?2004h> queue.sort()
+[?2004l[?2004h> topo=[]
+[?2004l[?2004h> while queue:
+[?2004l[?2004h>     p=queue.pop(0)
+[?2004l[?2004h>     topo.append(p)
+[?2004l[?2004h>     for c in graph[p]:
+[?2004l[?2004h>         if level[p]+1 > level[c]:
+[?2004l[?2004h>             level[c]=level[p]+1
+[?2004l[?2004h>         indeg[c]-=1
+[?2004l[?2004h>         if indeg[c]==0:
+[?2004l[?2004h>             queue.append(c)
+[?2004l[?2004h>             queue.sort()
+[?2004l[?2004h> # sanity: all parts topo? probably yes; if DAG incomplete, levels might be low
+[?2004l[?2004h> print('Levels:')
+[?2004l[?2004h> for p in sorted(all_part_ids, key=lambda x:(level[x],x)):
+[?2004l[?2004h>     print(f'{p}: {level[p]}')
+[?2004l[?2004h> print('Topo len', len(topo))
+[?2004l[?2004h> 
+[?2004l[?2004h> sorted_parts_by_level=[p for p in sorted(all_part_ids, key=lambda x:(level[x], x))]
+[?2004l[?2004h> 
+[?2004l[?2004h> def deep_copy_state(inv, wcav):
+[?2004l[?2004h>     return (dict(inv), dict(wcav))
+[?2004l[?2004h> 
+[?2004l[?2004h> def attempt_build(product_id, total_qty, state_inv, state_wc):
+[?2004l[?2004h>     # state_inv and state_wc are mutated; returns bool success
+[?2004l[?2004h>     inv = state_inv
+[?2004l[?2004h>     wcav = state_wc
+[?2004l[?2004h>     demands = defaultdict(float)
+[?2004l[?2004h>     demands[product_id] += total_qty
+[?2004l[?2004h>     for p in sorted_parts_by_level:
+[?2004l[?2004h>         qty = demands.get(p, 0.0)
+[?2004l[?2004h>         if qty <= 1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         # consume primary stock
+[?2004l[?2004h>         avail = inv[p]
+[?2004l[?2004h>         consume = min(qty, avail)
+[?2004l[?2004h>         inv[p] = avail - consume
+[?2004l[?2004h>         rem = qty - consume
+[?2004l[?2004h>         if rem <= 1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if p in parents or p in routing:
+[?2004l[?2004h>             # manufactured part
+[?2004l[?2004h>             batch = parts[p]['batch_size']
+[?2004l[?2004h>             build_qty = int(math.ceil(rem / batch - 1e-12)) * batch
+[?2004l[?2004h>             # route hours
+[?2004l[?2004h>             for rt in routing[p]:
+[?2004l[?2004h>                 wc = rt['workcenter_id']
+[?2004l[?2004h>                 hrs = rt['setup_hours'] + build_qty * rt['run_hours_per_unit']
+[?2004l[?2004h>                 if hrs > wcav[wc] + 1e-9:
+[?2004l[?2004h>                     return False
+[?2004l[?2004h>                 wcav[wc] -= hrs
+[?2004l[?2004h>             # child requirements
+[?2004l[?2004h>             for b in bom[p]:
+[?2004l[?2004h>                 child=b['child_part_id']
+[?2004l[?2004h>                 base=b['qty_per'] * build_qty
+[?2004l[?2004h>                 adj = math.ceil(base * (1.0 + b['scrap_rate_pct']/100.0) - 1e-12) + b['setup_scrap_qty']
+[?2004l[?2004h>                 demands[child] += adj
+[?2004l[?2004h>             # excess credit
+[?2004l[?2004h>             if build_qty > rem:
+[?2004l[?2004h>                 inv[p] += build_qty - rem
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             # leaf; use substitutes for rem
+[?2004l[?2004h>             for s in subs[p]:
+[?2004l[?2004h>                 sub_id=s['substitute_part_id']
+[?2004l[?2004h>                 ratio=s['qty_ratio']
+[?2004l[?2004h>                 sub_inv=inv[sub_id]
+[?2004l[?2004h>                 cover=int(sub_inv // ratio) if ratio>0 else 0
+[?2004l[?2004h>                 take=min(rem, cover)
+[?2004l[?2004h>                 if take<=0:
+[?2004l[?2004h>                     continue
+[?2004l[?2004h>                 inv[sub_id] -= take * ratio
+[?2004l[?2004h>                 rem -= take
+[?2004l[?2004h>                 if rem <= 1e-12:
+[?2004l[?2004h>                     break
+[?2004l[?2004h>             if rem > 1e-12:
+[?2004l[?2004h>                 return False
+[?2004l[?2004h>     # Check leftover demands not processed (shouldn't happen)
+[?2004l[?2004h>     for p,qty in demands.items():
+[?2004l[?2004h>         if qty > 1e-12:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     return True
+[?2004l[?2004h> 
+[?2004l[?2004h> def limiting_resource_for_order(order, state_inv, state_wc):
+[?2004l[?2004h>     product=order['product_part_id']
+[?2004l[?2004h>     batch=parts[product]['batch_size']
+[?2004l[?2004h>     target=allocated_qty + batch  # must be computed after allocated; but this function later
+[?2004l[?2004h>     pass
+[?2004l[?2004h> 
+[?2004l[?2004h> # temporary processing
+[?2004l[?2004h> current_inv={p: float(parts[p]['on_hand_qty']) for p in parts}
+[?2004l[?2004h> current_wc={w: float(workcenters[w]) for w in workcenters}
+[?2004l[?2004h> 
+[?2004l[?2004h> for order in orders:
+[?2004l[?2004h>     product=order['product_part_id']
+[?2004l[?2004h>     req=order['requested_qty']
+[?2004l[?2004h>     batch=parts[product]['batch_size']
+[?2004l[?2004h>     max_k=req//batch
+[?2004l[?2004h>     init_inv, init_wc = deep_copy_state(current_inv, current_wc)
+[?2004l[?2004h>     allocated=0
+[?2004l[?2004h>     chosen_inv=None; chosen_wc=None
+[?2004l[?2004h>     for k in range(max_k, -1, -1):
+[?2004l[?2004h>         target=k*batch
+[?2004l[?2004h>         t_inv,t_wc=deep_copy_state(init_inv, init_wc)
+[?2004l[?2004h>         ok=True
+[?2004l[?2004h>         if target>0:
+[?2004l[?2004h>             ok=attempt_build(product,target,t_inv,t_wc)
+[?2004l[?2004h>         if ok:
+[?2004l[?2004h>             allocated=target
+[?2004l[?2004h>             chosen_inv=t_inv; chosen_wc=t_wc
+[?2004l[?2004h>             break
+[?2004l[?2004h>     shortfall=req-allocated
+[?2004l[?2004h>     print(f'{order["order_id"]} p={product} req={req} batch={batch} alloc={allocated} short={shortfall}')
+[?2004l[?2004h>     if shortfall>0:
+[?2004l[?2004h>         # compute limiting later
+[?2004l[?2004h>         pass
+[?2004l[?2004h>     # update state
+[?2004l[?2004h>     current_inv=chosen_inv
+[?2004l[?2004h>     current_wc=chosen_wc
+[?2004l[?2004h> PY
+[?2004lLevels:
+P1: 0
+P10: 0
+P11: 0
+P12: 0
+P13: 0
+P15: 0
+P16: 0
+P17: 0
+P18: 0
+P2: 0
+P3: 0
+P30: 0
+P4: 0
+P40: 0
+P5: 0
+P50: 0
+P51: 0
+P6: 0
+P7: 0
+P70: 0
+P8: 0
+P9: 0
+SUB_L10: 0
+SUB_L12_A: 0
+SUB_L16: 0
+SUB_L3: 0
+SUB_L5: 0
+SUB_L6: 0
+L14: 1
+L15: 1
+L16: 1
+L17: 1
+L21: 1
+L40: 1
+L50: 1
+L8: 1
+SA1: 1
+SA10: 1
+SA11: 1
+SA3: 1
+SA30: 1
+SA4: 1
+SA5: 1
+SA70: 1
+SA71: 1
+SA8: 1
+SUB_50: 1
+SUB_L12_B: 1
+Z10: 1
+Z9: 1
+L10: 2
+L13: 2
+L2: 2
+L20: 2
+L22: 2
+L3: 2
+L30: 2
+L4: 2
+L7: 2
+SA2: 2
+SA6: 2
+SA72: 2
+L1: 3
+L11: 3
+L12: 3
+L5: 3
+L6: 3
+L70: 3
+Topo len 68
+O00_A p=P5 req=3 batch=2 alloc=0 short=3
+O00_B p=P6 req=10 batch=1 alloc=0 short=10
+O00_C p=P7 req=3 batch=1 alloc=0 short=3
+O00_D p=P8 req=1 batch=1 alloc=0 short=1
+O00_E p=P9 req=9 batch=1 alloc=0 short=9
+O00_F p=P8 req=1 batch=1 alloc=0 short=1
+O00_G p=P10 req=1 batch=1 alloc=0 short=1
+O00_H p=P11 req=2 batch=1 alloc=0 short=2
+O00_I p=P12 req=3 batch=1 alloc=0 short=3
+O00_J p=P13 req=1 batch=1 alloc=0 short=1
+O01 p=P2 req=14 batch=4 alloc=0 short=14
+O03 p=P3 req=15 batch=2 alloc=0 short=15
+O02 p=P1 req=30 batch=5 alloc=0 short=30
+O04 p=P2 req=20 batch=4 alloc=0 short=20
+O05 p=P4 req=5 batch=3 alloc=0 short=5
+O06 p=P3 req=8 batch=2 alloc=0 short=8
+O00_K p=P15 req=3 batch=1 alloc=0 short=3
+O00_L p=P16 req=1 batch=1 alloc=0 short=1
+O00_M p=P17 req=1 batch=1 alloc=0 short=1
+O00_N p=P18 req=20 batch=1 alloc=0 short=20
+O00_O p=P30 req=3 batch=1 alloc=0 short=3
+O00_P p=P30 req=1 batch=1 alloc=0 short=1
+O00_Q p=P40 req=1 batch=1 alloc=0 short=1
+O00_R1 p=P50 req=1 batch=1 alloc=0 short=1
+O00_R2 p=P51 req=1 batch=1 alloc=0 short=1
+O00_S2 p=P70 req=1 batch=1 alloc=0 short=1
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, math, copy
+[?2004l[?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004lc[?2004h> DB='/app/manufacturing.db'
+[?2004l
+[?2004h> conn=sqlite3.connect(DB)
+[?2004l[?2004h> conn.row_factory=sqlite3.Row
+[?2004l][?2004h> cur=conn.cursor()
+[?2004l[?2004h> 
+[?2004l[?2004h> parts={}
+[?2004l[?2004h> cur.execute('SELECT * FROM parts')
+[?2004lloca[?2004h> for r in cur.fetchall():
+[?2004l'[?2004h>     d=dict(r); parts[d['part_id']]=dict(d)
+[?2004lc=re[?2004h> 
+[?2004l[?2004h> bom=defaultdict(list)
+[?2004l wor[?2004h> cur.execute('SELECT * FROM bom')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r); bom[d['parent_part_id']].append(d)
+[?2004lati[?2004h> 
+[?2004l[?2004h> workcenters={}
+[?2004l[?2004h> cur.execute('SELECT * FROM workcenters')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r); workcenters[d['workcenter_id']]=float(d['available_hours'])
+[?2004l[?2004h> 
+[?2004l[?2004h> routing=defaultdict(list)
+[?2004l[?2004h> cur.execute('SELECT * FROM routing')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r); routing[d['parent_part_id']].append(d)
+[?2004l[?2004h> 
+[?2004l[?2004h> subs=defaultdict(list)
+[?2004l[?2004h> cur.execute('SELECT * FROM substitutes ORDER BY primary_part_id,preference_rank,substitute_part_id')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r); subs[d['primary_part_id']].append(d)
+[?2004l[?2004h> 
+[?2004l[?2004h> orders=[]
+[?2004l[?2004h> cur.execute('SELECT * FROM orders ORDER BY priority ASC, order_id DESC')
+[?2004l[?2004h> for r in cur.fetchall():
+[?2004l[?2004h>     d=dict(r); orders.append(d)
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004l[?2004h> # topological order parent-before-child
+[?2004l[?2004h> indeg={p:0 for p in parts}
+[?2004l[?2004h> graph=defaultdict(set)
+[?2004l[?2004h> for p, edges in bom.items():
+[?2004l[?2004h>     for e in edges:
+[?2004l[?2004h>         child=e['child_part_id']
+[?2004l[?2004h>         graph[p].add(child)
+[?2004l[?2004h> for p in parts:
+[?2004l[?2004h>     for c in graph.get(p,[]):
+[?2004l[?2004h>         indeg[c]+=1
+[?2004l[?2004h> queue=sorted([p for p in parts if indeg[p]==0])
+[?2004l[?2004h> topo=[]
+[?2004l[?2004h> while queue:
+[?2004l[?2004h>     p=queue.pop(0)
+[?2004l[?2004h>     topo.append(p)
+[?2004l[?2004h>     for c in sorted(graph.get(p,[])):
+[?2004l[?2004h>         indeg[c]-=1
+[?2004l[?2004h>         if indeg[c]==0:
+[?2004l[?2004h>             queue.append(c)
+[?2004l[?2004h>             queue.sort()
+[?2004l[?2004h> print('topo len',len(topo), 'parts',len(parts))
+[?2004l[?2004h> print('topo first 15', topo[:15])
+[?2004l[?2004h> 
+[?2004l[?2004h> def simulate_build(product, target, init_inv, init_wc):
+[?2004l[?2004h>     inv=dict(init_inv)
+[?2004l[?2004h>     wc=dict(init_wc)
+[?2004l[?2004h>     demands=defaultdict(int)
+[?2004l[?2004h>     demands[product]=target
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         qty=demands.get(p,0)
+[?2004l[?2004h>         if qty<=0:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         demands[p]=0
+[?2004l[?2004h>         avail=inv[p]
+[?2004l[?2004h>         consume=min(qty,avail)
+[?2004l[?2004h>         inv[p]=avail-consume
+[?2004l[?2004h>         rem=qty-consume
+[?2004l[?2004h>         if rem<=0:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if p in bom:
+[?2004l[?2004h>             batch=parts[p]['batch_size']
+[?2004l[?2004h>             build_qty=math.ceil(rem/batch - 1e-12)*batch
+[?2004l[?2004h>             # routing
+[?2004l[?2004h>             for rt in routing[p]:
+[?2004l[?2004h>                 wid=rt['workcenter_id']
+[?2004l[?2004h>                 hrs=rt['setup_hours'] + build_qty*rt['run_hours_per_unit']
+[?2004l[?2004h>                 if hrs > wc[wid] + 1e-9:
+[?2004l[?2004h>                     return None
+[?2004l[?2004h>                 wc[wid] -= hrs
+[?2004l[?2004h>             # child reqs
+[?2004l[?2004h>             for b in bom[p]:
+[?2004l[?2004h>                 child=b['child_part_id']
+[?2004l[?2004h>                 base=b['qty_per']*build_qty
+[?2004l[?2004h>                 adj=math.ceil(base*(1.0 + b['scrap_rate_pct']/100.0) - 1e-12) + b['setup_scrap_qty']
+[?2004l[?2004h>                 demands[child] += adj
+[?2004l[?2004h>             if build_qty > rem:
+[?2004l[?2004h>                 inv[p] += build_qty - rem
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             for s in subs.get(p,[]):
+[?2004l[?2004h>                 sub_id=s['substitute_part_id']
+[?2004l[?2004h>                 ratio=s['qty_ratio']
+[?2004l[?2004h>                 if ratio <= 0:
+[?2004l[?2004h>                     continue
+[?2004l[?2004h>                 cover=int(inv[sub_id] // ratio) if inv[sub_id] >= 0 else 0
+[?2004l[?2004h>                 take=min(rem,cover)
+[?2004l[?2004h>                 if take<=0:
+[?2004l[?2004h>                     continue
+[?2004l[?2004h>                 inv[sub_id] -= take*ratio
+[?2004l[?2004h>                 rem -= take
+[?2004l[?2004h>                 if rem<=0:
+[?2004l[?2004h>                     break
+[?2004l[?2004h>             if rem > 1e-12:
+[?2004l[?2004h>                 return None
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         if demands[p] > 1e-12:
+[?2004l[?2004h>             return None
+[?2004l[?2004h>     return (inv,wc)
+[?2004l[?2004h> 
+[?2004l[?2004h> current_inv={p: float(parts[p]['on_hand_qty']) for p in parts}
+[?2004l[?2004h> current_wc=dict(workcenters)
+[?2004l[?2004h> for order in orders:
+[?2004l[?2004h>     product=order['product_part_id']
+[?2004l[?2004h>     req=order['requested_qty']
+[?2004l[?2004h>     batch=parts[product]['batch_size']
+[?2004l[?2004h>     max_k=req//batch
+[?2004l[?2004h>     init_inv, init_wc=dict(current_inv), dict(current_wc)
+[?2004l[?2004h>     allocated=0; res_inv=init_inv; res_wc=init_wc
+[?2004l[?2004h>     if req>0 and batch>0:
+[?2004l[?2004h>         for k in range(max_k, -1, -1):
+[?2004l[?2004h>             target=k*batch
+[?2004l[?2004h>             if target==0:
+[?2004l[?2004h>                 allocated=0; res_inv=dict(init_inv); res_wc=dict(init_wc); break
+[?2004l[?2004h>             out=simulate_build(product, target, init_inv, init_wc)
+[?2004l[?2004h>             if out is not None:
+[?2004l[?2004h>                 allocated=target
+[?2004l[?2004h>                 res_inv,res_wc=out
+[?2004l[?2004h>                 break
+[?2004l[?2004h>     short=req-allocated
+[?2004l[?2004h>     print(f'{order["order_id"]:8s} prod={product:4s} req={req:3d} batch={batch} alloc={allocated:3d} short={short:3d}')
+[?2004l[?2004h>     current_inv=res_inv
+[?2004l[?2004h>     current_wc=res_wc
+[?2004l[?2004h> print('\nFinal workcenter hours:')
+[?2004l[?2004h> for w in sorted(current_wc): print(w,current_wc[w])
+[?2004l[?2004h> print('\nFinal inventory nonzero/negative:')
+[?2004l[?2004h> for p in sorted(current_inv):
+[?2004l[?2004h>     if current_inv[p] != 0:
+[?2004l[?2004h>         print(p, current_inv[p])
+[?2004l[?2004h> PY
+[?2004ltopo len 68 parts 68
+topo first 15 ['P1', 'P10', 'L14', 'P11', 'L15', 'P12', 'L16', 'P13', 'L17', 'P15', 'P16', 'P17', 'L21', 'P18', 'P2']
+O00_A    prod=P5   req=  3 batch=2 alloc=  0 short=  3
+O00_B    prod=P6   req= 10 batch=1 alloc= 10 short=  0
+O00_C    prod=P7   req=  3 batch=1 alloc=  3 short=  0
+O00_D    prod=P8   req=  1 batch=1 alloc=  1 short=  0
+O00_E    prod=P9   req=  9 batch=1 alloc=  9 short=  0
+O00_F    prod=P8   req=  1 batch=1 alloc=  0 short=  1
+O00_G    prod=P10  req=  1 batch=1 alloc=  0 short=  1
+O00_H    prod=P11  req=  2 batch=1 alloc=  1 short=  1
+O00_I    prod=P12  req=  3 batch=1 alloc=  2 short=  1
+O00_J    prod=P13  req=  1 batch=1 alloc=  1 short=  0
+O01      prod=P2   req= 14 batch=4 alloc= 12 short=  2
+O03      prod=P3   req= 15 batch=2 alloc= 14 short=  1
+O02      prod=P1   req= 30 batch=5 alloc=  0 short= 30
+O04      prod=P2   req= 20 batch=4 alloc=  0 short= 20
+O05      prod=P4   req=  5 batch=3 alloc=  0 short=  5
+O06      prod=P3   req=  8 batch=2 alloc=  2 short=  6
+O00_K    prod=P15  req=  3 batch=1 alloc=  2 short=  1
+O00_L    prod=P16  req=  1 batch=1 alloc=  0 short=  1
+O00_M    prod=P17  req=  1 batch=1 alloc=  0 short=  1
+O00_N    prod=P18  req= 20 batch=1 alloc= 10 short= 10
+O00_O    prod=P30  req=  3 batch=1 alloc=  3 short=  0
+O00_P    prod=P30  req=  1 batch=1 alloc=  0 short=  1
+O00_Q    prod=P40  req=  1 batch=1 alloc=  1 short=  0
+O00_R1   prod=P50  req=  1 batch=1 alloc=  1 short=  0
+O00_R2   prod=P51  req=  1 batch=1 alloc=  1 short=  0
+O00_S2   prod=P70  req=  1 batch=1 alloc=  1 short=  0
+
+Final workcenter hours:
+WC1 35.7
+WC10 0.0
+WC11 4.0
+WC2 11.600000000000001
+WC3 1.4500000000000006
+WC30 3.0
+WC31 90.0
+WC4 2.75
+WC40 -5.551115123125783e-17
+WC5 10.0
+WC6 1.1999999999999993
+WC70 3.0
+
+Final inventory nonzero/negative:
+L1 244.0
+L11 100.0
+L13 11.0
+L14 100.0
+L15 4.0
+L2 226.0
+L20 99.0
+L21 1.0
+L22 100.0
+L3 15.0
+L30 9.0
+L4 76.0
+L40 9.0
+L7 15.0
+L70 98.0
+L8 24.0
+SA1 2.0
+SA2 3.0
+SA30 4.0
+SA4 1.0
+SUB_L10 5.0
+SUB_L12_A 1.0
+SUB_L3 18.0
+SUB_L6 6.0
+[?2004hroot@ae74f276-8a01-4772-ac64-658828a32f5e:/app# 

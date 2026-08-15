@@ -1,0 +1,69 @@
+Selected strategy: _DaytonaDirect
+Building environment from /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/task/environment/Dockerfile
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Trajectory dumped to pass2-output/31869087653-pass2/task__LiPnECJ/agent/trajectory.json
+Collecting main service artifacts
+Failed to download artifact '/app/report.json' from service 'main' (best-effort)
+Traceback (most recent call last):
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_utils/errors.py", line 211, in async_wrapper
+    return await async_func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_utils/otel_decorator.py", line 129, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_utils/otel_decorator.py", line 257, in async_wrapper
+    result = await func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_async/filesystem.py", line 199, in download_file
+    raise create_file_download_error(response)
+daytona.common.errors.DaytonaFileNotFoundError: file not found: /app/report.json
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/harbor/trial/artifact_handler.py", line 330, in _download_artifact
+    await source_env.service_download_file(
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/harbor/environments/compose_service_ops.py", line 126, in service_download_file
+    await self.download_file(source_path, target_path)
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/harbor/environments/daytona/environment.py", line 1508, in download_file
+    return await self._strategy.download_file(source_path, target_path)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/harbor/environments/daytona/environment.py", line 357, in download_file
+    await self._env._sdk_download_file(source_path, target_path)
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/asyncio/__init__.py", line 193, in async_wrapped
+    return await copy(fn, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/asyncio/__init__.py", line 112, in __call__
+    do = await self.iter(retry_state=retry_state)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/asyncio/__init__.py", line 157, in iter
+    result = await action(retry_state)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/_utils.py", line 111, in inner
+    return call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/__init__.py", line 413, in exc_check
+    raise retry_exc.reraise()
+          ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/__init__.py", line 184, in reraise
+    raise self.last_attempt.result()
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/tenacity/asyncio/__init__.py", line 116, in __call__
+    result = await fn(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/harbor/environments/daytona/environment.py", line 1433, in _sdk_download_file
+    await self._sandbox.fs.download_file(source_path, str(target_path))
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_utils/errors.py", line 213, in async_wrapper
+    process_n_raise_exception(e)
+  File "/home/runner/.local/share/uv/tools/harbor/lib/python3.12/site-packages/daytona/_utils/errors.py", line 144, in process_n_raise_exception
+    raise e.__class__(
+daytona.common.errors.DaytonaFileNotFoundError: Failed to download file: file not found: /app/report.json

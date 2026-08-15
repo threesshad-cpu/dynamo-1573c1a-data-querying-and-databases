@@ -1,0 +1,281 @@
+{
+    "reportFormat": "CTRF",
+    "specVersion": "0.0.0",
+    "timestamp": "2026-08-15T06:37:29.247985+00:00",
+    "generatedBy": "pytest",
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.3.4"
+        },
+        "summary": {
+            "tests": 28,
+            "passed": 28,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1786775849149,
+            "stop": 1786775849247
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_outputs.py::test_file_exists_and_not_symlink",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849233,
+                "stop": 1786775849234,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_report_schema_and_keys",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849235,
+                "stop": 1786775849235,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_output_sorting",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849235,
+                "stop": 1786775849236,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O01_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849236,
+                "stop": 1786775849236,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O02_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849236,
+                "stop": 1786775849237,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O03_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849237,
+                "stop": 1786775849237,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O04_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849237,
+                "stop": 1786775849238,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O05_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849238,
+                "stop": 1786775849238,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O06_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849238,
+                "stop": 1786775849239,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_A_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849239,
+                "stop": 1786775849239,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_B_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849239,
+                "stop": 1786775849239,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_C_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849240,
+                "stop": 1786775849240,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_D_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849240,
+                "stop": 1786775849240,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_E_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849240,
+                "stop": 1786775849241,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_F_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849241,
+                "stop": 1786775849241,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_G_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849241,
+                "stop": 1786775849242,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_H_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849242,
+                "stop": 1786775849242,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_I_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849242,
+                "stop": 1786775849243,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_J_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849243,
+                "stop": 1786775849243,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_K_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849243,
+                "stop": 1786775849244,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_L_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849244,
+                "stop": 1786775849244,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_M_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849244,
+                "stop": 1786775849245,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_N_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849245,
+                "stop": 1786775849245,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_O_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849245,
+                "stop": 1786775849245,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_P_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849246,
+                "stop": 1786775849246,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_Q_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849246,
+                "stop": 1786775849246,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_R1_R2_allocation",
+                "status": "passed",
+                "duration": 1,
+                "start": 1786775849246,
+                "stop": 1786775849247,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            },
+            {
+                "name": "test_outputs.py::test_order_O00_S2_allocation",
+                "status": "passed",
+                "duration": 0,
+                "start": 1786775849247,
+                "stop": 1786775849247,
+                "retries": 0,
+                "file_path": "test_outputs.py"
+            }
+        ]
+    }
+}
