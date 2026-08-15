@@ -1,0 +1,681 @@
+review / review	UNKNOWN STEP	﻿2026-08-15T07:26:14.0036639Z Current runner version: '2.336.0'
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0039906Z Runner name: 'blacksmith-scale2-01m0250famxykyg81qe76qb01v-2vcpu'
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0040607Z Runner group name: 'blacksmith runners 01kwjf99pkapfc7yagwd0c1r2e'
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0041392Z Machine name: 'ip-172-31-64-123'
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0043173Z ##[group]GITHUB_TOKEN Permissions
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0044463Z Contents: read
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0044923Z Metadata: read
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0045350Z PullRequests: write
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0045829Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0047161Z Secret source: Actions
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0047861Z Prepare workflow directory
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0220580Z Prepare all required actions
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.0245007Z Getting action download info
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.3757718Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+review / review	UNKNOWN STEP	2026-08-15T07:26:14.9255355Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.4578374Z Download action repository 'actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.5050042Z Download action repository 'actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6120326Z Setting BLACKSMITH_ACTIONS_RESULTS_URL to https://results-receiver.actions.githubusercontent.com/
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6157295Z Uses: handshake-project-dynamo/handshake-orchestration-tb2/.github/workflows/dynamo-review.yml@refs/heads/main (623a2dbaae6fffe4e0cfe4e975c4442ae8ea3116)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6159285Z ##[group] Inputs
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6159494Z   checks_ref: main
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6159681Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6159875Z Complete job name: review / review
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6476985Z A job started hook has been configured by the self-hosted runner administrator
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6617624Z ##[group]Run '/setup.sh'
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6635782Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6636179Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6636429Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6636682Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6636901Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6861511Z Logging daemon started (blacksmithd for logs)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.6976131Z Results daemon started (blacksmithd for results)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7115197Z Background adoption and SSH setup started (PID: 3506)
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7115626Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7116003Z ----------------------------------------
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7151417Z View this job: https://app.blacksmith.sh/handshake-project-dynamo/runs/31871852318/jobs/94981801600
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7153568Z SSH Access (using your GitHub SSH key):
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7161021Z   ssh -p 64005 runner@blacksmith-scale2-01m0250famxykyg81qe76qb01v-2vcpu.vm.blacksmith.sh
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7161394Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7161583Z No GitHub SSH key? Add one at:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7162026Z https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7162375Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7162524Z ----------------------------------------
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7162717Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7162905Z VM ID: blacksmith-scale2-01m0250famxykyg81qe76qb01v-2vcpu
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7163217Z Host: production-192.240.244.178-x8664
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7163483Z Host Agent PID: 1941506
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7163749Z Agent Process Count: 1
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7163998Z Host Agent Git SHA: 1dcca3f2
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7164253Z Host CPU Manufacturer: GenuineIntel
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7164538Z Blacksmith Host Generation: gen 1
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7164831Z Petname: production-good-drum-efcf9b7b
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7165103Z Region: us-west
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7165641Z Rootfs Version: ubuntu24-full-x64-012126
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7185564Z OS Version: Ubuntu 24.04.3 LTS
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7191576Z System Statistics:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7194301Z -----------------
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7196369Z VM CPU Count: 3
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7196581Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7196744Z Jobs by Process ID:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7196981Z -----------------
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7197209Z PID 1941506: 3 jobs
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7197446Z Total: 3 jobs across 1 process
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7197619Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7197741Z Devices by Process ID:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7197966Z -----------------
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7198194Z PID 1941506: 3 devices
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7198596Z Total: 3 devices across 1 process
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7218108Z Enabling Blacksmith transparent cache
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7519594Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7523758Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7529296Z with:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7529567Z   repository: handshake-project-dynamo/handshake-orchestration-tb2
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7529853Z   ref: main
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7530246Z   token: ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7530428Z   ssh-strict: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7530615Z   ssh-user: git
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7530802Z   persist-credentials: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531003Z   clean: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531190Z   sparse-checkout-cone-mode: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531395Z   fetch-depth: 1
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531569Z   fetch-tags: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531790Z   show-progress: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7531970Z   lfs: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7532141Z   submodules: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7532322Z   set-safe-directory: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7532531Z   allow-unsafe-pr-checkout: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7532760Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7532940Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7533173Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7533626Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.7533949Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8706180Z Syncing repository: handshake-project-dynamo/handshake-orchestration-tb2
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8707052Z ##[group]Getting Git version info
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8707479Z Working directory is '/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases'
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8708022Z [command]/usr/local/bin/git version
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8759764Z git version 2.52.0
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8768798Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8775284Z Temporarily overriding HOME='/home/runner/_work/_temp/faf0343f-aff2-4375-b59a-fc0b147f9564' before making global git config changes
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8775863Z Adding repository directory to the temporary git global config as a safe directory
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8778445Z [command]/usr/local/bin/git config --global --add safe.directory /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8803232Z Deleting the contents of '/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases'
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8804680Z ##[group]Initializing the repository
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8807138Z [command]/usr/local/bin/git init /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8835674Z hint: Using 'master' as the name for the initial branch. This default branch name
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8836251Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8836665Z hint: to use in all of your new repositories, which will suppress this warning,
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8836992Z hint: call:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8837209Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8837493Z hint: 	git config --global init.defaultBranch <name>
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8838030Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8838306Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8838698Z hint: 'development'. The just-created branch can be renamed via this command:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8839013Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8839248Z hint: 	git branch -m <name>
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8839486Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8839776Z hint: Disable this message with "git config set advice.defaultBranchName false"
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8840371Z Initialized empty Git repository in /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/.git/
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8841524Z [command]/usr/local/bin/git remote add origin https://github.com/handshake-project-dynamo/handshake-orchestration-tb2
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8861110Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8861467Z ##[group]Disabling automatic garbage collection
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8863253Z [command]/usr/local/bin/git config --local gc.auto 0
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8881639Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8881975Z ##[group]Setting up auth
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8885765Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.8905933Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9057433Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9077384Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9174778Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9193712Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9291130Z [command]/usr/local/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9312213Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9312562Z ##[group]Fetching the repository
+review / review	UNKNOWN STEP	2026-08-15T07:26:15.9316918Z [command]/usr/local/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8921848Z From https://github.com/handshake-project-dynamo/handshake-orchestration-tb2
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8924817Z  * [new branch]      main       -> origin/main
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8936652Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8937016Z ##[group]Determining the checkout info
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8940967Z [command]/usr/local/bin/git branch --list --remote origin/main
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8956898Z   origin/main
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8965266Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8965593Z [command]/usr/local/bin/git sparse-checkout disable
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.8985846Z [command]/usr/local/bin/git config --local --unset-all extensions.worktreeConfig
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9001291Z ##[group]Checking out the ref
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9003352Z [command]/usr/local/bin/git checkout --progress --force -B main refs/remotes/origin/main
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9109815Z Switched to a new branch 'main'
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9115496Z branch 'main' set up to track 'origin/main'.
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9116302Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9136828Z [command]/usr/local/bin/git log -1 --format=%H
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9151614Z 623a2dbaae6fffe4e0cfe4e975c4442ae8ea3116
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9262347Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9262564Z with:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9262703Z   ref: 93eff05ee31f23cc69f140d3c50cd1fd8854a374
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9262867Z   path: submission
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9263069Z   persist-credentials: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9263326Z   allow-unsafe-pr-checkout: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9263553Z   repository: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265098Z   token: ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265223Z   ssh-strict: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265341Z   ssh-user: git
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265453Z   clean: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265580Z   sparse-checkout-cone-mode: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265723Z   fetch-depth: 1
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265839Z   fetch-tags: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9265960Z   show-progress: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266082Z   lfs: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266192Z   submodules: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266344Z   set-safe-directory: true
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266472Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266594Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266761Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9266991Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9267225Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9689119Z Syncing repository: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9689520Z ##[group]Getting Git version info
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9689880Z Working directory is '/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission'
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9703789Z [command]/usr/local/bin/git version
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9726003Z git version 2.52.0
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9745129Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9760345Z Temporarily overriding HOME='/home/runner/_work/_temp/fda7fb0e-f61c-4c44-873e-2b5742aa03e1' before making global git config changes
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9760877Z Adding repository directory to the temporary git global config as a safe directory
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9763236Z [command]/usr/local/bin/git config --global --add safe.directory /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9780853Z ##[group]Determining repository object format
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9781553Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9781839Z ##[group]Initializing the repository
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9784284Z [command]/usr/local/bin/git init /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9807669Z hint: Using 'master' as the name for the initial branch. This default branch name
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9808004Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9808294Z hint: to use in all of your new repositories, which will suppress this warning,
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9808531Z hint: call:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9810444Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9810681Z hint: 	git config --global init.defaultBranch <name>
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9810922Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9811168Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9811511Z hint: 'development'. The just-created branch can be renamed via this command:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9811799Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9812017Z hint: 	git branch -m <name>
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9812168Z hint:
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9813335Z hint: Disable this message with "git config set advice.defaultBranchName false"
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9813863Z Initialized empty Git repository in /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git/
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9814802Z [command]/usr/local/bin/git remote add origin https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9825472Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9825929Z ##[group]Disabling automatic garbage collection
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9827882Z [command]/usr/local/bin/git config --local gc.auto 0
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9844809Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9845102Z ##[group]Setting up auth
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9845338Z Removing SSH command configuration
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9848099Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9865710Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9961172Z Removing HTTP extra header
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9963889Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:26:16.9987089Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0085327Z Removing includeIf entries pointing to credentials config files
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0085670Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0101920Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0198869Z [command]/usr/local/bin/git config --file /home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0217990Z [command]/usr/local/bin/git config --local includeIf.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git.path /home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0235619Z [command]/usr/local/bin/git config --local includeIf.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git/worktrees/*.path /home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0252758Z [command]/usr/local/bin/git config --local includeIf.gitdir:/github/workspace/submission/.git.path /github/runner_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0270713Z [command]/usr/local/bin/git config --local includeIf.gitdir:/github/workspace/submission/.git/worktrees/*.path /github/runner_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0287553Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0287784Z ##[group]Fetching the repository
+review / review	UNKNOWN STEP	2026-08-15T07:26:17.0291710Z [command]/usr/local/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin 93eff05ee31f23cc69f140d3c50cd1fd8854a374
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0148481Z From https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0149182Z  * branch            93eff05ee31f23cc69f140d3c50cd1fd8854a374 -> FETCH_HEAD
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0162140Z [command]/usr/local/bin/git rev-parse --verify --quiet 93eff05ee31f23cc69f140d3c50cd1fd8854a374^{object}
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0178813Z 93eff05ee31f23cc69f140d3c50cd1fd8854a374
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0180291Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0180553Z ##[group]Determining the checkout info
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0180828Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0183925Z [command]/usr/local/bin/git sparse-checkout disable
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0209371Z [command]/usr/local/bin/git config --local --unset-all extensions.worktreeConfig
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0225919Z ##[group]Checking out the ref
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0228182Z [command]/usr/local/bin/git checkout --progress --force 93eff05ee31f23cc69f140d3c50cd1fd8854a374
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0371022Z Note: switching to '93eff05ee31f23cc69f140d3c50cd1fd8854a374'.
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0371214Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0371560Z You are in 'detached HEAD' state. You can look around, make experimental
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0371854Z changes and commit them, and you can discard any commits you make in this
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0372168Z state without impacting any branches by switching back to a branch.
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0372327Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0372441Z If you want to create a new branch to retain commits you create, you may
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0372832Z do so (now or later) by using -c with the switch command. Example:
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0372971Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373036Z   git switch -c <new-branch-name>
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373158Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373317Z Or undo this operation with:
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373411Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373470Z   git switch -
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373545Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373659Z Turn off this advice by setting config variable advice.detachedHead to false
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373828Z 
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0373925Z HEAD is now at 93eff05 trigger ci for pass2 timeout retry
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0374430Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0393603Z [command]/usr/local/bin/git log -1 --format=%H
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0407919Z 93eff05ee31f23cc69f140d3c50cd1fd8854a374
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0411638Z ##[group]Removing auth
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0411814Z Removing SSH command configuration
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0413812Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0434035Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0537019Z Removing HTTP extra header
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0540806Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0564274Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0672003Z Removing includeIf entries pointing to credentials config files
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0674294Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0710543Z includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0711225Z includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git/worktrees/*.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0711683Z includeif.gitdir:/github/workspace/submission/.git.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0711960Z includeif.gitdir:/github/workspace/submission/.git/worktrees/*.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0716209Z [command]/usr/local/bin/git config --local --get-all includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0733725Z /home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0745586Z [command]/usr/local/bin/git config --local --unset includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git.path \/home\/runner\/_work\/_temp\/git\-credentials\-13413c59\-143c\-4e77\-aacc\-4152c60ae402\.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0776215Z [command]/usr/local/bin/git config --local --get-all includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git/worktrees/*.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0789995Z /home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0796961Z [command]/usr/local/bin/git config --local --unset includeif.gitdir:/home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission/.git/worktrees/*.path \/home\/runner\/_work\/_temp\/git\-credentials\-13413c59\-143c\-4e77\-aacc\-4152c60ae402\.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0811855Z [command]/usr/local/bin/git config --local --get-all includeif.gitdir:/github/workspace/submission/.git.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0825911Z /github/runner_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0828774Z [command]/usr/local/bin/git config --local --unset includeif.gitdir:/github/workspace/submission/.git.path \/github\/runner_temp\/git\-credentials\-13413c59\-143c\-4e77\-aacc\-4152c60ae402\.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0889169Z [command]/usr/local/bin/git config --local --get-all includeif.gitdir:/github/workspace/submission/.git/worktrees/*.path
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0901345Z /github/runner_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0907424Z [command]/usr/local/bin/git config --local --unset includeif.gitdir:/github/workspace/submission/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-13413c59\-143c\-4e77\-aacc\-4152c60ae402\.config
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.0922282Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1017915Z Removing credentials config '/home/runner/_work/_temp/git-credentials-13413c59-143c-4e77-aacc-4152c60ae402.config'
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1021122Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1076925Z ##[group]Run bash .dynamo/static-report.sh submission/task
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1077173Z ^[[36;1mbash .dynamo/static-report.sh submission/task^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1092200Z shell: /usr/bin/bash -e {0}
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1092345Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1092474Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1092686Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1092930Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1094528Z   GH_TOKEN: ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1094720Z   REPO: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1094938Z   PR_NUMBER: 5
+review / review	UNKNOWN STEP	2026-08-15T07:26:18.1095061Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0358461Z static checks passed
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0436936Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0437680Z ##[group]Run actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0437889Z with:
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0438004Z   node-version: 20
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0438125Z   always-auth: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0438250Z   check-latest: false
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0439659Z   token: ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0439773Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0439890Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0440053Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0440294Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.0440531Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.1251101Z (node:4579) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.1251489Z (Use `node --trace-deprecation ...` to show where the warning was created)
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.1255716Z Found in cache @ /opt/hostedtoolcache/node/20.20.0/x64
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.1261264Z ##[group]Environment details
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.2964813Z node: v20.20.0
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.2965067Z npm: 10.8.2
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.2965241Z yarn: 1.22.22
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.2965599Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3016613Z ##[group]Run npm install -g @anthropic-ai/claude-code >/dev/null 2>&1
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3016889Z ^[[36;1mnpm install -g @anthropic-ai/claude-code >/dev/null 2>&1^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3039847Z shell: /usr/bin/bash -e {0}
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3039997Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3040126Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3040295Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3040540Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:22.3040791Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8222361Z ##[group]Run set -euo pipefail
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8222556Z ^[[36;1mset -euo pipefail^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8222714Z ^[[36;1mif [ -z "${ANTHROPIC_API_KEY:-}" ]; then^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8222971Z ^[[36;1m  echo "::error::Set the ANTHROPIC_API_KEY repo/org secret (project-pays key)."^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8223191Z ^[[36;1m  exit 1^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8223308Z ^[[36;1mfi^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8223500Z ^[[36;1m# Deny-by-default: settings.json confines the model to reading ONLY the^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8223734Z ^[[36;1m# rubric and submission/ (no Bash/Write).^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8223916Z ^[[36;1mpython3 tools/claude_costs.py run-cli \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8224197Z ^[[36;1m  --stage rubric-review \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8224373Z ^[[36;1m  --cost-dir "$RUNNER_TEMP/claude-costs" \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8224544Z ^[[36;1m  -- claude -p \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8224692Z ^[[36;1m    --model claude-opus-4-8 \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8224894Z ^[[36;1m    --settings .dynamo/settings.json \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8225067Z ^[[36;1m    --permission-mode dontAsk \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8225233Z ^[[36;1m  < .dynamo/dynamo-eval-prompt.md \^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8225406Z ^[[36;1m  | tee "$RUNNER_TEMP/verdict.md"^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8240683Z shell: /usr/bin/bash -e {0}
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8240833Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8240971Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8241132Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8241368Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8241875Z   ANTHROPIC_API_KEY: ***
+review / review	UNKNOWN STEP	2026-08-15T07:26:23.8242005Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5596505Z # Dynamo Eval — bom-shortage-cascade
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5596896Z Format: Harbor
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5597267Z Verdict: FAIL (one or more criteria fail)
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5597461Z 
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5597890Z ## Criteria
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5598228Z | # | Criterion | Result | Note |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5598551Z |---|-----------|--------|------|
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5599616Z | 1 | code_dependent | PASS | Multi-level BOM explosion, netting, scrap, substitution cascade and sequential shared-pool allocation over 28 orders — not solvable by reasoning or a single query. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5601454Z | 2 | essential_difficulty | PASS | Bespoke MRP simulation with heterogeneous binding constraints and many interacting edge cases; genuinely hard for an expert, not tedium. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5602682Z | 3 | interesting_realistic | PASS | Realistic MRP/ERP bottleneck-analysis scenario; outputs (allocation, shortfall, limiting resource) are what a supply-chain analyst wants. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5603700Z | 4 | novel | PASS | Custom schema + hand-built dataset and non-standard rule combination; not a memorizable textbook problem. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5604656Z | 5 | solvable | PASS | `solution/solve.py` implements a complete, self-consistent simulation and writes `/app/report.json`; feasible for an expert in ~2h. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5606022Z | 6 | unambiguous | FAIL | O00_V expects `limiting_resource: null` with `shortfall_qty=1`, but the instruction says null is for `shortfall==0`; the shared-substitute ratio is genuinely ambiguous, and a sound expert reading diverges (see Failures). |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5607533Z | 7 | outcome_verified | PASS | Verifier grades the final `report.json` end state; the numbered steps define the problem semantics (bespoke rules), not a mandated implementation/tooling. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5608657Z | 8 | instruction_concision | PASS | Absolute paths, backticks, `$U$` math, no tool listings, no TB3 time-budget string; reads as human-written. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5609491Z | 9 | structured_data_schema | PASS | Exact JSON schema with keys/types and sort order given in `instruction.md`. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5610476Z | 10 | verifiable | PASS | Deterministic exact-match on the requested `/app/report.json`; `artifacts`, instruction, and `TEST_REPORT_PATH` default all agree; no online bypass. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5611424Z | 11 | functional_verification | PASS | Tests load and compare output values; no source-string/keyword scanning. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5612339Z | 12 | deterministic_reproducible | PASS | Deterministic data generation, pinned pytest, digest-pinned base image, `1e-9` float guard in the reference. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5613462Z | 13 | test_instruction_alignment | FAIL | O00_V (and the "blindspot trap" framing) grade on a reference-implementation artifact that contradicts the instruction's stated rule. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5614595Z | 14 | anti_cheat | PASS | No answer/oracle in `environment/`; `generate_data.py` removed from image; expected values live only in `tests/` (overlaid at verify time). |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5615704Z | 15 | solution_quality | PASS | Derives every value through real computation; no hardcoded answers; large logic kept in a separate `solve.py`, not a heredoc. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5616510Z | 16 | task_security | PASS | No malicious/exfiltration/obfuscated behavior in any file. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5617243Z | 17 | difficulty_explanation_quality | PASS | Names expertise, traps, synthetic provenance, and the real-world audience. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5617987Z | 18 | solution_explanation_quality | PASS | Congruent with `solve.py`; conveys strategy and key steps. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5618927Z | 19 | verification_explanation_quality | PASS | Accurately describes per-order checks; exact-match verifier has no inequality bands needing calibration. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5620058Z | 20 | accurate_taxonomy_labels | PASS | `analyze/generate/implement` and `document_or_report/generated_output_artifact` fit; graph/semantic subcategory is defensible for a BOM DAG. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5621179Z | 21 | expert_time_estimate | PASS | 2.0h, non-zero and plausible for the described complexity. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5621915Z | 22 | open_internet | PASS | `allow_internet=true`; answer is not retrievable online. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5623788Z | 23 | reviewable | PASS | Values are derivable by running `solve.py`; explanations give enough context (note below). |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5624578Z | 24 | typos | PASS | Table/column names, paths, and IDs are consistent across files. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5625190Z | 25 | no_extraneous_files | PASS | Only definition/solution/verifier/environment files present. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5625923Z | 26 | verifier_configuration | PASS | `artifacts` at top level; pytest baked; ground truth in `tests/`; single-image mode. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5626772Z | 27 | environment_hygiene | PASS | Dockerfile does not COPY `solution/`/`tests/`; verifier deps baked & pinned; no apt to mismanage. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5627609Z | 28 | resource_configuration | PASS | 1 cpu / 2GB / no GPU; difficulty is intellectual (note on agent timeout below). |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5628510Z | 29 | task_name | PASS | `[task].name = "dynamo/bom-shortage-cascade"` — org/name, kebab-case, 3 words. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5629041Z | 30 | task_readme | N/A | No development README present. |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5629652Z | 31 | task_toml_schema | PASS | Valid Harbor fields; `[task].description` is a standard/recognized field (note below). |
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5630035Z 
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5630127Z ## Failures
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5630239Z 
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5634410Z **test_instruction_alignment (FAIL).** `test_order_O00_V_allocation` asserts `limiting_resource is None` while `shortfall_qty == 1`. The instruction (`instruction.md` step 5) states limiting_resource is set to `null` only "When `shortfall_qty == 0`," and otherwise instructs the solver to "identify the single most constraining resource that prevents building one additional batch." For O00_V (P90 → L91 + L92, both fed by the single shared `SUB_90` with `on_hand=1`), the reference's allocation logic correctly detects the shared-substitute shortage (`solve.py:166-179`), but its limiting-resource computation (`solve.py:250-258`) counts `SUB_90`'s full stock independently for both L91 and L92, so each ratio is exactly 1.0, none is "below 1.0," and it returns `null`. The expected value is thus an artifact of a self-inconsistency in the reference implementation (the `verification_explanation` itself calls O00_U/O00_V "blindspot trap[s]"), not a requirement the instruction establishes — grading on it is an unfair stump. The contributor should either make the instruction's limiting-resource rule explicit for the "shortfall>0 but no ratio<1.0" case, or fix the reference so limiting_resource is computed consistently with the shared-pool allocation.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5636702Z 
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5639006Z **unambiguous (FAIL).** Same root cause. The limiting-resource ratio in step 5 says to "include available substitute stock (converted at the appropriate `qty_ratio`) in the available supply" but is silent on whether a substitute shared across multiple leaves may be counted once per leaf or must be netted across them. A competent expert who — for consistency with the shared-pool consumption they just implemented — nets `SUB_90` across L91/L92 gets one leaf at ratio 0 and would output `limiting_resource = "L91"`/`"L92"`, failing O00_V. Compounding this, the instruction explicitly reserves `null` for `shortfall==0`, so a reasonable expert facing `shortfall=1` would expect a non-null resource and would not produce `null`. This is a concrete, sound, divergent reading that fails verification. Disclose the intended shared-substitute handling and the "no ratio below 1.0 ⇒ null even when shortfall>0" convention in `instruction.md`.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5640612Z 
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5640673Z ## Notes
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5641589Z - **resource_configuration:** `[agent].timeout_sec = 600` (10 min) is aggressive for a task whose `expert_time_estimate_hours` is 2.0 and which requires implementing this entire bespoke simulation with many edge cases. Not clearly wrong for an LLM agent, so graded PASS, but a human reviewer may want to confirm the budget is sufficient.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5642594Z - **task_toml_schema:** `[task].description` is treated as a recognized/benign Harbor field (PASS). If the local schema check flags it as extraneous, that would flip this criterion.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5643829Z - **reviewable:** The 28 expected values in `tests/test_outputs.py` are hardcoded and appear to have been produced by running `solve.py` (they trivially match the reference), so the verifier confirms "agent matches reference," not that the reference rules are themselves correct. The O00_V inconsistency above is a concrete instance where that matters. A per-order derivation note in the README/verification_explanation would strengthen reviewability.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5645112Z - What would change the two FAILs: making the shared-substitute ratio handling and the shortfall>0/limiting=null convention explicit in `instruction.md` (or aligning the reference's limiting logic with its allocation logic) would move both criteria to PASS.
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5666778Z ##[group]Run bash .dynamo/report.sh "$RUNNER_TEMP/verdict.md"
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5667023Z ^[[36;1mbash .dynamo/report.sh "$RUNNER_TEMP/verdict.md"^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5681676Z shell: /usr/bin/bash -e {0}
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5681823Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5681953Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5682118Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5682362Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5683858Z   GH_TOKEN: ***
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5684055Z   REPO: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5684307Z   PR_NUMBER: 5
+review / review	UNKNOWN STEP	2026-08-15T07:30:50.5684420Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8891204Z eval verdict: FAIL
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8903642Z ##[error]Process completed with exit code 1.
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8966489Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8967209Z ##[group]Run actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8967423Z with:
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8967559Z   name: claude-costs-partial-attempt-1-review
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8967739Z   path: /home/runner/_work/_temp/claude-costs/
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8967906Z   if-no-files-found: ignore
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8968043Z   retention-days: 1
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8968163Z   compression-level: 6
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8968335Z   overwrite: false
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8968463Z   include-hidden-files: false
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8968594Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8976981Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8977208Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8977467Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.8977707Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.9826127Z (node:5639) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.9826557Z (Use `node --trace-deprecation ...` to show where the warning was created)
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.9848651Z With the provided path, there will be 1 file uploaded
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.9850874Z Artifact name is valid!
+review / review	UNKNOWN STEP	2026-08-15T07:30:51.9851161Z Root directory input is valid!
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.2719090Z Beginning upload of artifact content to blob storage
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.2846762Z (node:5639) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.5369804Z Uploaded bytes 709
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.6022299Z Finished uploading artifact content to blob storage!
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.6022807Z SHA256 digest of uploaded artifact zip is 6319875d92a2669449f2b3dc0495c6dd03426bd37713e71221e7f54da9fee455
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.6023308Z Finalizing artifact upload
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9197998Z Artifact claude-costs-partial-attempt-1-review.zip successfully finalized. Artifact ID 9243716364
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9198609Z Artifact claude-costs-partial-attempt-1-review has been successfully uploaded! Final size is 709 bytes. Artifact ID is 9243716364
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9201907Z Artifact download URL: https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31871852318/artifacts/9243716364
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9254959Z ##[group]Run .dynamo/report-unhandled.sh
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9255166Z ^[[36;1m.dynamo/report-unhandled.sh^[[0m
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9270265Z shell: /usr/bin/bash -e {0}
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9270419Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9270553Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9270741Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9271008Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9271406Z   DYNAMO_TASK_SIMILARITY_API_TOKEN: ***
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9271640Z   DYNAMO_CHECKS_TOKEN: ***
+review / review	UNKNOWN STEP	2026-08-15T07:30:52.9271778Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.3825729Z note: verdict at "Report + gate (FAIL verdict → red check)" — the gate already told the PR; not reported.
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.3890890Z Post job cleanup.
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4424514Z [command]/usr/local/bin/git version
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4448220Z git version 2.52.0
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4466474Z Temporarily overriding HOME='/home/runner/_work/_temp/a000652d-1b2a-49ee-a598-862b1a9cfa15' before making global git config changes
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4467049Z Adding repository directory to the temporary git global config as a safe directory
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4470264Z [command]/usr/local/bin/git config --global --add safe.directory /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/submission
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4494156Z Removing SSH command configuration
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4497864Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4523156Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4641646Z Removing HTTP extra header
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4644860Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4667428Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4778651Z Removing includeIf entries pointing to credentials config files
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4782384Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4803252Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4990643Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.4991391Z Post job cleanup.
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5468287Z [command]/usr/local/bin/git version
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5494759Z git version 2.52.0
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5512625Z Temporarily overriding HOME='/home/runner/_work/_temp/01d82810-2710-4d36-9dc1-d5119374f852' before making global git config changes
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5513188Z Adding repository directory to the temporary git global config as a safe directory
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5518830Z [command]/usr/local/bin/git config --global --add safe.directory /home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5541500Z [command]/usr/local/bin/git config --local --name-only --get-regexp core\.sshCommand
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5565574Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5681277Z [command]/usr/local/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5729271Z http.https://github.com/.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5734701Z [command]/usr/local/bin/git config --local --unset-all http.https://github.com/.extraheader
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5756712Z [command]/usr/local/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5903346Z [command]/usr/local/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.5918767Z [command]/usr/local/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6132994Z A job completed hook has been configured by the self-hosted runner administrator
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6158231Z ##[group]Run '/job_completed.sh'
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6174582Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6174808Z env:
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6174959Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 2205
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6175145Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1119
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6175325Z ##[endgroup]
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6271080Z Docker container caching not enabled, skipping hash computation.
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6320919Z No active SSH sessions detected. Proceeding with shutdown immediately.
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.6362395Z Cleaning up orphan processes
+review / review	UNKNOWN STEP	2026-08-15T07:30:53.7322437Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020, actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+review / gate	UNKNOWN STEP	﻿2026-08-15T07:31:30.1070425Z Current runner version: '2.336.0'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1073589Z Runner name: 'blacksmith-scale2-01m025a6nc5f67t2azngsm29kf-2vcpu'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1074184Z Runner group name: 'blacksmith runners 01kyaj49yqtkmevmxapsvtx542'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1074883Z Machine name: 'ip-172-31-64-123'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1076318Z ##[group]GITHUB_TOKEN Permissions
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1077468Z Contents: read
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1077817Z Metadata: read
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1078176Z PullRequests: write
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1078524Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1079734Z Secret source: Actions
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1080426Z Prepare workflow directory
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1257209Z Prepare all required actions
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1276123Z Setting BLACKSMITH_ACTIONS_RESULTS_URL to https://results-receiver.actions.githubusercontent.com/
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1316349Z Uses: handshake-project-dynamo/handshake-orchestration-tb2/.github/workflows/dynamo-review.yml@refs/heads/main (623a2dbaae6fffe4e0cfe4e975c4442ae8ea3116)
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1318995Z ##[group] Inputs
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1319365Z   checks_ref: main
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1319734Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1320086Z Complete job name: review / gate
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1648423Z A job started hook has been configured by the self-hosted runner administrator
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1898168Z ##[group]Run '/setup.sh'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1913891Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1914291Z env:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1914510Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 1481
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1914784Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1140
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.1915037Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2188367Z Logging daemon started (blacksmithd for logs)
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2251208Z Results daemon started (blacksmithd for results)
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2443785Z Background adoption and SSH setup started (PID: 3511)
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2444126Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2444230Z ----------------------------------------
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2538297Z View this job: https://app.blacksmith.sh/handshake-project-dynamo/runs/31871852318/jobs/94982345302
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2538940Z SSH Access (using your GitHub SSH key):
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2539767Z   ssh -p 64011 runner@blacksmith-scale2-01m025a6nc5f67t2azngsm29kf-2vcpu.vm.blacksmith.sh
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2540136Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2540349Z No GitHub SSH key? Add one at:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2540978Z https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2541406Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2541545Z ----------------------------------------
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2541748Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2541924Z VM ID: blacksmith-scale2-01m025a6nc5f67t2azngsm29kf-2vcpu
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2542273Z Host: production-192.240.250.56-x8664
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2542565Z Host Agent PID: 3409771
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2542819Z Agent Process Count: 1
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2543076Z Host Agent Git SHA: 1dcca3f2
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2543351Z Host CPU Manufacturer: AuthenticAMD
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2543646Z Blacksmith Host Generation: gen 2
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2543951Z Petname: production-growing-dassie-4a323c31
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2544251Z Region: us-west
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2544546Z Rootfs Version: ubuntu24-full-x64-012126
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2578470Z OS Version: Ubuntu 24.04.3 LTS
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2587484Z System Statistics:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2587977Z -----------------
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2588385Z VM CPU Count: 3
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2588588Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2588741Z Jobs by Process ID:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2589045Z -----------------
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2589328Z PID 3409771: 4 jobs
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2589634Z Total: 4 jobs across 1 process
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2589861Z 
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2590007Z Devices by Process ID:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2590348Z -----------------
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2590629Z PID 3409771: 4 devices
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2590996Z Total: 4 devices across 1 process
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2591342Z Enabling Blacksmith transparent cache
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2898287Z ##[group]Run R='failure'; S='skipped'; DR='skipped'; AR='skipped'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2898939Z ^[[36;1mR='failure'; S='skipped'; DR='skipped'; AR='skipped'^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2909036Z ^[[36;1mV='skipped'; P='skipped'; T='skipped'; QG='skipped'; T1='skipped'^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2909573Z ^[[36;1mstage_ok() { # result run_flag — success, or skipped WITH sanction^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2909990Z ^[[36;1m  [ "$1" = "success" ] || { [ "$1" = "skipped" ] && [ "$2" = "false" ]; }^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2910346Z ^[[36;1m}^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2910548Z ^[[36;1mALL_GREEN=true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2910824Z ^[[36;1mstage_ok "$R" "$RUN_REVIEW"      || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2911176Z ^[[36;1mstage_ok "$S" "$RUN_SIMILARITY"  || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2911530Z ^[[36;1mstage_ok "$V" "$RUN_VALIDATION"  || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2911881Z ^[[36;1mstage_ok "$P" "$RUN_PASS2"       || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2912261Z ^[[36;1mstage_ok "$T1" "$RUN_TIER1"      || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2912611Z ^[[36;1mstage_ok "$QG" "$RUN_QC"         || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2912957Z ^[[36;1mstage_ok "$DR" "$RUN_DEEP"       || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2913301Z ^[[36;1mstage_ok "$AR" "$RUN_AVA"        || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2913647Z ^[[36;1mstage_ok "$T" "$RUN_TRIALS"      || ALL_GREEN=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2913959Z ^[[36;1mif [ "$ALL_GREEN" = true ]; then^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2914352Z ^[[36;1m  ADD=accepted; RM=needs-revision; COLOR=0e8a16; DESC="Dynamo: all checks passed"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2914935Z ^[[36;1m  gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "rework-submitted-on-red" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2915363Z ^[[36;1melse^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2915713Z ^[[36;1m  ADD=needs-revision; RM=accepted; COLOR=d93f0b; DESC="Dynamo: one or more checks failed"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2916112Z ^[[36;1mfi^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2916464Z ^[[36;1mgh label create "$ADD" --repo "$REPO" --color "$COLOR" --description "$DESC" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2916990Z ^[[36;1mgh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "$ADD" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2917544Z ^[[36;1mgh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "$RM" --remove-label "in-progress" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2934129Z shell: /usr/bin/bash -e {0}
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2934369Z env:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2934649Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 1481
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2934931Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1140
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2935334Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2937455Z   GH_TOKEN: ***
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2937792Z   REPO: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2938156Z   PR_NUMBER: 5
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2938376Z   RUN_REVIEW: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2938582Z   RUN_SIMILARITY: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2938809Z   RUN_VALIDATION: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2939030Z   RUN_PASS2: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2939341Z   RUN_TIER1: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2939540Z   RUN_QC: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2939794Z   RUN_DEEP: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2939996Z   RUN_AVA: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2940198Z   RUN_TRIALS: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:30.2940440Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.0487594Z https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/pull/5
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8256845Z ##[group]Run R='failure'; S='skipped'; DR='skipped'; AR='skipped'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8257140Z ^[[36;1mR='failure'; S='skipped'; DR='skipped'; AR='skipped'^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8257359Z ^[[36;1mV='skipped'; P='skipped'; T='skipped'; QG='skipped'; T1='skipped'^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8257674Z ^[[36;1mecho "review=$R  similarity=$S  validation=$V  pass2=$P  tier1=$T1  qc_gate=$QG  deep_review=$DR  ava_review=$AR  trials=$T"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8258205Z ^[[36;1mecho "sanctioned: review=$RUN_REVIEW similarity=$RUN_SIMILARITY validation=$RUN_VALIDATION pass2=$RUN_PASS2 tier1=$RUN_TIER1 qc=$RUN_QC deep=$RUN_DEEP ava=$RUN_AVA trials=$RUN_TRIALS (run flags — 'false' = skip sanctioned)"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8259000Z ^[[36;1mstage_ok() { # result run_flag — success, or skipped WITH sanction^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8259325Z ^[[36;1m  [ "$1" = "success" ] || { [ "$1" = "skipped" ] && [ "$2" = "false" ]; }^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8259504Z ^[[36;1m}^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8259641Z ^[[36;1mFAILED=""^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8259803Z ^[[36;1mstage_ok "$R" "$RUN_REVIEW"      || FAILED="$FAILED review=$R"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8260030Z ^[[36;1mstage_ok "$S" "$RUN_SIMILARITY"  || FAILED="$FAILED similarity=$S"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8260254Z ^[[36;1mstage_ok "$V" "$RUN_VALIDATION"  || FAILED="$FAILED validation=$V"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8260470Z ^[[36;1mstage_ok "$P" "$RUN_PASS2"       || FAILED="$FAILED pass2=$P"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8260692Z ^[[36;1mstage_ok "$T1" "$RUN_TIER1"      || FAILED="$FAILED tier1=$T1"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8260912Z ^[[36;1mstage_ok "$QG" "$RUN_QC"         || FAILED="$FAILED qc_gate=$QG"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8261143Z ^[[36;1mstage_ok "$DR" "$RUN_DEEP"       || FAILED="$FAILED deep_review=$DR"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8261369Z ^[[36;1mstage_ok "$AR" "$RUN_AVA"        || FAILED="$FAILED ava_review=$AR"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8261582Z ^[[36;1mstage_ok "$T" "$RUN_TRIALS"      || FAILED="$FAILED trials=$T"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8261776Z ^[[36;1mif [ -n "$FAILED" ]; then^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8261935Z ^[[36;1m  CANCELLED=false; ANY_STAGE_FAILURE=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8262133Z ^[[36;1m  for RESULT in "$R" "$S" "$V" "$P" "$T1" "$QG" "$DR" "$AR" "$T"; do^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8262330Z ^[[36;1m    [ "$RESULT" = "cancelled" ] && CANCELLED=true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8262731Z ^[[36;1m    [ "$RESULT" = "failure" ] && ANY_STAGE_FAILURE=true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8263183Z ^[[36;1m  done^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8263393Z ^[[36;1m  # Rework advisory CI: on a trusted rework task with^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8263672Z ^[[36;1m  # REWORK_CI_POLICY=advisory, a red pipeline no longer blocks the^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8263931Z ^[[36;1m  # fellow's submission — the required check passes, while the^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8264167Z ^[[36;1m  # verdict labels above stay honest (needs-revision + a distinct^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8264431Z ^[[36;1m  # rework-submitted-on-red marker for downstream tooling). The^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8264698Z ^[[36;1m  # failed stage keeps the RUN conclusion red, so this run can never^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8264936Z ^[[36;1m  # sanction a future skip. STRICTLY "a check judged it red and the^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8265171Z ^[[36;1m  # fellow submits anyway" — never "nothing ran, submit blind":^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8265398Z ^[[36;1m  # the decision job must have succeeded and at least one monitored^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8265629Z ^[[36;1m  # stage must have actually FAILED (an upstream collapse that only^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8265872Z ^[[36;1m  # cascades unsanctioned skips stays blocking, as do cancellations).^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8266111Z ^[[36;1m  if [ "$REWORK_ADVISORY" = "true" ] && [ "$CANCELLED" = "false" ] \^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8266354Z ^[[36;1m    && [ "$CHANGES_RESULT" = "success" ] && [ "$ANY_STAGE_FAILURE" = "true" ]; then^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8266755Z ^[[36;1m    echo "::warning::Pipeline not green —$FAILED — but this task is in rework and the policy is advisory CI: submission is allowed. Verdicts remain on the PR as labels."^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8267443Z ^[[36;1m    gh label create "rework-submitted-on-red" --repo "$REPO" --color d93f0b --description "Rework submitted with failing checks (advisory CI)" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8267860Z ^[[36;1m    gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "rework-submitted-on-red" 2>/dev/null || true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8268090Z ^[[36;1m    exit 0^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8268238Z ^[[36;1m  fi^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8268483Z ^[[36;1m  echo "::error::Pipeline not green —$FAILED. PR is blocked (a Tier-1 HOLD blocks here until the required fixes are attempted)."^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8268811Z ^[[36;1m  exit 1^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8268932Z ^[[36;1mfi^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8269102Z ^[[36;1mecho "All stages passed or were sanctioned-skipped — PR may merge."^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8269356Z ^[[36;1m# No marker to persist: the skip authority is this run's own success^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8269601Z ^[[36;1m# conclusion, read back via the Actions API by future `changes` jobs.^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8284518Z shell: /usr/bin/bash -e {0}
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8284657Z env:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8284784Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 1481
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8284941Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1140
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8285176Z   GITHUB_REPO_NAME: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8286633Z   GH_TOKEN: ***
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8286813Z   REPO: handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287020Z   PR_NUMBER: 5
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287144Z   REWORK_ADVISORY: false
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287280Z   CHANGES_RESULT: success
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287414Z   RUN_REVIEW: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287532Z   RUN_SIMILARITY: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287659Z   RUN_VALIDATION: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287777Z   RUN_PASS2: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8287892Z   RUN_TIER1: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8288003Z   RUN_QC: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8288112Z   RUN_DEEP: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8288224Z   RUN_AVA: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8288339Z   RUN_TRIALS: true
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8288454Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8313058Z review=failure  similarity=skipped  validation=skipped  pass2=skipped  tier1=skipped  qc_gate=skipped  deep_review=skipped  ava_review=skipped  trials=skipped
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8361247Z sanctioned: review=true similarity=true validation=true pass2=true tier1=true qc=true deep=true ava=true trials=true (run flags — 'false' = skip sanctioned)
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8379583Z ##[error]Pipeline not green — review=failure similarity=skipped validation=skipped pass2=skipped tier1=skipped qc_gate=skipped deep_review=skipped ava_review=skipped trials=skipped. PR is blocked (a Tier-1 HOLD blocks here until the required fixes are attempted).
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8384812Z ##[error]Process completed with exit code 1.
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8414112Z A job completed hook has been configured by the self-hosted runner administrator
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8435874Z ##[group]Run '/job_completed.sh'
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8446739Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8446931Z env:
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8447063Z   BLACKSMITH_RUNNER_MESSAGE_WAIT_MS: 1481
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8447279Z   BLACKSMITH_RUNNER_ACQUIRE_JOB_MS: 1140
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8447432Z ##[endgroup]
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8522045Z Docker container caching not enabled, skipping hash computation.
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8571335Z No active SSH sessions detected. Proceeding with shutdown immediately.
+review / gate	UNKNOWN STEP	2026-08-15T07:31:32.8609268Z Cleaning up orphan processes

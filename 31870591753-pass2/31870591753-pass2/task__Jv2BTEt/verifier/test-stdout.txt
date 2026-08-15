@@ -1,0 +1,209 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-8.3.4, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.5.3
+collected 30 items
+
+../tests/test_outputs.py ....F.FFFF....FFFF.FFFF.FF.FF.                  [100%]
+
+=================================== FAILURES ===================================
+__________________________ test_order_O02_allocation ___________________________
+
+    def test_order_O02_allocation():
+        """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker. alloc=0, sf=30, limiting=L5."""
+        m = _get_orders_map()
+        assert m["O02"]["allocated_qty"] == 0
+        assert m["O02"]["shortfall_qty"] == 30
+>       assert m["O02"]["limiting_resource"] == "L5"
+E       AssertionError: assert None == 'L5'
+
+/tests/test_outputs.py:68: AssertionError
+__________________________ test_order_O04_allocation ___________________________
+
+    def test_order_O04_allocation():
+        """Verify O04 allocation (P2 x 20, batch=4): SA1 requires SA2 which needs L5 — fully depleted by O01+O03. alloc=0, sf=20, limiting=L5."""
+        m = _get_orders_map()
+        assert m["O04"]["allocated_qty"] == 0
+        assert m["O04"]["shortfall_qty"] == 20
+>       assert m["O04"]["limiting_resource"] == "L5"
+E       AssertionError: assert None == 'L5'
+
+/tests/test_outputs.py:84: AssertionError
+__________________________ test_order_O05_allocation ___________________________
+
+    def test_order_O05_allocation():
+        """Verify O05 allocation (P4 x 5, batch=3): Dual-workcenter routing on WC1+WC3 after prior WC consumption. alloc=0, sf=5, limiting=WC3."""
+        m = _get_orders_map()
+        assert m["O05"]["allocated_qty"] == 0
+        assert m["O05"]["shortfall_qty"] == 5
+>       assert m["O05"]["limiting_resource"] == "WC3"
+E       AssertionError: assert None == 'WC3'
+
+/tests/test_outputs.py:92: AssertionError
+__________________________ test_order_O06_allocation ___________________________
+
+    def test_order_O06_allocation():
+        """Verify O06 allocation (P3 x 8, batch=2): Uses 3 excess SA4 from O03 lot rounding to build 2; next batch needs SA2 build requiring depleted L5. alloc=2, sf=6, limiting=L5."""
+        m = _get_orders_map()
+        assert m["O06"]["allocated_qty"] == 2
+        assert m["O06"]["shortfall_qty"] == 6
+>       assert m["O06"]["limiting_resource"] == "L5"
+E       AssertionError: assert None == 'L5'
+
+/tests/test_outputs.py:100: AssertionError
+_________________________ test_order_O00_A_allocation __________________________
+
+    def test_order_O00_A_allocation():
+        """Verifies that O00_A fails allocation due to L10 shortage with the correct limiting resource."""
+        m = _get_orders_map()
+        assert m["O00_A"]["allocated_qty"] == 0
+        assert m["O00_A"]["shortfall_qty"] == 3
+>       assert m["O00_A"]["limiting_resource"] == "L10"
+E       AssertionError: assert None == 'L10'
+
+/tests/test_outputs.py:107: AssertionError
+_________________________ test_order_O00_F_allocation __________________________
+
+    def test_order_O00_F_allocation():
+        """Verifies that O00_F fails allocation due to scrap rate requirement on L13."""
+        m = _get_orders_map()
+        assert m["O00_F"]["allocated_qty"] == 0
+        assert m["O00_F"]["shortfall_qty"] == 1
+>       assert m["O00_F"]["limiting_resource"] == "L13"
+E       AssertionError: assert None == 'L13'
+
+/tests/test_outputs.py:147: AssertionError
+_________________________ test_order_O00_G_allocation __________________________
+
+    def test_order_O00_G_allocation():
+        """Verifies that O00_G fails allocation due to setup and run hours on WC5."""
+        m = _get_orders_map()
+        assert m["O00_G"]["allocated_qty"] == 0
+        assert m["O00_G"]["shortfall_qty"] == 1
+>       assert m["O00_G"]["limiting_resource"] == "WC5"
+E       AssertionError: assert None == 'WC5'
+
+/tests/test_outputs.py:155: AssertionError
+_________________________ test_order_O00_H_allocation __________________________
+
+    def test_order_O00_H_allocation():
+        """Verifies that O00_H fails with correct limiting resource, distinguishing INITIAL vs LEFTOVER calculation."""
+        m = _get_orders_map()
+        assert m["O00_H"]["allocated_qty"] == 1
+        assert m["O00_H"]["shortfall_qty"] == 1
+>       assert m["O00_H"]["limiting_resource"] == "L15"
+E       AssertionError: assert None == 'L15'
+
+/tests/test_outputs.py:162: AssertionError
+_________________________ test_order_O00_I_allocation __________________________
+
+    def test_order_O00_I_allocation():
+        """Verifies O00_I allocates correctly with substitute integer conversion constraints."""
+        m = _get_orders_map()
+        assert m["O00_I"]["allocated_qty"] == 2
+        assert m["O00_I"]["shortfall_qty"] == 1
+>       assert m["O00_I"]["limiting_resource"] == "L16"
+E       AssertionError: assert None == 'L16'
+
+/tests/test_outputs.py:170: AssertionError
+_________________________ test_order_O00_K_allocation __________________________
+
+    def test_order_O00_K_allocation():
+        """Verifies O00_K correctly ignores Sub-Assemblies when finding limiting resources."""
+        m = _get_orders_map()
+        assert m["O00_K"]["allocated_qty"] == 2
+        assert m["O00_K"]["shortfall_qty"] == 1
+>       assert m["O00_K"]["limiting_resource"] == "WC10"
+E       AssertionError: assert None == 'WC10'
+
+/tests/test_outputs.py:185: AssertionError
+_________________________ test_order_O00_L_allocation __________________________
+
+    def test_order_O00_L_allocation():
+        """Verifies O00_L applies batch size rounding to child sub-assembly run hours."""
+        m = _get_orders_map()
+        assert m["O00_L"]["allocated_qty"] == 0
+        assert m["O00_L"]["shortfall_qty"] == 1
+>       assert m["O00_L"]["limiting_resource"] == "WC11"
+E       AssertionError: assert None == 'WC11'
+
+/tests/test_outputs.py:193: AssertionError
+_________________________ test_order_O00_M_allocation __________________________
+
+    def test_order_O00_M_allocation():
+        """Verifies O00_M applies math.ceil() on the scrap percentage calculation."""
+        m = _get_orders_map()
+        assert m["O00_M"]["allocated_qty"] == 0
+        assert m["O00_M"]["shortfall_qty"] == 1
+>       assert m["O00_M"]["limiting_resource"] == "L21"
+E       AssertionError: assert None == 'L21'
+
+/tests/test_outputs.py:201: AssertionError
+_________________________ test_order_O00_N_allocation __________________________
+
+    def test_order_O00_N_allocation():
+        """Verifies O00_N correctly handles ASCII string sorting tie-breakers (Z10 vs Z9)."""
+        m = _get_orders_map()
+        assert m["O00_N"]["allocated_qty"] == 10
+        assert m["O00_N"]["shortfall_qty"] == 10
+>       assert m["O00_N"]["limiting_resource"] == "Z10"
+E       AssertionError: assert None == 'Z10'
+
+/tests/test_outputs.py:208: AssertionError
+_________________________ test_order_O00_P_allocation __________________________
+
+    def test_order_O00_P_allocation():
+        """Verifies O00_P properly nets out available sub-assemblies before computing limiting_resource."""
+        m = _get_orders_map()
+        assert m["O00_P"]["allocated_qty"] == 0
+        assert m["O00_P"]["shortfall_qty"] == 1
+>       assert m["O00_P"]["limiting_resource"] == "WC30"
+E       AssertionError: assert None == 'WC30'
+
+/tests/test_outputs.py:222: AssertionError
+_________________________ test_order_O00_Q_allocation __________________________
+
+    def test_order_O00_Q_allocation():
+        """Verifies O00_Q tests floating point precision tolerance for workcenter hours."""
+        m = _get_orders_map()
+>       assert m["O00_Q"]["allocated_qty"] == 1
+E       assert 0 == 1
+
+/tests/test_outputs.py:227: AssertionError
+_________________________ test_order_O00_S2_allocation _________________________
+
+    def test_order_O00_S2_allocation():
+        """Verifies Level-Order (BFS) aggregation of demand before calculating routing batch setup hours."""
+        m = _get_orders_map()
+>       assert m["O00_S2"]["allocated_qty"] == 1
+E       assert 0 == 1
+
+/tests/test_outputs.py:240: AssertionError
+_________________________ test_order_O00_U_allocation __________________________
+
+    def test_order_O00_U_allocation():
+        """Verifies golden solution sub_created substitute blindspot trap."""
+        m = _get_orders_map()
+>       assert m["O00_U"]["allocated_qty"] == 0
+E       assert 1 == 0
+
+/tests/test_outputs.py:247: AssertionError
+=========================== short test summary info ============================
+FAILED ../tests/test_outputs.py::test_order_O02_allocation - AssertionError: ...
+FAILED ../tests/test_outputs.py::test_order_O04_allocation - AssertionError: ...
+FAILED ../tests/test_outputs.py::test_order_O05_allocation - AssertionError: ...
+FAILED ../tests/test_outputs.py::test_order_O06_allocation - AssertionError: ...
+FAILED ../tests/test_outputs.py::test_order_O00_A_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_F_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_G_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_H_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_I_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_K_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_L_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_M_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_N_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_P_allocation - AssertionError...
+FAILED ../tests/test_outputs.py::test_order_O00_Q_allocation - assert 0 == 1
+FAILED ../tests/test_outputs.py::test_order_O00_S2_allocation - assert 0 == 1
+FAILED ../tests/test_outputs.py::test_order_O00_U_allocation - assert 1 == 0
+======================== 17 failed, 13 passed in 0.11s =========================
