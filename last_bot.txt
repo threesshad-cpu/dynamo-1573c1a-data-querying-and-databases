@@ -1,0 +1,155 @@
+## ≡ƒº¬ Agent Trial Results
+
+**pass@5: 1/5 passed** ΓÇö `Model A` on Daytona
+
+Trials: Γ¥î ΓÜá∩╕Å ΓÜá∩╕Å Γ£à Γ¥î
+
+Γ¥î **Blocked.** Not hard enough ΓÇö 2 good valid + 0 soft-timeout fail(s) = 2 of 5; need >=3 total with >=1 good valid (solved 1/5, avg@5=0.200).
+
+<sub>Breakdown: 1 solved ┬╖ 2 good-valid-fail ┬╖ 0 soft-timeout-fail ┬╖ 0 task/verifier-issue ┬╖ 2 in-progress-timeout ┬╖ 0 infra/setup-timeout ┬╖ 0 unanalyzed ┬╖ avg@5=0.200</sub>
+
+<details><summary>Pass@ Analysis ΓÇö Model A</summary>
+
+## Per-Trajectory Rubric
+
+| Trial | Reward | task_specification | reward_hacking | difficulty_crux | near_miss | refusals | low_timeout | approach_validity |
+|---|---|---|---|---|---|---|---|---|
+| task__nmT9x5M | 0 | PASS | PASS | PASS | PASS | PASS | FAIL | PASS |
+| task__zwaQoAE | 0 | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| task__5xYTwME | 0 | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| task__zdVHm3J | 1 | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| task__VKberXX | 0 | PASS | PASS | PASS | FAIL | PASS | FAIL | PASS |
+
+---
+
+## Fail Reasons
+
+Four failing trials, stratified into three root-cause groups:
+
+**1. Incremental-batch vs. single-run semantics (analytical failure)** ΓÇö task__zwaQoAE, task__5xYTwME. Both agents looped over allocations in `batch_size` increments, committing inventory and workcenter state after each sub-batch. The spec requires computing the *maximum buildable quantity* as a single production run (one `setup_scrap_qty`, one `setup_hours`). By applying setup costs once per increment, agents inflated WC2 hour consumption for O01, exhausted capacity prematurely, and allocated O02=15 instead of 25. The cascading wrong pool state propagated incorrect limiting_resource values into every subsequent order (O03ΓÇôO10).
+
+**2. Recursive simulation state-tracking bug (analytical failure)** ΓÇö task__nmT9x5M. The agent's `try_fulfill()` mutated a shared inventory/workcenter dict and relied on outer rollback on failure, but did not correctly deduct leaf stock across different recursive call paths (double-counting). This too caused WC2 to be exhausted prematurely, producing O02=15 and the same cascade into O03ΓÇôO10. Additionally, the ASCII tie-breaking code returned the larger-ASCII resource (WC3 instead of WC1 for O09), a secondary bug also present in group 1.
+
+**3. Gross vs. net requirements for limiting_resource (analytical failure / near-miss timeout)** ΓÇö task__VKberXX. This trial correctly allocated all orders (including O02=25) but used a separate `compute_gross_requirements()` that assumed zero on-hand inventory when computing resource ratios, instead of reusing the inventory-aware BOM simulation. This inflated the L5 leaf demand, depressing L5's ratio below WC2's true ratio and producing the wrong bottleneck for O02. 12/13 tests passed; the agent was actively debugging toward the fix when the 1800 s timeout fired.
+
+**Group 1 and 2 share the same surface symptom** (O02 allocated_qty=15, wrong limiting resources for O05/O06/O08/O10, wrong ASCII tie-break for O09) and trace to a common conceptual error: treating allocation as a sequence of independent production runs rather than a single maximal run. Group 3 is a distinct but related bug: the correct allocation computation was achieved, but the limiting_resource computation used an inconsistent (non-inventory-aware) code path. task__nmT9x5M also faced a near-miss timeout; the agent was rewriting `solve2.py` to fix the identified bugs when the LLM call was cut off at 1800 s.
+
+---
+
+## Golden vs Agent Values
+
+| Quantity | Golden Expected | Agent Value(s) | Off by | Trial(s) |
+|---|---|---|---|---|
+| O02 allocated_qty | 25 | 15 | ΓêÆ10 | nmT9x5M, zwaQoAE, 5xYTwME |
+| O02 limiting_resource | WC2 | L5 | wrong resource (gross vs net) | VKberXX |
+| O03 allocated_qty | 2 | 6 | +4 | nmT9x5M, zwaQoAE, 5xYTwME |
+| O03 limiting_resource | L5 | WC2 | wrong resource (cascaded state) | zwaQoAE |
+| O05 limiting_resource | L3 | WC2 | wrong resource (cascaded state) | nmT9x5M, zwaQoAE, 5xYTwME |
+| O06 limiting_resource | L5 | WC2 | wrong resource (cascaded state) | nmT9x5M, zwaQoAE, 5xYTwME |
+| O08 limiting_resource | L3 | WC2 | wrong resource (cascaded state) | nmT9x5M, zwaQoAE, 5xYTwME |
+| O09 limiting_resource | WC1 | WC3 | wrong ASCII side (tie-break bug) | nmT9x5M, zwaQoAE, 5xYTwME |
+| O10 limiting_resource | L5 | WC2 | wrong resource (cascaded state) | nmT9x5M, zwaQoAE, 5xYTwME |
+
+All values sourced from ctrf.json (present in all trials). trial task__zdVHm3J produced correct values for all quantities listed above. trial task__VKberXX produced correct values for all quantities except O02 limiting_resource.
+
+---
+
+## Failing Tests
+
+**Tests failing in all four failing trials** (task__nmT9x5M, task__zwaQoAE, task__5xYTwME, task__VKberXX): none ΓÇö task__VKberXX has a much narrower failure profile.
+
+**Tests failing in exactly three trials** (task__nmT9x5M, task__zwaQoAE, task__5xYTwME):
+- `test_order_O02_allocation`
+- `test_order_O03_allocation`
+- `test_order_O05_allocation`
+- `test_order_O06_allocation`
+- `test_order_O08_allocation`
+- `test_order_O09_allocation`
+- `test_order_O10_allocation`
+
+**Tests failing in exactly one trial**:
+- `test_order_O02_allocation` also fails in task__VKberXX ΓÇö but for a different field (limiting_resource='L5' vs 'WC2') rather than allocated_qty.
+
+**Tests passing in all trials** (including the three bulk-failure trials): `test_file_exists_and_not_symlink`, `test_report_schema_and_keys`, `test_output_sorting`, plus per-order tests for O01, O04, O07 (these three have zero or trivially bounded allocations and no tie-break ambiguity). ctrf.json was present and used as source in all five trials.
+
+---
+
+## Golden Solution Approach
+
+Consistent across all trial analyses:
+
+1. **Read SQLite**: Load BOM, routing, inventory, workcenter-capacity, and order tables.
+2. **Backward search for maximum allocation**: For each order (processed in ascending priority/order_id), iterate `for u in range(max_units, -1, -batch_size)` and call `simulate_explosion(product_id, u, curr_inv, curr_wc_hours)` for the full candidate quantity at once.
+3. **`simulate_explosion` internals**: Level-order (BFS) BOM DAG traversal ensuring topological correctness; gross child requirement = `setup_scrap_qty + ceil(U ├ù qty_per ├ù (1 + scrap_rate_pct/100))` applied once per production run of `U` units; lot-size rounding (`build_qty = ceil(net / batch_size) ├ù batch_size`); primary stock consumed first, then substitutes in `preference_rank` order; excess sub-assembly stock credited back to inventory; workcenter hours deducted as `setup_hours + build_qty ├ù run_hours_per_unit` once per run.
+4. **Limiting resource**: After finding `allocated_qty`, call `simulate_explosion` again on the *pre-current-order* inventory snapshot for `allocated_qty + batch_size` units; collect `gross_leaf_demand` and `gross_wc_demand`; compute fulfillment ratios using effective substitute availability (`avail_primary + floor(avail_sub / ratio)`); sort by `(ratio asc, resource_id asc)` (ASCII ascending tie-break); return the resource with the smallest ratio &lt; 1.0, or `null` if none.
+5. **Output**: Sort orders by `(allocated_qty asc, order_id asc)`, write `report.json`.
+
+No discrepancy across trial analyses.
+
+---
+
+## Agent Approach
+
+Across all trials the agents independently wrote Python scripts that query the same SQLite database and implement BOM explosion, but diverged in key algorithmic choices:
+
+**Incremental-commit loop** (task__zwaQoAE, task__5xYTwME ΓÇö converged independently): Both agents wrote a `while allocated &lt; max_possible` loop advancing by exactly `batch_size` units per iteration, calling a `compute_requirements(product_id, batch_size, ...)` or equivalent function and committing state changes after each successful batch. This treats each `batch_size`-unit increment as a separate production run with its own setup overhead.
+
+**Recursive try_fulfill with rollback** (task__nmT9x5M): Agent wrote a `try_fulfill()` function that mutated a shared `on_hand`/`wc_hours` dict in-place, relying on outer rollback on failure. Separately wrote `compute_requirements_for_batch()` for limiting resource. The agent identified a double-counting bug mid-trajectory and was rewriting when the timeout occurred.
+
+**BFS allocation + separate gross-requirements function** (task__VKberXX): Agent wrote `try_build()` with correct inventory-tracking for allocation, but a distinct `compute_gross_requirements()` assuming zero on-hand for limiting_resource computation. Correctly allocated 9/10 orders; the inventory blindspot caused only O02's limiting_resource to be wrong.
+
+**BFS with iterative debugging to convergence** (task__zdVHm3J): Agent attempted DFS-based BOM traversal first (produced wrong O04 allocation due to diamond-dependency ordering), then rewrote as BFS level-order (`solve_correct.py`), correctly handling topological ordering, substitutes, workcenter hours, batch rounding, and ASCII tie-break. Produced all-correct output before timeout.
+
+**Convergence pattern**: The incremental-batch approach appeared independently in two trials (task__zwaQoAE, task__5xYTwME), suggesting it is a common but incorrect heuristic for "maximum units" that agents reach from training data on similar lot-sizing problems.
+
+---
+
+## Approach Diff
+
+Three decisive divergences from the golden approach, in declining frequency:
+
+**1. Single-run vs. multi-run semantics for maximum allocation** (task__zwaQoAE, task__5xYTwME; symptom also in task__nmT9x5M via a different bug path): The golden solution calls `simulate_explosion(product_id, full_target, ...)` once, applying `setup_scrap_qty` and `setup_hours` once for the entire production run. Agents in groups 1ΓÇô2 called their BOM function once per `batch_size` increment, applying setup costs repeatedly. For O02 producing 25 units of P1 in one run requires one SA2 lot-sizing event (WC2=7.7 h) plus P1 direct routing (WC2=14.5 h) = 22.2 h Γëñ 23.05 h available. Three separate batch runs inflate the total to Γëê19.8 h for only 15 units, exhausting WC2 prematurely. This single divergence produces O02=15, and the corrupted workcenter state cascades to wrong limiting_resource identifications for O03ΓÇôO10.
+
+**2. Inventory-aware vs. gross requirements for limiting_resource** (task__VKberXX; present as secondary effect in the group-1/2 cascade): The golden solution passes the current post-prior-orders inventory snapshot into `simulate_explosion` for the ratio computation, so sub-assembly stock built in prior orders' lot-rounding is netted out. The task__VKberXX agent called a zero-inventory `compute_gross_requirements()` instead, inflating leaf demand for L5 and making L5's ratio appear binding when WC2 is the true bottleneck.
+
+**3. ASCII tie-break direction** (task__nmT9x5M, task__zwaQoAE, task__5xYTwME): When two resources share the minimum fulfillment ratio, the golden solution selects the resource with the lexicographically smallest `resource_id` (ASCII ascending: `L1 &lt; WC1`). These agents sorted by ratio but either omitted the secondary sort or sorted descending, returning `WC3` instead of `WC1` for O09.
+
+---
+
+## Validity of Agent Approach
+
+All five trials returned **approach_validity PASS**. The failures are legitimate agent limitations in implementing a correctly-specified algorithm, not symptoms of a task or verifier defect:
+
+- The one passing trial (task__zdVHm3J) demonstrates the task is fully solvable within the timeout with the same toolset.
+- The incremental-batch and recursive-mutation approaches are self-consistent algorithms ΓÇö they just do not correctly implement "maximum units buildable" as defined by the spec. instruction.md is explicit that gross requirements use a single production run, and the golden test values are derivable from that spec.
+- The ASCII tie-break rule (`'L1' &lt; 'WC1'`) is stated in instruction.md; the agents that failed it had the rule available but sorted incorrectly.
+- The gross-vs-net limiting_resource bug (task__VKberXX) is an agent design decision (two separate code paths vs. one unified simulation), not a specification gap.
+- No tolerance, threshold, or hidden convention is doing the work of the reward: O02's 15 vs. 25 is a 40% gap; O03's 6 vs. 2 is a 3├ù overcount; and the limiting_resource failures are categorical wrong-resource errors, not off-by-one boundary cases.
+
+**The difficulty is genuine.** Multi-level MRP with lot-sizing, substitute parts, workcenter capacity, and ASCII-ordered bottleneck identification is an inherently complex simulation; the 1/4 pass rate (one clean pass, one near-miss near-fix, two clean algorithmic misreads) is consistent with that difficulty rather than with a verifier defect.
+
+---
+
+## Rubric Aggregate
+
+| Criterion | PASS | FAIL | NA | Pattern |
+|---|---|---|---|---|
+| task_specification | 5 | 0 | 0 | Uniform pass ΓÇö instruction.md is complete and unambiguous; no spec gap contributed to any failure. |
+| reward_hacking | 5 | 0 | 0 | Uniform pass ΓÇö all agents wrote and ran their own code; no access to solution/ or reward files. |
+| difficulty_crux | 5 | 0 | 0 | Uniform pass ΓÇö every failure maps directly onto the stated crux (batch lot-sizing, BOM explosion, bottleneck identification). |
+| near_miss | 4 | 1 | 0 | One FAIL (task__VKberXX: 12/13 correct, single-field error). This is a genuine near-miss: the agent found the correct allocation for all orders but used the wrong code path for one ratio computation and was debugging it when cut off. Binary reward scores it the same as a 7-test failure; the task's all-or-nothing scoring is appropriate for a production planning system but makes this trial look identical to much-wider failures. |
+| refusals | 5 | 0 | 0 | Uniform pass ΓÇö no safety/policy refusals in any trial. |
+| low_timeout | 3 | 2 | 0 | Two FAILs: task__nmT9x5M (agent was rewriting solve2.py with the identified fix when LLM call 16 was cut off at 1800 s) and task__VKberXX (agent was running targeted debug iterations toward the O02 limiting_resource fix). Both trials had identified the bug before timeout. A modest budget increase (~+5ΓÇô10 min) would likely have converted at least task__VKberXX; task__nmT9x5M still had two independent bugs to fix, making it less certain. No action required on timeout for the other three trials. |
+| approach_validity | 5 | 0 | 0 | Uniform pass ΓÇö all agent failures trace to agent coding errors or algorithmic misreadings, not to over-tight verifier tolerances, undisclosed conventions, or spec inconsistencies. |
+
+---
+
+## Summary
+
+ANALYSIS COMPLETE ΓÇö Failures are genuine algorithmic difficulty: two trials independently misapplied single-run BOM semantics (incremental batch commits), one had a recursive state-tracking bug, one achieved correct allocation but used a non-inventory-aware code path for limiting_resource and was debugging it at timeout; only the 1800 s timeout budget is potentially constraining (two near-miss timeouts), while the core crux ΓÇö topological BOM explosion with lot-sizing, substitute stock netting, and heterogeneous bottleneck identification ΓÇö is legitimately hard and solvable as the single passing trial demonstrates.
+
+</details>
+
+≡ƒôï [View logs & artifacts](https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31353426313)
+
+<!-- Sticky Pull Request Commentagent-trial-results -->

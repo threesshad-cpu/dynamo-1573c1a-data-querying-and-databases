@@ -1,0 +1,12 @@
+<!-- AVA-GATE -->
+## 🤖 Automated Review — Verifier Audit (AVA)
+
+**Verdict:** PASS
+
+**Advisory (non-blocking) — minor findings**
+_These do not block the PR; consider addressing them, but they are not required for this check to pass._
+- **`sound_verifier`** (AVA)
+    - **What this check verifies:** the verifier must reject work that does not satisfy the task; a wrong or invalid submission is currently accepted.
+    - **How your task failed it:** at `tests/test_outputs.py test_order_O00_R1_R2_allocation()`, Body only does `assert m['O00_R1']['allocated_qty'] == 1` and `assert m['O00_R2']['allocated_qty'] == 1`. No assertion on shortfall_qty or limiting_resource for either order, unli…; expected Per instruction.md, shortfall_qty = requested_qty - allocated_qty and limiting_resource must be the true constraining resource (or null); the bogus/inconsistent values violate the contract, but the verifier would instead PASS/reward=1 — schema test only type-checks these fields (int, str/None), and test_order_O00_R1_R2_allocation asserts only allocated_qty==1 for each.
+
+<!-- Sticky Pull Request Commentava-review -->

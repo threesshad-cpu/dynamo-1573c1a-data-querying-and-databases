@@ -1,0 +1,377 @@
+<!-- dynamo-eval -->
+### Dynamo eval — ✅ PASS
+
+# Dynamo Eval — bom-shortage-cascade
+Format: Harbor
+Verdict: PASS (all criteria pass / only N/A)
+
+## Criteria
+| # | Criterion | Result | Note |
+|---|-----------|--------|------|
+| 1 | code_dependent | PASS | Requires implementing a multi-level MRP simulation over SQLite; not solvable by reasoning or a single query. |
+| 2 | essential_difficulty | PASS | Difficulty is intellectual: BOM DAG explosion order, scrap/batch rounding, substitute cascades, netting-before-limiting-resource, ASCII tie-breaks. |
+| 3 | interesting_realistic | PASS | Realistic MRP/ERP production-planning problem with a real practitioner audience. |
+| 4 | novel | PASS | Bespoke synthetic dataset and custom allocation rules; not a memorizable textbook problem. |
+| 5 | solvable | PASS | `solution/solve.py` legitimately implements the stated rules; ~2h expert estimate is plausible. |
+| 6 | unambiguous | PASS | Rules for tie-breaks, netting, substitutes, rounding, and limiting-resource are precisely specified; no concrete sound approach that clearly fails identified. |
+| 7 | outcome_verified | PASS | Verifier grades only the final `report.json` values; steps 1–6 define business semantics, not a mandated implementation/tool. |
+| 8 | instruction_concision | PASS | Absolute paths, backticks, no fluff/roleplay, no tool listing, no TB3 time-budget string. |
+| 9 | structured_data_schema | PASS | Exact JSON schema with per-field types and sort order documented in `instruction.md`. |
+| 10 | verifiable | PASS | Deterministic exact-equality checks on `/app/report.json`, matching `artifacts` and `TEST_REPORT_PATH`; answer not leaked. |
+| 11 | functional_verification | PASS | Tests parse and assert output values; no source-string/keyword scanning. |
+| 12 | deterministic_reproducible | PASS | Base image pinned by sha256, pytest/plugin pinned, deterministic data gen, no live services. |
+| 13 | test_instruction_alignment | PASS | Per-order atomic tests with docstrings; assertions trace to instruction outputs (allocated/shortfall/limiting). |
+| 14 | anti_cheat | PASS | DB holds only inputs; expected values live in `tests/` only; `environment/` has no oracle/solution. |
+| 15 | solution_quality | PASS | `solve.py` computes results from inputs; no hardcoded answers; kept as a separate file, not a heredoc. |
+| 16 | task_security | PASS | No exfiltration, obfuscation, destructive ops, or prompt injection. |
+| 17 | difficulty_explanation_quality | PASS | Names expertise, traps, synthetic provenance, and real-world audience; not results-based. |
+| 18 | solution_explanation_quality | PASS | Approach description is congruent with `solve.py`. |
+| 19 | verification_explanation_quality | PASS | Describes what each order isolates; verifier uses exact matches (no inequality tolerances to justify). |
+| 20 | accurate_taxonomy_labels | PASS | `task_objective`/`artifact_type` fit; category/subcategory (graph/semantic) reasonable and judged leniently. |
+| 21 | expert_time_estimate | PASS | 2.0h, non-zero, consistent with described difficulty. |
+| 22 | open_internet | PASS | `allow_internet = true`; bespoke answer not retrievable online. |
+| 23 | reviewable | PASS | Derivation exists in `solve.py` and per-order rationale in `verification_explanation`; see note. |
+| 24 | typos | PASS | Table/column names and paths match the schema in `generate_data.py`. |
+| 25 | no_extraneous_files | PASS | Only definition/solution/verifier/input files present; no cruft. |
+| 26 | verifier_configuration | PASS | `artifacts` top-level; single image; pytest/plugin baked; `test.sh` installs nothing; ground truth in `tests/`. |
+| 27 | environment_hygiene | PASS | Dockerfile copies only `generate_data.py`; no `solution/`/`tests/` COPY; deps pinned; no apt used. |
+| 28 | resource_configuration | PASS | Light compute (cpus 1 / 2 GB); timeouts plausible; difficulty is intellectual. See note on agent timeout. |
+| 29 | task_name | PASS | `[task].name = "dynamo/bom-shortage-cascade"`, org/name, kebab-case, 3 tokens, descriptive. |
+| 30 | task_readme | N/A | No README present (optional). |
+| 31 | task_toml_schema | PASS | Fields are recognized Harbor fields; see note on `[task].description`. |
+
+## Failures
+None.
+
+## Notes
+- **`outcome_verified` / `instruction_concision` (borderline PASS):** `instruction.md` lays out a numbered 6-step procedure. I read these as the *definition of the simulation's business rules* (necessary for a deterministic answer), not as a mandated implementation method or tool — the agent still designs the algorithm/data structures, and the verifier grades only `report.json`. A stricter reviewer could view the enumeration as leaning procedural; if so it edges toward over-specification, but it does not hand the agent an implementation and does not enforce an approach.
+- **`task_toml_schema` (borderline PASS):** `task.toml` includes a `description` field inside the `[task]` table. `[task].name` is the correct Harbor form (confirmed by the task_name criterion), but I could not positively confirm `[task].description` is a recognized Harbor field vs. a silently-ignored extra. It is harmless and conventional, so I graded PASS; a maintainer should confirm it against the Harbor schema — if unrecognized, it is a minor extraneous field to drop.
+- **`resource_configuration`:** `[agent].timeout_sec = 600` (10 min) is on the short side for a task with a 2-hour expert estimate and many subtle traps. Not "clearly too short," so PASS, but human reviewers may want to raise it.
+- **`reviewable`:** The 29 expected values in `tests/test_outputs.py` are golden/hardcoded; correctness hinges on `solve.py` being right. The derivation is present in `solve.py` and the per-order `verification_explanation`, satisfying the "derived, not hardcoded" intent — but a true non-specialist cannot easily audit the golden values without trusting/running the solution.
+- All grades are read-only; I did not execute the solution or tests. Evidence that would change borderline grades: confirmation of Harbor's `[task]` allowed subfields (affects criterion 31).
+
+---
+*Automated read-only review against `.dynamo/dynamo-rubric.toml`. Address the
+failing criteria above, then `git commit` and `git push` to re-run. All
+criteria must pass to be accepted.*
+
+=====
+
+## 🔍 Task Validation Results
+
+| Docker | Oracle | Nop |
+|--------|--------|-----|
+| ✅ | ✅ | ✅ |
+
+<details><summary>Legend</summary>
+
+- **Docker**: `environment/` image builds on the runner
+- **Oracle**: `solution/solve.sh` makes the verifier pass (reward 1.0)
+- **Nop**: doing nothing fails the verifier (reward < 1.0) — proves the task is non-trivial
+- ⏭️ = skipped (prerequisite failed) · ➖ = not run (remote backend builds the image, or environment/ is unchanged since the last green run)
+</details>
+
+<sub><a href="https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31877805924">Ran</a> on <code>79d08cb</code> after static checks + rubric review passed.</sub>
+
+<!-- Sticky Pull Request Commenttask-validation -->
+
+=====
+
+Hello maintainers - the task-similarity service is timing out and repeatedly blocking the pipeline:
+
+- PR: https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/pull/5
+- Failing job: review / cosine_similarity
+- Last run: https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/30696192997
+- Error excerpt: "curl: (28) Operation timed out after 30002 milliseconds with 0 bytes received" contacting https://ai.joinhandshake.com/api/internal/task-similarity/checks
+
+I retried the run; it still times out. Could you please check the task-similarity service (ai.joinhandshake.com) or temporarily permit the pipeline to continue when the similarity service is unreachable? Thanks.
+
+
+=====
+
+## ⏱️ Pre-check (pass@2)
+
+**pass@2: 0/2 passed** — `Model A` on Daytona (agent-run budget = task timeout_sec, capped 3600s/1hr — working time only, excludes environment startup)
+
+Trials: ❌ ⚠️
+
+✅ **At least one valid agent failure** (1/2) — the task is plausibly hard. Proceeding to pass@5.
+
+**Rerun Recommended: NO**
+
+<sub>Breakdown: 0 solved · 1 valid-fail · 1 task/verifier-issue · 0 in-progress-timeout · 0 infra/setup-timeout · 0 unanalyzed</sub>
+
+<details><summary>Pass@ Analysis — Model A</summary>
+
+## Per-Trajectory Rubric
+
+| Trial | Reward | task_specification | reward_hacking | difficulty_crux | near_miss | refusals | low_timeout | approach_validity |
+|---|---|---|---|---|---|---|---|---|
+| task__aKHwpKw | 0 | PASS | PASS | PASS | PASS | PASS | PASS | PASS |
+| task__wTDZj6t | 0 | PASS | PASS | PASS | FAIL | PASS | FAIL | FAIL |
+
+---
+
+## Fail Reasons
+
+The two trials are **stratified** — they failed for distinct root causes.
+
+**task__aKHwpKw — Analytical failure (broad, multi-bug)**
+Four independent implementation errors, all traceable to rules explicitly stated in `instruction.md`:
+1. *Priority tie-breaking omitted*: O02 processed before O03 (missing `order_id DESC` rule) → wrong allocation cascade.
+2. *Scrap `ceil()` missing*: under-calculated required leaf material → over-allocation for O00_F, O00_M.
+3. *Substitute floor division mis-applied*: integer-unit conversion incorrect → over-allocation for O00_I, O00_U, O00_V.
+4. *Limiting-resource ratio logic wrong*: consistently flagged workcenter constraints (WC4, WC6, WC2, WC3) instead of tighter leaf-material constraints (L10, L15, L5, L5) for O00_A, O00_H, O04, O06.
+
+This is a broad implementation failure spanning 11 tests and 4 algorithmic areas. The 600-second timeout ended a debugging session already underway but was **not the primary cause** — the initial `solve.py` had all four bugs baked in before any debugging began.
+
+**task__wTDZj6t — Edge-case trap (near-miss, partial spec ambiguity)**
+Agent passed 29/31 tests. Two targeted edge-case tests failed:
+1. *BFS vs DFS BOM explosion (O00_S2)*: Recursive DFS double-counted WC70 setup hours for SA72 (shared child of SA70 and SA71) → 22h consumed vs 15h available → allocated_qty=0 vs expected 1. BFS aggregates the 2-unit demand before routing: 12h ≤ 15h → feasible.
+2. *Sequential vs independent limiting-resource availability (O00_V)*: Agent consumed substitute SUB_90 for L91 before computing L92's effective availability → L92 appeared binding (L92 reported), when the golden solution evaluates each leaf's ratio independently from frozen initial state → no binding resource (null expected).
+
+Both failures trace to algorithmic conventions that are either implicit in the domain (BFS aggregation) or ambiguously specified (independent per-leaf availability). The `spec_consistency` check explicitly FAILED for this trial.
+
+---
+
+## Golden vs Agent Values
+
+| Quantity | Golden expected | Agent value | Off by | Trial(s) |
+|---|---|---|---|---|
+| O02 allocated_qty | 0 | 5 | −5 | task__aKHwpKw |
+| O02 shortfall_qty | 30 | 25 | +5 | task__aKHwpKw |
+| O02 limiting_resource | L5 | WC2 | wrong field | task__aKHwpKw |
+| O00_F allocated_qty | 0 | 1 | −1 | task__aKHwpKw |
+| O00_F limiting_resource | L13 | null | missing | task__aKHwpKw |
+| O00_I allocated_qty | 2 | 3 | −1 | task__aKHwpKw |
+| O00_M allocated_qty | 0 | 1 | −1 | task__aKHwpKw |
+| O00_M limiting_resource | L21 | null | missing | task__aKHwpKw |
+| O00_N allocated_qty | 10 | 20 | −10 | task__aKHwpKw |
+| O00_A limiting_resource | L10 | WC4 | wrong field | task__aKHwpKw |
+| O00_H limiting_resource | L15 | WC6 | wrong field | task__aKHwpKw |
+| O04 limiting_resource | L5 | WC2 | wrong field | task__aKHwpKw |
+| O06 limiting_resource | L5 | WC3 | wrong field | task__aKHwpKw |
+| O00_S2 allocated_qty | 1 | 0 | +1 | task__wTDZj6t |
+| O00_S2 shortfall_qty | 0 | 1 | −1 | task__wTDZj6t |
+| O00_S2 limiting_resource | null | WC70 | spurious | task__wTDZj6t |
+| O00_V limiting_resource | null | L92 | spurious | task__wTDZj6t |
+
+All values were recoverable from artifacts. `report.json` was present in both trials.
+
+---
+
+## Failing Tests
+
+**Failing in task__aKHwpKw only (10 tests):**
+- `test_order_O02_allocation`
+- `test_order_O04_allocation`
+- `test_order_O06_allocation`
+- `test_order_O00_A_allocation`
+- `test_order_O00_F_allocation`
+- `test_order_O00_H_allocation`
+- `test_order_O00_I_allocation`
+- `test_order_O00_M_allocation`
+- `test_order_O00_N_allocation`
+- `test_order_O00_U_allocation`
+
+**Failing in task__wTDZj6t only (1 test):**
+- `test_order_O00_S2_allocation`
+
+**Failing in BOTH trials (1 test):**
+- `test_order_O00_V_allocation` *(though for different reasons: task__aKHwpKw failed on `allocated_qty`; task__wTDZj6t failed on `limiting_resource` only)*
+
+Both trials sourced failing tests from `ctrf.json`; no missing structured source was flagged.
+
+---
+
+## Golden Solution Approach
+
+Both trials report the same reference implementation (no discrepancy):
+
+1. **Data source**: Python reads the SQLite database via `sqlite3`.
+2. **BOM explosion**: BFS/topological order ("low-level code" pattern), accumulating cross-path demand into a `needed_parts` dict before performing any manufacturing step at a given level.
+3. **Stock netting**: At each BOM node, consume available on-hand stock first; net-build quantity rounded up to batch_size multiple.
+4. **Scrap formula**: child demand = `ceil(build_qty × qty_per × (1 + scrap_pct/100)) + setup_scrap_qty`.
+5. **Substitutes**: coverage via floor division of available substitute stock, ranked by preference.
+6. **Workcenter capacity**: setup + per-unit hours deducted from available capacity.
+7. **Limiting resource**: `argmin(available/required)` computed independently per leaf part (including substitute coverage) and per workcenter, evaluated from the order's **initial** resource state (frozen `curr_inv`), not consuming state across leaves.
+8. **Output**: orders sorted by `order_id` ascending; priority processing by score then `order_id DESC` as tie-breaker.
+
+---
+
+## Agent Approach
+
+Both agents used the same broad method: Python + `sqlite3`, multi-phase BOM explosion into a `report.json`. The key divergence is in the algorithmic implementation:
+
+**task__aKHwpKw**: Wrote `solve.py` in a single large step (~6.5-minute LLM call). The explosion appears to be DFS-like (the agent self-identified a "topological ordering bug" late in its trajectory). Additional implementation errors: missing `math.ceil()` in scrap computation; flawed substitute unit conversion; incorrect `available/required` ratio logic for limiting resource; omitted `order_id DESC` tie-breaker.
+
+**task__wTDZj6t**: Explicitly used recursive DFS (`process_component` calls itself for each child), with a mutable `state` object passed through `compute_order_ratios()` — sequentially consuming substitutes across leaves rather than reading from a frozen initial state. The `solve.py` was generated in a single 449-second LLM call.
+
+**Convergence pattern**: Both agents independently chose recursive DFS for BOM explosion and sequential state mutation for limiting-resource computation. This is not coincidence — DFS is the default natural recursion pattern in code generated from training data; BFS with level-order demand aggregation requires domain-specific MRP knowledge to reach for first.
+
+---
+
+## Approach Diff
+
+| Divergence | Golden | Agent | Caused test failure? |
+|---|---|---|---|
+| BOM traversal order | BFS (level-order, aggregating cross-path demand) | DFS (recursive, each path independent) | Yes — O00_S2 in task__wTDZj6t (SA72 demand double-counted) |
+| Limiting-resource availability | Evaluated per-leaf from frozen `curr_inv` | Evaluated sequentially with mutable state (substitutes depleted across leaves) | Yes — O00_V in task__wTDZj6t; also O00_A/O00_H/O04/O06 in task__aKHwpKw |
+| Scrap formula | `ceil(build_qty × qty_per × (1+scrap_pct/100)) + setup_scrap_qty` | Missing `ceil()` | Yes — O00_F, O00_M in task__aKHwpKw |
+| Substitute floor division | Whole-unit floor conversion strictly applied | Incorrectly applied | Yes — O00_I, O00_U, O00_V in task__aKHwpKw |
+| Priority tie-breaker | `order_id DESC` within equal priority scores | Not applied | Yes — O02 in task__aKHwpKw |
+| Limiting-resource ratio logic | `argmin(avail/required)` across all constraint types | Wrong ratio → workcenters reported over tighter leaf-materials | Yes — O00_A, O00_H, O04, O06 in task__aKHwpKw |
+
+The BFS-vs-DFS divergence and the sequential-vs-independent availability divergence each produce failures independently and across both trials.
+
+---
+
+## Validity of Agent Approach
+
+**task__aKHwpKw — approach_validity PASS**: All four failing rule categories (tie-breaker, scrap ceil, substitute floor division, limiting-resource logic) are explicitly stated in `instruction.md`. The failures are unambiguous implementation bugs; a careful reading of the spec would have prevented each one. This represents genuine agent difficulty.
+
+**task__wTDZj6t — approach_validity FAIL**: This trial surfaces a genuine task/verifier problem:
+
+- **BFS vs DFS**: `instruction.md` says "Explode the product's BOM top-down through all assembly levels. At each node, consume available on-hand stock of that part first." This does not mandate BFS or demand aggregation across paths. DFS recursion is a natural, defensible reading of "top-down" and "at each node." The verifier silently enforces BFS (SA72's setup hours are computed once over 2 aggregated units) but the spec never states this. The `spec_consistency` check explicitly confirmed a three-part hidden-rule trace: enforced BFS rule → conflicting "at each node" language → defensible DFS alternative.
+
+- **Sequential vs independent substitute availability**: The spec says "from the order's initial resource state (before any allocation from this order)" but does not specify that this evaluation must be independent per leaf (i.e., substitutes must not be consumed across leaf computations in sequence). Sequential mutation of the initial state is a plausible implementation.
+
+Both failures in task__wTDZj6t arise from the agent following instruction-permitted approaches that the verifier silently rejects via undisclosed conventions. This is a **task/verifier problem**: the BFS requirement for shared-node demand aggregation is an implicit MRP domain convention that should be explicitly documented in `instruction.md`.
+
+---
+
+## Rubric Aggregate
+
+| Criterion | PASS | FAIL | NA | Pattern |
+|---|---|---|---|---|
+| task_specification | 2 | 0 | 0 | Consistent PASS. The spec is substantively complete; failures are agent errors (trial 1) or implicit domain conventions (trial 2). |
+| reward_hacking | 2 | 0 | 0 | No manipulation of tests, verifier, or solution files in either trial. |
+| difficulty_crux | 2 | 0 | 0 | Failing tests map cleanly to MRP mechanics cited as the intended difficulty. |
+| near_miss | 1 | 1 | 0 | trial 2 (task__wTDZj6t) is a clear near-miss: 29/31 tests, only targeted edge-case traps failing. The task **looks** harder than trial 2 demonstrates — two specific conventions (BFS, independent availability) are doing the discriminating work, not conceptual difficulty. |
+| refusals | 2 | 0 | 0 | Both agents fully engaged. No safety-policy language or early exit. |
+| low_timeout | 1 | 1 | 0 | trial 1 (task__aKHwpKw): timeout hit during a debugging session; initial solve.py was complete and already wrong, so time was not the binding constraint. trial 2 (task__wTDZj6t): the agent was mid-review-pass when cut off — with only 36 seconds left after a 449-second generation call, it is plausible that a review-and-fix cycle was prevented. The combination of near_miss FAIL + low_timeout FAIL in the same trial is a meaningful signal. |
+| approach_validity | 1 | 1 | 0 | trial 1: PASS — bugs are unambiguous implementation errors against explicit spec rules. trial 2: FAIL — BFS-vs-DFS and sequential-vs-independent availability are instruction-permitted choices silently rejected by the verifier. This FAIL points to a spec gap requiring a fix. |
+
+**Refusals**: No FAIL; no trigger-word issue.
+
+**Near miss**: trial 2's FAIL signals the near-miss threshold is extremely narrow — two edge-case tests out of 31, one of which only fails on the `limiting_resource` field while `allocated_qty` was correct.
+
+**Approach validity**: The FAIL in trial 2 indicates a task/verifier fix is needed — specifically, `instruction.md` must explicitly mandate BFS/level-order demand aggregation for shared BOM nodes.
+
+---
+
+## Summary
+
+TASK FIX SUGGESTED — `instruction.md` must explicitly require BFS/level-order demand accumulation (aggregating cross-path demand for shared BOM nodes before computing routing hours) and must state that per-leaf limiting-resource availability is evaluated independently from frozen initial state; without these two disclosures, a sound DFS implementation and sequential availability computation each constitute instruction-permitted approaches that the verifier silently rejects, invalidating the FAIL in task__wTDZj6t.
+
+</details>
+
+📋 [View logs & artifacts](https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31877805924)
+
+<!-- Sticky Pull Request Commentpass2-timeout-check -->
+
+=====
+
+## 🤖 Automated Review
+
+_This automated review **gates** the PR. Every item under **Blocking Issues** must be addressed and
+pushed — the pipeline re-runs on push; each bullet ends with the concrete fix. **Advisory Notes** are
+optional improvements and never block. **Human reviewers are stricter than this check**: passing it
+does not guarantee acceptance._
+
+**Verdict:** FAIL — a decisive verifier assertion (O00_S2) hinges on a cross-path demand-aggregation (BFS/low-level-code) rule that is not disclosed in agent-visible material.
+
+**Oracle-Derivation:** clean — the Oracle (`solution/solve.py`) derives every value from `/app/manufacturing.db` via a genuine simulation; no sibling-crux import, no hard-coded answer table/threshold, no undocumented injected default. The defect below is a spec-disclosure gap, not a hidden oracle.
+
+**Blocking Issues**
+- **decisive_answer_discoverable (O00_S2, BFS cross-path aggregation)** — `test_order_O00_S2_allocation` (`tests/test_outputs.py:237-242`) asserts `allocated_qty==1`, which is only reachable if the shared sub-assembly SA72 (demanded once via SA70 and once via SA71) has its demand **aggregated to 2 units and built in a single manufacturing run** (WC70: `10 + 2×1 = 12h ≤ 15h`). A depth-first reading manufactures SA72 twice (`10+1 + 10+1 = 22h > 15h` → `allocated_qty=0`). The instruction only says "Explode the product's BOM top-down through all assembly levels. At each node…" (`instruction.md:10-12`) — it never states that demand for a part appearing under multiple parents must be summed across BOM paths into one net build/run. The intended rule lives only in agent-invisible material (`task.toml:18` "O00_S2 verifies Level-Order (BFS) aggregation…" and `solution/solve.py:89-149`). Evidence this is a genuine ambiguity, not a solve failure: trial `task__wTDZj6t`'s precomputed `spec_consistency` verdict is **FAIL** with a complete 3-part trace (`pass2-output/31877805924-pass2/task__wTDZj6t/analysis.json`), and **both** engaged pass@2 agents independently implemented DFS. → **Fix:** in `instruction.md` Step 1, add an explicit rule that a component appearing under multiple parents has its net requirement aggregated (summed) across all BOM paths and manufactured **once per order at its lowest BOM level**, so routing `setup_hours` are incurred a single time over the aggregated build quantity — not once per parent occurrence.
+- **traceable_requirements (both-directions break at O00_S2)** — same root cause: the verifier enforces a requirement (single aggregated run for shared nodes) that has no basis in `instruction.md`, so the instruction→solution→test trace is broken in the test→instruction direction. → **Fix:** the same `instruction.md` Step-1 clarification closes this; once the aggregation rule is stated, O00_S2's expected value becomes derivable and the trace is restored.
+
+**Advisory Notes**
+1. `instruction.md` Step 5 / `tests/test_outputs.py:251-256` (O00_V) — the limiting-resource "blindspot" (shortfall=1 but `limiting_resource=null` because shared substitute SUB_90 is counted in full toward **both** L91 and L92, giving each ratio exactly 1.0) follows the literal per-leaf rule, but the instruction never states whether leaf availability is evaluated **independently** per leaf or **sequentially** (consuming shared substitute stock as you iterate). Trial `task__wTDZj6t` chose the sequential reading and got `L92`. Recommend stating explicitly that each leaf's `available/required` is computed independently from the frozen initial state, with shared substitute stock counted in full toward every primary it can serve. This is less clear-cut than O00_S2 but worth pinning to avoid a second near-miss trap.
+2. `tests/test_outputs.py:231-235` (O00_R1/R2) — this test asserts only `allocated_qty==1` for each; unlike every other order it does not also assert `shortfall_qty`/`limiting_resource`. The crux (exact substitute leftover across two sequential orders) is captured by `allocated_qty`, so this is not material, but adding the two remaining fields would make coverage uniform.
+
+<details><summary>Full deep-review assessment</summary>
+
+### Unverified requirements
+Requirement → assertion map (all satisfied unless noted):
+- Output file `/app/report.json`, regular file, not symlink → `test_file_exists_and_not_symlink` (`test_outputs.py:7-9`). ✅
+- Top-level `{"orders":[…]}` only-key + 29 elements + per-element keys `{order_id, allocated_qty, shortfall_qty, limiting_resource}` + types (int not bool; str; str|null) → `test_report_schema_and_keys:12-38`. ✅ (count/no-extras/type all pinned)
+- Sort by `order_id` ascending → `test_output_sorting:41-46` (exact id list). ✅
+- Priority processing + `order_id DESC` tie-break → witnessed by the O02/O03 pair (equal priority 12) in `test_order_O02/O03` (`:63-77`). ✅
+- Batch-multiple floor for `allocated_qty`, scrap `ceil`, setup scrap, substitute floor-div, workcenter setup+run hours, float tolerance, ASCII tie-break (leaf/leaf and leaf/WC) → each pinned by a dedicated order test (O01, O00_F/M, O00_I, O00_G/L, O00_Q, O00_N/W). ✅
+- **Coverage hole — none material.** Every order's decisive triple is asserted except O00_R1/R2 (`allocated_qty` only; Advisory 2).
+- **Bad expected / tolerance — none.** The only tolerance is `1e-9` on workcenter hours (`solve.py:192`, exercised by O00_Q); everything else is exact integer/string match, appropriately tight.
+
+### Trajectory analysis
+Trace integrity: **clean.** Neither trial read `solution/` or `tests/`, wrote `/logs/verifier/reward.txt`, monkey-patched, or intercepted PATH (`reward_hacking` PASS both trials). Both wrote `report.json` via a bona-fide sqlite simulation.
+
+Constructed bypass attempt (advisory, none confirmed): the verifier hard-codes all expected values and never reads `/app/manufacturing.db` or imports the solution, so DB tampering / oracle-import / label-path sniffing are all infeasible; `test_outputs.py` imports only `json`,`os`. No trivial-output bypass: `test_report_schema_and_keys` forces exactly 29 elements with the exact key set, and each order's values are individually asserted, so no coarse aggregate is game-able.
+
+True difficulty (2 trials — thin, graded conservatively): the failures are **stratified**. `task__aKHwpKw` is a valid, genuine-crux multi-bug analytical failure (missing `order_id DESC`, missing scrap `ceil`, mis-applied substitute floor-div, wrong ratio logic) — all rules explicitly in the instruction (`approach_validity` PASS). This is real difficulty on the intended crux. `task__wTDZj6t` is a near-miss (29/31) whose two failures (O00_S2, O00_V) are the undisclosed-convention traps above (`approach_validity`, `spec_consistency`, `near_miss`, `low_timeout` all FAIL). So at least one trial demonstrates genuine difficulty, but the second trial's failure is an ambiguity artifact — which is exactly the `decisive_answer_discoverable` blocker, and something the pass@5 gate should watch (the near-miss threshold on O00_S2 is a single algorithmic-convention flip, not conceptual difficulty).
+
+### Domain-expert read
+End-to-end traceability holds for every mechanic except the O00_S2 aggregation rule (Blocking). instruction↔environment is consistent: DB at `/app/manufacturing.db`, six tables matching the schema prose, generated at build (`Dockerfile:11-12`, `generate_data.py`). instruction↔solution↔test are aligned on the disclosed rules. The `limiting_resource=null`-on-shortfall behavior (O00_V) and the sub-assembly-excess-not-available-within-same-order behavior (O00_U, `solve.py:132-133` credits excess to `sub_created`, separate from `inv_snapshot`, matching "credited back into inventory **for later orders**") are internally consistent with the stated algorithm — the only expert-distrust point is O00_S2, where the routing "per manufacturing run" model plus node-by-node explosion language genuinely admits a DFS reading that both strong agents took.
+
+### Gap rubric
+- complete_test_coverage — PASS: every material requirement (file, schema, count, no-extras, types, sort, and each order's decisive values) maps to a real assertion; only O00_R1/R2 partial (immaterial).
+- correct_expected_results — PASS: expected values are self-consistent with and derivable from the specified computation; no partial/wrong pass@2 output scored as correct.
+- decisive_answer_discoverable — **FAIL**: O00_S2's decisive value requires the undisclosed BFS/cross-path aggregation rule; `spec_consistency` FAIL with 3-part trace, both agents diverged (Blocking).
+- granular_specific_tests — PASS: one focused test function per order with specific asserts.
+- tolerances_justified — PASS: only `1e-9` float tolerance on WC hours; rest exact-match.
+- readable_tests — PASS: plain asserts against readable hard-coded expecteds; no encoding/hashes.
+- graceful_failure — PASS: `test.sh:6-10` writes `0` on any pytest failure (missing/invalid report → fail → reward 0).
+- verifier_performance — PASS: single fast pytest, no external/subprocess calls, well within 120s.
+- fixtures_and_tamper_independence — PASS: expected values baked into tests; verifier never reads the agent-writable DB nor imports the solution.
+- traceable_requirements — **FAIL**: O00_S2 enforces a requirement absent from agent-visible material (Blocking).
+- instruction_environment_alignment — PASS: all described tables/paths exist as stated.
+- solution_alignment — PASS: Oracle derives from the DB, no hidden knowledge/imports/forbidden actions (Oracle-Derivation clean).
+- no_contradictions — PASS: `/app/report.json`, `/app/manufacturing.db`, 29 orders consistent across components.
+- no_orphaned_behavior — PASS: parts/workcenters/orders all exercised by some order.
+- metadata_reality_alignment — PASS: 29 orders matches test; timeouts (agent 600s, verifier 120s) and cpu/mem consistent with observed runtime; 2h estimate plausible.
+- agent_traces_clean — PASS: no cheating/tampering in either trace.
+- trivial_bypasses_blocked — PASS: reward-write, PATH/tool interception, ground-truth access, and loose-aggregate outputs all infeasible.
+- difficulty_evidence — PASS: ≥1 valid genuine-crux failure (`task__aKHwpKw`); noted that trial 2's failure is an ambiguity artifact feeding the decisive-answer blocker (sample only 2, graded conservatively).
+- unix_line_endings — PASS (advisory): files read as LF; a breaking CRLF would have failed validation upstream.
+- text_only_assets — PASS: all assets text/SQLite, tool-parsable.
+- no_brittle_time_dependence — PASS: fully static data, no `now()`/date/unseeded RNG.
+- no_solution_only_deps_in_agent_image — PASS: agent image ships stock python + pytest (verifier infra); nothing telegraphs the approach.
+- environment_permissions_and_services — N/A: no services; default permissions.
+- no_prompt_injection_or_obfuscation — PASS: agent-readable content clean; "Trap-*" part names are benign data labels, not injection.
+- dockerfile_structuring — PASS: nothing compiled, DB materialized as a real file at build, no opaque archives.
+
+### CI escapes (optional)
+The Stage-2 `unambiguous` criterion is assumed green, but the deep-review view from the agent's actual field of view overrides it here: the O00_S2 cross-path aggregation rule is a decisive discriminator whose intended reading exists only in `task.toml`/`solution` — the `decisive_answer_discoverable` FAIL is the intended override of a lenient `unambiguous` PASS.
+
+</details>
+
+<!-- Sticky Pull Request Commentautomated-review -->
+
+=====
+
+<!-- AVA-GATE -->
+## 🤖 Automated Review — Verifier Audit (AVA)
+
+**Verdict:** PASS
+
+**Advisory (non-blocking) — minor findings**
+_These do not block the PR; consider addressing them, but they are not required for this check to pass._
+- **`sound_verifier`** (AVA)
+    - **What this check verifies:** the verifier must reject work that does not satisfy the task; a wrong or invalid submission is currently accepted.
+    - **How your task failed it:** at `tests/test_outputs.py test_order_O00_R1_R2_allocation()`, Body only does `assert m['O00_R1']['allocated_qty'] == 1` and `assert m['O00_R2']['allocated_qty'] == 1`. No assertion on shortfall_qty or limiting_resource for either order, unli…; expected Per instruction.md, shortfall_qty = requested_qty - allocated_qty and limiting_resource must be the true constraining resource (or null); the bogus/inconsistent values violate the contract, but the verifier would instead PASS/reward=1 — schema test only type-checks these fields (int, str/None), and test_order_O00_R1_R2_allocation asserts only allocated_qty==1 for each.
+
+<!-- Sticky Pull Request Commentava-review -->
+
+=====
+
+## 🚦 Tier-1 fix-addressal   ⏸️ Some required fixes not yet attempted — Tier 2 held
+
+No diff since the review — required fixes not attempted. [cumulative compare fe54f31…fe54f31: 0 files]
+
+- ❌ **B1** (Ambiguous Rule, No Disambiguation): no changes pushed since the review
+
+<!-- TIER1-ADDRESSAL -->
+<!-- TIER1-BASE:fe54f312f23817c39e26a7ee0534ed402023120e -->
+<!-- TIER1-STATE:{"head_sha":"fe54f312f23817c39e26a7ee0534ed402023120e","base_sha":"fe54f312f23817c39e26a7ee0534ed402023120e","verdict":"HOLD","fixes":{"B1":false}} -->
+
+<!-- Sticky Pull Request Commenttier1-addressal -->
