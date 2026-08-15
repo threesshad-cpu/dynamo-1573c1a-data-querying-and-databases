@@ -3,6 +3,7 @@ artifacts = ["/app/report.json"]
 
 [task]
 name = "dynamo/bom-shortage-cascade"
+description = "Analyze multi-level manufacturing bill-of-materials (BOM) DAG in SQLite and simulate sequential shared-inventory allocation across production orders with routing and substitute parts."
 
 [metadata]
 category = "data_querying_and_databases"
