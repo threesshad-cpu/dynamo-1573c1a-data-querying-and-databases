@@ -7,12 +7,12 @@ from pathlib import Path
 
 parts_data = [
     # Leaf raw materials
-    ("L1", "Bolt-M4", 350, 1),
+    ("L1", "Bolt-M4", 1000, 1),
     ("L2", "Bolt-M6", 300, 1),
-    ("L3", "Steel-Plate", 55, 1),
+    ("L3", "Steel-Plate", 500, 1),
     ("L4", "Rubber-Gasket", 150, 1),
-    ("L5", "Circuit-Board", 12, 1),
-    ("L6", "Wire-Harness", 58, 1),
+    ("L5", "Circuit-Board", 92, 1),
+    ("L6", "Wire-Harness", 500, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
     ("SUB_L3", "Alloy-Plate", 18, 1),
@@ -157,7 +157,7 @@ bom_data = [
 
 workcenters_data = [
     ("WC1", "Stamping-Press", 50.0),
-    ("WC2", "Assembly-Line", 21.0),
+    ("WC2", "Assembly-Line", 48.4),
     ("WC3", "Testing-Station", 18.0),
     ("WC4", "Trap-Station", 2.75),
     ("WC5", "Setup-Test", 10.0),
