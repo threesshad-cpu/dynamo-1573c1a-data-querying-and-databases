@@ -232,7 +232,11 @@ def test_order_O00_R1_R2_allocation():
     """Verifies correct integer consumption of substitute stock leaving exact leftovers."""
     m = _get_orders_map()
     assert m["O00_R1"]["allocated_qty"] == 1
+    assert m["O00_R1"]["shortfall_qty"] == 0
+    assert m["O00_R1"]["limiting_resource"] is None
     assert m["O00_R2"]["allocated_qty"] == 1
+    assert m["O00_R2"]["shortfall_qty"] == 0
+    assert m["O00_R2"]["limiting_resource"] is None
 
 def test_order_O00_S2_allocation():
     """Verifies Level-Order (BFS) aggregation of demand before calculating routing batch setup hours."""
