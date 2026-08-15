@@ -15,16 +15,18 @@ parts_data = [
     ("L6", "Wire-Harness", 58, 1),
     ("L7", "LED-Display", 30, 1),
     ("L8", "Power-Unit", 40, 1),
-    ("SUB_L3", "Alloy-Plate", 18, 1),     # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
-    ("SUB_L6", "Flex-Cable", 10, 1),      # Substitute for L6 (ratio 1.0: 1 L6 needs 1 SUB_L6)
-    ("SUB_L5", "Alt-Board", 32, 1),       # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
+    ("SUB_L3", "Alloy-Plate", 18, 1),
+    # Substitute for L3 (ratio 2.0: 1 L3 needs 2 SUB_L3)
+    ("SUB_L6", "Flex-Cable", 10, 1),
+    # Substitute for L6 (ratio 1.0: 1 L6 needs 1 SUB_L6)
+    ("SUB_L5", "Alt-Board", 32, 1),
+    # Substitute for L5 (ratio 2.0: 1 L5 needs 2 SUB_L5)
 
     # Sub-assemblies
     ("SA1", "Bracket-Assembly", 2, 4),
     ("SA2", "Sensor-Module", 2, 7),
     ("SA3", "Base-Frame", 0, 6),
     ("SA4", "Control-Panel", 2, 5),
-
     # Finished products
     ("P1", "Widget-X", 0, 5),
     ("P2", "Widget-Y", 0, 4),
@@ -68,6 +70,17 @@ parts_data = [
     ("Z9", "Tie-Break-9", 10, 1),
     ("Z10", "Tie-Break-10", 10, 1),
     ("L30", "Net-Leaf", 109, 1),
+    ("P40", "Float-Trap-Prod", 0, 1),
+    ("P50", "Sub-Leftover-Prod1", 0, 1),
+    ("P51", "Sub-Leftover-Prod2", 0, 1),
+    ("L50", "Sub-Leftover-Leaf", 0, 1),
+    ("SUB_50", "Sub-Leftover-Sub", 4, 1),
+    ("P70", "DFS-Trap-Prod", 0, 1),
+    ("SA70", "DFS-Trap-SA1", 0, 1),
+    ("SA71", "DFS-Trap-SA2", 0, 1),
+    ("SA72", "DFS-Trap-SA-Shared", 0, 1),
+    ("L70", "DFS-Trap-Leaf", 100, 1),
+    ("L40", "Float-Trap-Leaf", 10, 1),
 ]
 
 bom_data = [
@@ -116,6 +129,14 @@ bom_data = [
     ("P30", "SA30", 2, 0.0, 0),
     ("P18", "Z9", 1, 0.0, 0),
     ("P18", "Z10", 1, 0.0, 0),
+    ("P50", "L50", 2, 0.0, 0),
+    ("P51", "SUB_50", 1, 0.0, 0),
+    ("P70", "SA70", 1, 0.0, 0),
+    ("P70", "SA71", 1, 0.0, 0),
+    ("SA70", "SA72", 1, 0.0, 0),
+    ("SA71", "SA72", 1, 0.0, 0),
+    ("SA72", "L70", 1, 0.0, 0),
+    ("P40", "L40", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -129,6 +150,8 @@ workcenters_data = [
     ("WC11", "Trap-WC-Batch-WC", 4.0),
     ("WC30", "Net-WC", 33.0),
     ("WC31", "Net-WC31", 100.0),
+    ("WC40", "Float-Trap-WC", 0.3),
+    ("WC70", "DFS-Trap-WC", 15.0),
 ]
 
 routing_data = [
@@ -151,6 +174,8 @@ routing_data = [
     ("SA11", "WC11", 0.0, 1.0),
     ("P30", "WC30", 0.0, 10.0),
     ("SA30", "WC31", 0.0, 1.0),
+    ("P40", "WC40", 0.1, 0.2),
+    ("SA72", "WC70", 10.0, 1.0),
 ]
 
 substitutes_data = [
@@ -163,6 +188,7 @@ substitutes_data = [
     ("L12", "SUB_L12_B", 1.0, 2),
     ("L16", "SUB_L16", 2.0, 1),
     ("L17", "SUB_L16", 1.0, 1),
+    ("L50", "SUB_50", 1.5, 1),
 ]
 
 
@@ -183,6 +209,10 @@ orders_data = [
     ("O00_N", "P18", 20, 23),
     ("O00_O", "P30", 3, 24),
     ("O00_P", "P30", 1, 25),
+    ("O00_Q", "P40", 1, 26),
+    ("O00_R1", "P50", 1, 27),
+    ("O00_R2", "P51", 1, 28),
+    ("O00_S2", "P70", 1, 29),
     ("O01", "P2", 14, 11),
     ("O02", "P1", 30, 12),
     ("O03", "P3", 15, 12),

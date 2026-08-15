@@ -1,0 +1,40 @@
+{
+  "cost_by_model": {
+    "claude-opus-4-8": 0.64113225
+  },
+  "cost_by_provider": {
+    "anthropic": 0.64113225
+  },
+  "cost_by_source": {
+    "claude_cli": 0.64113225
+  },
+  "cost_by_stage": {
+    "rubric-review": 0.64113225
+  },
+  "estimated_session_or_request_count": 1,
+  "generated_at": "2026-08-15T04:56:23.216481+00:00",
+  "notice": "Client/provider-reported estimates only. Direct Anthropic Messages API costs use standard global list prices dated 2026-07-23.",
+  "record_count": 1,
+  "records_with_cost": 1,
+  "records_without_cost": 0,
+  "schema_version": 1,
+  "sessions_or_requests_by_model": {
+    "claude-opus-4-8": 1
+  },
+  "sessions_or_requests_by_provider": {
+    "anthropic": 1
+  },
+  "sessions_or_requests_by_source": {
+    "claude_cli": 1
+  },
+  "sessions_or_requests_by_stage": {
+    "rubric-review": 1
+  },
+  "token_usage": {
+    "cache_creation_input_tokens": 41387,
+    "cache_read_input_tokens": 174519,
+    "input_tokens": 2471,
+    "output_tokens": 11237
+  },
+  "total_estimated_cost_usd": 0.64113225
+}

@@ -1,0 +1,3 @@
+The instruction (instruction.md step 1) requires honoring the BOM scrap parameters `scrap_rate_pct` and `setup_scrap_qty`, giving the explicit rule `setup_scrap + ceil(build_qty*qty_per*(1+scrap_rate_pct/100))`. But a solver that treats **both** `scrap_rate_pct` and `setup_scrap_qty` as their trivial value 0 passes all 11 graded assertions in `tests/test_outputs.py`.
+
+Break (identical outputs with

@@ -1,0 +1,41 @@
+FOUND COMMENT:
+## ≡ƒÜª Tier-1 fix-addressal   ΓÅ╕∩╕Å Some required fixes not yet attempted ΓÇö Tier 2 held
+
+No diff since the review ΓÇö required fixes not attempted. [cumulative compare fe54f31ΓÇªfe54f31: 0 files]
+
+- Γ¥î **B1** (Ambiguous Rule, No Disambiguation): no changes pushed since the review
+
+<!-- TIER1-ADDRESSAL -->
+<!-- TIER1-BASE:fe54f312f23817c39e26a7ee0534ed402023120e -->
+<!-- TIER1-STATE:{"head_sha":"fe54f312f23817c39e26a7ee0534ed402023120e","base_sha":"fe54f312f23817c39e26a7ee0534ed402023120e","verdict":"HOLD","fixes":{"B1":false}} -->
+
+<!-- Sticky Pull Request Commenttier1-addressal -->
+===================================
+FOUND COMMENT:
+## ≡ƒñû Per-Check QC ΓÇö Task Soundness   Γ¢ö Needs revision
+
+**1 issue must be fixed before this task can pass.** Fix them, then push to re-run (the pipeline re-runs automatically).
+
+### ≡ƒö┤ Must fix / resolve
+
+**1. Ambiguous Rule, No Disambiguation** ΓÇö `instruction.md`
+_What this means:_ An instruction can be read more than one way and the task never says which, so multiple different answers are all defensible.
+_What we found:_ The Step-5 rule for computing a leaf component's fulfillment ratio has two reasonable readings that diverge on the graded order **O00_A**, and nothing agent-visible forces one. The rule (instruction.md, Step 5): *"Compare the fulfillment ratio (available / required) for every leaf component ... ForΓÇª
+**Fix:** Disambiguate the rule in instruction.md so exactly one output is correct.
+
+<details><summary>41 checks passed ┬╖ 2 minor advisory</summary>
+
+**Minor advisory (non-blocking):**
+- Default-Only Parameter Coverage ΓÇö `instruction.md`: The instruction (instruction.md step 1) requires honoring the BOM scrap parameters `scrap_rate_pct` and `setup_scrap_qty`, giving the explicit ruleΓÇª
+- Untested Advertised Behavior ΓÇö `tests/test_outputs.py`: The tests fully check `allocated_qty`, `shortfall_qty`, and `limiting_resource` for all 11 orders (tests/test_outputs.py:test_order_*), so most advertisedΓÇª
+
+<sub>44 checks & probes run.</sub>
+</details>
+
+<!-- QC-STICKY -->
+
+<!-- QC-BASE:fe54f312f23817c39e26a7ee0534ed402023120e -->
+<!-- QC-FIXES-B64:W3siY2lkIjoiQjEiLCJiYXNlIjoiQjEiLCJuYW1lIjoiQW1iaWd1b3VzIFJ1bGUsIE5vIERpc2FtYmlndWF0aW9uIiwic2V2IjoiTWFqb3IiLCJldmlkZW5jZSI6IlsxLzEgc2FtcGxlcyBGQUlMXSBUaGUgU3RlcC01IHJ1bGUgZm9yIGNvbXB1dGluZyBhIGxlYWYgY29tcG9uZW50J3MgZnVsZmlsbG1lbnQgcmF0aW8gaGFzIHR3byByZWFzb25hYmxlIHJlYWRpbmdzIHRoYXQgZGl2ZXJnZSBvbiB0aGUgZ3JhZGVkIG9yZGVyICoqTzAwX0EqKiwgYW5kIG5vdGhpbmcgYWdlbnQtdmlzaWJsZSBmb3JjZXMgb25lLlxuXG5UaGUgcnVsZSAoaW5zdHJ1Y3Rpb24ubWQsIFN0ZXAgNSk6ICpcIkNvbXBhcmUgdGhlIGZ1bGZpbGxtZW50IHJhdGlvIChhdmFpbGFibGUgLyByZXF1aXJlZCkgZm9yIGV2ZXJ5IGxlYSIsImxvYyI6Imluc3RydWN0aW9uLm1kIn1d -->
+
+<!-- Sticky Pull Request Commentqc -->
+===================================

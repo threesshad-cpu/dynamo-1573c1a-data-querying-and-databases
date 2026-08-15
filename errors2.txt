@@ -1,0 +1,20 @@
+review / review	UNKNOWN STEP	2026-08-15T05:04:54.0229538Z ##[error]Process completed with exit code 1.
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7231459Z ^[[36;1mFAILED=""^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7231616Z ^[[36;1mstage_ok "$R" "$RUN_REVIEW"      || FAILED="$FAILED review=$R"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7231839Z ^[[36;1mstage_ok "$S" "$RUN_SIMILARITY"  || FAILED="$FAILED similarity=$S"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7232054Z ^[[36;1mstage_ok "$V" "$RUN_VALIDATION"  || FAILED="$FAILED validation=$V"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7232303Z ^[[36;1mstage_ok "$P" "$RUN_PASS2"       || FAILED="$FAILED pass2=$P"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7232511Z ^[[36;1mstage_ok "$T1" "$RUN_TIER1"      || FAILED="$FAILED tier1=$T1"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7232725Z ^[[36;1mstage_ok "$QG" "$RUN_QC"         || FAILED="$FAILED qc_gate=$QG"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7232945Z ^[[36;1mstage_ok "$DR" "$RUN_DEEP"       || FAILED="$FAILED deep_review=$DR"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7233164Z ^[[36;1mstage_ok "$AR" "$RUN_AVA"        || FAILED="$FAILED ava_review=$AR"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7233371Z ^[[36;1mstage_ok "$T" "$RUN_TRIALS"      || FAILED="$FAILED trials=$T"^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7233557Z ^[[36;1mif [ -n "$FAILED" ]; then^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7233713Z ^[[36;1m  CANCELLED=false; ANY_STAGE_FAILURE=false^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7234277Z ^[[36;1m    [ "$RESULT" = "failure" ] && ANY_STAGE_FAILURE=true^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7236642Z ^[[36;1m  # stage must have actually FAILED (an upstream collapse that only^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7237334Z ^[[36;1m    && [ "$CHANGES_RESULT" = "success" ] && [ "$ANY_STAGE_FAILURE" = "true" ]; then^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7237717Z ^[[36;1m    echo "::warning::Pipeline not green —$FAILED — but this task is in rework and the policy is advisory CI: submission is allowed. Verdicts remain on the PR as labels."^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7239270Z ^[[36;1m  echo "::error::Pipeline not green —$FAILED. PR is blocked (a Tier-1 HOLD blocks here until the required fixes are attempted)."^[[0m
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7342335Z ##[error]Pipeline not green — review=failure similarity=skipped validation=skipped pass2=skipped tier1=skipped qc_gate=skipped deep_review=skipped ava_review=skipped trials=skipped. PR is blocked (a Tier-1 HOLD blocks here until the required fixes are attempted).
+review / gate	UNKNOWN STEP	2026-08-15T05:05:03.7346505Z ##[error]Process completed with exit code 1.
