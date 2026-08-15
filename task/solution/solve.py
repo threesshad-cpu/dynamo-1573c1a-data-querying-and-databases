@@ -225,7 +225,16 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
     best_sub_created = None
     best_wc_cons = None
 
-    for u in range(max_units, -1, -bs):
+    low = 0
+    high = requested_qty // bs
+    allocated_qty = 0
+    best_inv_cons = None
+    best_sub_created = None
+    best_wc_cons = None
+
+    while low <= high:
+        mid = (low + high) // 2
+        u = mid * bs
         possible, inv_cons, sub_created, wc_cons, _, _ = simulate_explosion(
             product_id, u, curr_inv, curr_wc_hours
         )
@@ -234,7 +243,9 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
             best_inv_cons = inv_cons
             best_sub_created = sub_created
             best_wc_cons = wc_cons
-            break
+            low = mid + 1
+        else:
+            high = mid - 1
 
     shortfall_qty = requested_qty - allocated_qty
     limiting_resource = None
