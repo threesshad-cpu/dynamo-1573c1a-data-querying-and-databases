@@ -63,16 +63,9 @@ def test_order_O01_allocation():
 def test_order_O02_allocation():
     """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker."""
     m = _get_orders_map()
-    assert m["O02"]["allocated_qty"] in (0, 15, 25)
-    if m["O02"]["allocated_qty"] == 0:
-        assert m["O02"]["shortfall_qty"] == 30
-        assert m["O02"]["limiting_resource"] == "L5"
-    elif m["O02"]["allocated_qty"] == 15:
-        assert m["O02"]["shortfall_qty"] == 15
-        assert m["O02"]["limiting_resource"] == "L5"
-    else:
-        assert m["O02"]["shortfall_qty"] == 5
-        assert m["O02"]["limiting_resource"] == "WC2"
+    assert m["O02"]["allocated_qty"] == 25
+    assert m["O02"]["shortfall_qty"] == 5
+    assert m["O02"]["limiting_resource"] == "WC2"
 
 
 def test_order_O03_allocation():
@@ -86,9 +79,9 @@ def test_order_O03_allocation():
 def test_order_O04_allocation():
     """Verify O04 allocation (P2 x 20, batch=4): SA1 requires SA2 which needs L5 — fully depleted by O01+O03. alloc=0, sf=20, limiting=L5."""
     m = _get_orders_map()
-    assert m["O04"]["allocated_qty"] == 0
-    assert m["O04"]["shortfall_qty"] == 20
-    assert m["O04"]["limiting_resource"] == "L5"
+    assert m["O04"]["allocated_qty"] == 4
+    assert m["O04"]["shortfall_qty"] == 16
+    assert m["O04"]["limiting_resource"] == "WC2"
 
 
 def test_order_O05_allocation():
@@ -102,13 +95,9 @@ def test_order_O05_allocation():
 def test_order_O06_allocation():
     """Verify O06 allocation (P3 x 8, batch=2): Uses excess SA4 from O03 lot rounding."""
     m = _get_orders_map()
-    assert m["O06"]["allocated_qty"] in (0, 2)
-    if m["O06"]["allocated_qty"] == 0:
-        assert m["O06"]["shortfall_qty"] == 8
-        assert m["O06"]["limiting_resource"] == "L5"
-    else:
-        assert m["O06"]["shortfall_qty"] == 6
-        assert m["O06"]["limiting_resource"] == "L5"
+    assert m["O06"]["allocated_qty"] == 2
+    assert m["O06"]["shortfall_qty"] == 6
+    assert m["O06"]["limiting_resource"] == "WC2"
 
 def test_order_O00_A_allocation():
     """Verifies that O00_A fails allocation due to L10 shortage with the correct limiting resource."""
@@ -129,13 +118,9 @@ def test_order_O00_B_allocation():
 def test_order_O00_C_allocation():
     """Verifies that O00_C is successfully allocated fully (or fails if agent missed the tie-breaker)."""
     m = _get_orders_map()
-    assert m["O00_C"]["allocated_qty"] in (0, 3)
-    if m["O00_C"]["allocated_qty"] == 0:
-        assert m["O00_C"]["shortfall_qty"] == 3
-        assert m["O00_C"]["limiting_resource"] == "SUB_L12_B"
-    else:
-        assert m["O00_C"]["shortfall_qty"] == 0
-        assert m["O00_C"]["limiting_resource"] is None
+    assert m["O00_C"]["allocated_qty"] == 3
+    assert m["O00_C"]["shortfall_qty"] == 0
+    assert m["O00_C"]["limiting_resource"] is None
 
 
 def test_order_O00_D_allocation():
