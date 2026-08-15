@@ -53,7 +53,7 @@ for parent, wc, setup_h, run_h in cursor.fetchall():
     routing[parent].append((wc, setup_h, run_h))
 
 cursor.execute(
-    "SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes ORDER BY preference_rank ASC"
+    "SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes ORDER BY preference_rank ASC, substitute_part_id ASC"
 )
 substitutes = {}
 for prim, sub, ratio, rank in cursor.fetchall():
