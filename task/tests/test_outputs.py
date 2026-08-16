@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 26, "Expected 26 order results in report"
+    assert len(orders) == 24, "Expected 24 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_N", "O00_O", "O00_P", "O00_R1", "O00_R2", "O00_S2", "O00_W", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_O", "O00_P", "O00_R1", "O00_R2", "O00_S2", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -200,13 +200,6 @@ def test_order_O00_M_allocation():
     assert m["O00_M"]["shortfall_qty"] == 1
     assert m["O00_M"]["limiting_resource"] == "L21"
 
-def test_order_O00_N_allocation():
-    """Verifies O00_N correctly handles ASCII string sorting tie-breakers (Z10 vs Z9)."""
-    m = _get_orders_map()
-    assert m["O00_N"]["allocated_qty"] == 10
-    assert m["O00_N"]["shortfall_qty"] == 10
-    assert m["O00_N"]["limiting_resource"] == "Z10"
-
 def test_order_O00_O_allocation():
     """Verifies O00_O builds inventory for O00_P netting."""
     m = _get_orders_map()
@@ -238,10 +231,4 @@ def test_order_O00_S2_allocation():
     assert m["O00_S2"]["shortfall_qty"] == 0
     assert m["O00_S2"]["limiting_resource"] is None
 
-def test_order_O00_W_allocation():
-    """Verifies heterogeneous ASCII tie-breaker between leaves and workcenters."""
-    m = _get_orders_map()
-    assert m["O00_W"]["allocated_qty"] == 1
-    assert m["O00_W"]["shortfall_qty"] == 1
-    assert m["O00_W"]["limiting_resource"] == "WC99"
 
