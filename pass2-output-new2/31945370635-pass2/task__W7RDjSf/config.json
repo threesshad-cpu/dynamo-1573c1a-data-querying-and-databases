@@ -1,0 +1,75 @@
+{
+    "task": {
+        "path": "submission/task",
+        "git_url": null,
+        "git_commit_id": null,
+        "name": null,
+        "ref": null,
+        "overwrite": false,
+        "download_dir": null,
+        "source": null
+    },
+    "trial_name": "task__W7RDjSf",
+    "trials_dir": "pass2-output/31945370635-pass2",
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": null,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "agent": {
+        "name": "terminus-2",
+        "import_path": null,
+        "model_name": "openrouter/deepseek/deepseek-v4-pro",
+        "skills": [],
+        "override_timeout_sec": 1800.0,
+        "override_setup_timeout_sec": null,
+        "max_timeout_sec": null,
+        "extra_allowed_hosts": [],
+        "kwargs": {
+            "llm_kwargs": {
+                "reasoning": {
+                    "effort": "high"
+                },
+                "max_tokens": 128000
+            }
+        },
+        "env": {},
+        "mcp_servers": []
+    },
+    "environment": {
+        "type": "daytona",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "cpu_enforcement_policy": "auto",
+        "memory_enforcement_policy": "auto",
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "override_tpu": null,
+        "mounts": null,
+        "extra_docker_compose": [],
+        "env": {},
+        "kwargs": {
+            "auto_stop_interval_mins": 60,
+            "labels": {
+                "dynamo.task": "dynamo/bom-shortage-cascade",
+                "dynamo.repository": "handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases",
+                "dynamo.sha": "88002005d2711024b395b7e39522de6462e8a8d2",
+                "dynamo.github_run_id": "31945370635",
+                "dynamo.github_job": "pass2"
+            }
+        },
+        "extra_allowed_hosts": []
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "artifacts": [],
+    "extra_instruction_paths": [],
+    "job_id": "84ea81c1-3426-4f3f-a0f4-aea4a2ce32e9"
+}

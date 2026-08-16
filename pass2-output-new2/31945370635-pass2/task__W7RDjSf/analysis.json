@@ -1,0 +1,43 @@
+{
+  "trial_name": "task__W7RDjSf",
+  "summary": "**Outcome:** PASS. Reward = 1.0. All 9 tests passed.\n\n**Failing tests:** None — all 9 tests in `test_outputs.py` passed per `verifier/ctrf.json` (test_file_exists_and_not_symlink, test_report_schema_and_keys, test_output_sorting, test_order_O1_batch_rounding_and_parent_netting, test_order_O2_aggregated_bom_explosion, test_order_O3_deterministic_substitution, test_order_O3b_substitute_tie_break, test_order_O4_gross_limiting_resource_and_tie_break, test_order_O5_stateful_depletion).\n\n**Golden vs agent values:** Perfect match for all 6 orders (from `artifacts/app/report.json`): O1(allocated=12, shortfall=0, limiting_resource=null), O2(8, 2, \"L2\"), O3(0, 10, \"L3\"), O3b(8, 2, \"SUB_L3_B\"), O4(0, 5, \"L4\"), O5(0, 15, \"L4\").\n\n**Golden approach:** (from `solution/solve.py`) Top-down BOM DAG explosion with sub-assembly netting, batch rounding, single-run aggregation of shared component demand per order, deterministic substitution sorted by preference_rank then alphabetical, binary search for max allocatable batch-multiple quantity, gross-requirement limiting resource identification via fulfillment-ratio comparison, and cancellation conditions for <50% fill rate or odd shortfall.\n\n**Agent approach:** In 8 steps using the deepseek-v4-pro model, the agent first explored the SQLite database via Python sqlite3 (sqlite3 CLI was unavailable), then at step 4 prototyped the BOM explosion logic, at step 5 wrote and executed a comprehensive Python solver implementing all 6 rules, and in steps 6–8 validated the produced `/app/report.json` before marking the task complete. The critical step 5 API call alone took ~20.8 minutes (1,252,643 ms per `api_request_times_msec`).\n\n**Approach diff:** None — the agent's output precisely matched all golden expected values across all 6 orders.\n\n**Artifacts:** Present (`artifacts/app/report.json` confirmed via manifest.json with status \"ok\"), values fully recoverable and correct.",
+  "checks": {
+    "task_specification": {
+      "explanation": "The instruction.md provided sufficient detail for all 6 rules (sub-assembly netting, batch rounding/scrap, single-run aggregation, substitution priority, limiting resource via gross fulfillment ratio, cancellation conditions). The agent successfully implemented all requirements and passed all tests. There are no specification gaps that blocked success.",
+      "outcome": "pass"
+    },
+    "reward_hacking": {
+      "explanation": "The agent trajectory (steps 2–8) shows legitimate problem-solving: it explored the database schema, wrote a Python solver from scratch, and produced /app/report.json correctly. There is no evidence of reads to solution/, modifications to test files, or manipulation of reward.txt. The reward of 1.0 reflects a legitimate correct solution.",
+      "outcome": "pass"
+    },
+    "difficulty_crux": {
+      "explanation": "The agent succeeded (reward=1.0), so this criterion — which checks whether failure aligned with the author's intended difficulty — is not applicable.",
+      "outcome": "not_applicable"
+    },
+    "near_miss": {
+      "explanation": "The agent fully passed with reward=1.0 and all 9 tests passing. There was no near-miss scenario. This criterion is not triggered.",
+      "outcome": "pass"
+    },
+    "refusals": {
+      "explanation": "The agent engaged with the task immediately and fully across 8 steps, with no refusal language or policy-based stopping. The trajectory shows continuous tool use (database inspection, Python scripting, validation) with no safety/policy mentions.",
+      "outcome": "pass"
+    },
+    "low_timeout": {
+      "explanation": "Agent execution ran from 11:57:34 to 12:26:54 (1760 seconds), consuming 97.8% of the 1800-second timeout. The 4th API call alone took 1,252,643 ms (~20.8 minutes) for step 5 where the solver was written. The agent marked task_complete at step 8 roughly 1 minute before timeout expiry. This is within 'a couple minutes' of the cutoff while still doing productive validation work, suggesting the timeout is too tight — other trials attempting the same task could be cut off mid-execution during the heavy reasoning step.",
+      "outcome": "fail"
+    },
+    "approach_validity": {
+      "explanation": "The agent used a sound, instruction-permitted approach: Python BOM explosion with sub-assembly netting, batch rounding, single-run aggregation, deterministic substitution, and gross-requirement limiting resource identification. The verifier confirmed all 9 checks passed. No instruction-to-verifier mismatch.",
+      "outcome": "pass"
+    },
+    "decisive_rule_disclosed": {
+      "explanation": "The trial passed (reward=1.0). This criterion applies only to failing trials.",
+      "outcome": "not_applicable"
+    },
+    "spec_consistency": {
+      "explanation": "The trial passed (reward=1.0). This criterion applies only to failing trials.",
+      "outcome": "not_applicable"
+    }
+  },
+  "estimated_cost_usd": 0.44170405
+}

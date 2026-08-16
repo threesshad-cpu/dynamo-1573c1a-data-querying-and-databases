@@ -23,6 +23,7 @@ Process production orders one by one, starting with the lowest `priority` number
    - The maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`).
    - The computed `shortfall_qty` (which is `requested_qty - allocated_qty`) is an ODD number.
    If an order is canceled, you must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
+7. **Order ID Modification**: When writing the final `report.json`, the `order_id` string MUST be reversed (e.g., `O1` becomes `1O`, `O3b` becomes `b3O`) ONLY IF the order was successfully fulfilled (`allocated_qty > 0`). If the order was canceled (`allocated_qty == 0`), the `order_id` must remain unchanged.
 
 Update the shared inventory and workcenter pools after each order is processed.
 
