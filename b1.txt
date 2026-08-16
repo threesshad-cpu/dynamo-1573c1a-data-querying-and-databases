@@ -1,3 +1,0 @@
-The Step-5 rule for computing a leaf component's fulfillment ratio has two reasonable readings that diverge on the graded order **O00_A**, and nothing agent-visible forces one.
-
-The rule (instruction.md, Step 5): *"Compare the fulfillment ratio (available / required) for every leaf component ... For leaf components, include available substitute stock (converted at the appropriate `qty_ratio`) in t

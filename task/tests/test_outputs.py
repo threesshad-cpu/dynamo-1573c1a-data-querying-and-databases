@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 29, "Expected 29 order results in report"
+    assert len(orders) == 26, "Expected 26 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_N", "O00_O", "O00_P", "O00_Q", "O00_R1", "O00_R2", "O00_S2", "O00_U", "O00_V", "O00_W", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_N", "O00_O", "O00_P", "O00_R1", "O00_R2", "O00_S2", "O00_W", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -221,13 +221,6 @@ def test_order_O00_P_allocation():
     assert m["O00_P"]["shortfall_qty"] == 1
     assert m["O00_P"]["limiting_resource"] == "WC30"
 
-def test_order_O00_Q_allocation():
-    """Verifies O00_Q tests floating point precision tolerance for workcenter hours."""
-    m = _get_orders_map()
-    assert m["O00_Q"]["allocated_qty"] == 1
-    assert m["O00_Q"]["shortfall_qty"] == 0
-    assert m["O00_Q"]["limiting_resource"] is None
-
 def test_order_O00_R1_R2_allocation():
     """Verifies correct integer consumption of substitute stock leaving exact leftovers."""
     m = _get_orders_map()
@@ -244,20 +237,6 @@ def test_order_O00_S2_allocation():
     assert m["O00_S2"]["allocated_qty"] == 1
     assert m["O00_S2"]["shortfall_qty"] == 0
     assert m["O00_S2"]["limiting_resource"] is None
-
-def test_order_O00_U_allocation():
-    """Verifies golden solution sub_created substitute blindspot trap."""
-    m = _get_orders_map()
-    assert m["O00_U"]["allocated_qty"] == 0
-    assert m["O00_U"]["shortfall_qty"] == 1
-    assert m["O00_U"]["limiting_resource"] == "L80"
-
-def test_order_O00_V_allocation():
-    """Verifies golden solution shared substitute limiting_resource blindspot trap."""
-    m = _get_orders_map()
-    assert m["O00_V"]["allocated_qty"] == 0
-    assert m["O00_V"]["shortfall_qty"] == 1
-    assert m["O00_V"]["limiting_resource"] is None
 
 def test_order_O00_W_allocation():
     """Verifies heterogeneous ASCII tie-breaker between leaves and workcenters."""

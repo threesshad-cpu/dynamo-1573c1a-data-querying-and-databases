@@ -1,694 +1,0 @@
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# asciinema rec --stdin /logs/agent/recording.cast
-[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
-[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# clear
-[?2004l[H[J[3J[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# ls -la
-[?2004ltotal 52
-drwxr-xr-x 1 root root    30 Aug 15 07:03 .
-drwxr-xr-x 1 root root    74 Aug 15 07:04 ..
-drwxr-xr-x 2 root root     6 Aug 15 07:03 data
--rw-r--r-- 1 root root 53248 Aug 15 07:03 manufacturing.db
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# sqlite3 /app/manufacturing.db ".tables"
-[?2004lbash: sqlite3: command not found
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# sqlite3 /app/manufacturing.db ".schema"
-[?2004lbash: sqlite3: command not found
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# which python3 python python2 2>/dev/null || echo "checking python"
-[?2004l/usr/local/bin/python3
-/usr/local/bin/python
-checking python
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# python3 -c "import sqlite3; print('ok')" 2>&1
-[?2004lok
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# python3 << 'EOF'
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> conn = sqlite3.connect('/app/manufacturing.db')
-[?2004l[?2004h> cur = conn.cursor()
-[?2004l[?2004h> cur.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
-[?2004l[?2004h> tables = [r[0] for r in cur.fetchall()]
-[?2004l[?2004h> print("Tables:", tables)
-[?2004l[?2004h> for t in tables:
-[?2004l[?2004h>     print(f"\n=== {t} ===")
-[?2004l[?2004h>     cur.execute(f"PRAGMA table_info({t})")
-[?2004l[?2004h>     cols = cur.fetchall()
-[?2004l[?2004h>     print("Columns:", [(c[1], c[2]) for c in cols])
-[?2004l[?2004h>     cur.execute(f"SELECT * FROM {t}")
-[?2004l[?2004h>     rows = cur.fetchall()
-[?2004l[?2004h>     for r in rows:
-[?2004l[?2004h>         print(r)
-[?2004l[?2004h> conn.close()
-[?2004l[?2004h> EOF
-[?2004lTables: ['bom', 'orders', 'parts', 'routing', 'substitutes', 'workcenters']
-
-=== bom ===
-Columns: [('parent_part_id', 'TEXT'), ('child_part_id', 'TEXT'), ('qty_per', 'INTEGER'), ('scrap_rate_pct', 'REAL'), ('setup_scrap_qty', 'INTEGER')]
-('SA1', 'L1', 4, 0.0, 2)
-('SA1', 'SA2', 1, 0.0, 0)
-('SA1', 'L3', 1, 5.0, 3)
-('SA2', 'L5', 1, 0.0, 0)
-('SA2', 'L6', 2, 5.0, 1)
-('SA2', 'L1', 2, 0.0, 0)
-('SA3', 'L3', 2, 0.0, 0)
-('SA3', 'L2', 6, 0.0, 2)
-('SA3', 'L4', 4, 2.5, 0)
-('SA4', 'SA2', 1, 0.0, 0)
-('SA4', 'L7', 1, 0.0, 0)
-('P1', 'SA1', 1, 0.0, 0)
-('P1', 'SA2', 2, 0.0, 0)
-('P1', 'L2', 4, 0.0, 0)
-('P2', 'SA1', 1, 0.0, 0)
-('P2', 'SA3', 1, 0.0, 0)
-('P2', 'L4', 2, 0.0, 0)
-('P3', 'SA4', 1, 0.0, 0)
-('P3', 'L8', 1, 0.0, 0)
-('P4', 'L1', 1, 0.0, 0)
-('P4', 'L4', 1, 0.0, 0)
-('P5', 'SA5', 1, 0.0, 0)
-('SA5', 'SA6', 1, 0.0, 0)
-('SA5', 'L10', 2, 0.0, 0)
-('SA6', 'L11', 1, 0.0, 0)
-('SA6', 'L12', 1, 0.0, 0)
-('P6', 'L12', 1, 0.0, 0)
-('P7', 'SUB_L12_B', 1, 0.0, 0)
-('P8', 'SA8', 1, 0.0, 0)
-('P9', 'SA8', 1, 0.0, 0)
-('SA8', 'L13', 1, 12.5, 2)
-('P10', 'L14', 1, 0.0, 0)
-('P11', 'L15', 5, 0.0, 0)
-('P12', 'L16', 1, 0.0, 0)
-('P13', 'L17', 1, 0.0, 0)
-('P15', 'SA10', 1, 0.0, 0)
-('SA10', 'L20', 1, 0.0, 0)
-('P16', 'SA11', 1, 0.0, 0)
-('P17', 'L21', 1, 1.0, 0)
-('SA11', 'L22', 1, 0.0, 0)
-('SA30', 'L30', 10, 0.0, 0)
-('P30', 'SA30', 2, 0.0, 0)
-('P18', 'Z9', 1, 0.0, 0)
-('P18', 'Z10', 1, 0.0, 0)
-('P50', 'L50', 2, 0.0, 0)
-('P51', 'SUB_50', 1, 0.0, 0)
-('P70', 'SA70', 1, 0.0, 0)
-('P70', 'SA71', 1, 0.0, 0)
-('SA70', 'SA72', 1, 0.0, 0)
-('SA71', 'SA72', 1, 0.0, 0)
-('SA72', 'L70', 1, 0.0, 0)
-('P40', 'L40', 1, 0.0, 0)
-('P80', 'SA80', 1, 0.0, 0)
-('P80', 'L80', 1, 0.0, 0)
-('SA80', 'L81', 1, 0.0, 0)
-('P90', 'L91', 1, 0.0, 0)
-('P90', 'L92', 1, 0.0, 0)
-
-=== orders ===
-Columns: [('order_id', 'TEXT'), ('product_part_id', 'TEXT'), ('requested_qty', 'INTEGER'), ('priority', 'INTEGER')]
-('O00_A', 'P5', 3, 0)
-('O00_B', 'P6', 10, 1)
-('O00_C', 'P7', 3, 2)
-('O00_D', 'P8', 1, 3)
-('O00_E', 'P9', 9, 4)
-('O00_F', 'P8', 1, 5)
-('O00_G', 'P10', 1, 6)
-('O00_H', 'P11', 2, 7)
-('O00_I', 'P12', 3, 8)
-('O00_J', 'P13', 1, 9)
-('O00_K', 'P15', 3, 20)
-('O00_L', 'P16', 1, 21)
-('O00_M', 'P17', 1, 22)
-('O00_N', 'P18', 20, 23)
-('O00_O', 'P30', 3, 24)
-('O00_P', 'P30', 1, 25)
-('O00_Q', 'P40', 1, 994)
-('O00_U', 'P80', 1, 993)
-('O00_V', 'P90', 1, 992)
-('O00_R1', 'P51', 1, 991)
-('O00_R2', 'P51', 1, 990)
-('O00_S2', 'P70', 1, 989)
-('O01', 'P2', 14, 11)
-('O02', 'P1', 30, 12)
-('O03', 'P3', 15, 12)
-('O04', 'P2', 20, 14)
-('O05', 'P4', 5, 15)
-('O06', 'P3', 8, 16)
-
-=== parts ===
-Columns: [('part_id', 'TEXT'), ('name', 'TEXT'), ('on_hand_qty', 'INTEGER'), ('batch_size', 'INTEGER')]
-('L1', 'Bolt-M4', 350, 1)
-('L2', 'Bolt-M6', 300, 1)
-('L3', 'Steel-Plate', 55, 1)
-('L4', 'Rubber-Gasket', 150, 1)
-('L5', 'Circuit-Board', 12, 1)
-('L6', 'Wire-Harness', 58, 1)
-('L7', 'LED-Display', 30, 1)
-('L8', 'Power-Unit', 40, 1)
-('SUB_L3', 'Alloy-Plate', 18, 1)
-('SUB_L6', 'Flex-Cable', 10, 1)
-('SUB_L5', 'Alt-Board', 32, 1)
-('SA1', 'Bracket-Assembly', 2, 4)
-('SA2', 'Sensor-Module', 2, 7)
-('SA3', 'Base-Frame', 0, 6)
-('SA4', 'Control-Panel', 2, 5)
-('P1', 'Widget-X', 0, 5)
-('P2', 'Widget-Y', 0, 4)
-('P3', 'Widget-Z', 0, 2)
-('P4', 'Gadget-Q', 0, 3)
-('L10', 'Trap-Plate', 0, 1)
-('L11', 'Trap-Wire', 100, 1)
-('L12', 'Trap-Sensor', 0, 1)
-('L13', 'Trap-Metal', 25, 1)
-('SUB_L10', 'Sub-Trap-Plate', 5, 1)
-('SUB_L12_A', 'Sub-Sensor-A', 7, 1)
-('SUB_L12_B', 'Sub-Sensor-B', 10, 1)
-('SA5', 'Trap-Assembly', 0, 10)
-('SA6', 'Core-Assembly', 0, 5)
-('SA8', 'Trap-Sub-8', 0, 10)
-('P5', 'Trap-Product', 0, 2)
-('P6', 'Test-Pref', 0, 1)
-('P7', 'Test-Pref-Followup', 0, 1)
-('P8', 'Product-8', 0, 1)
-('P9', 'Product-9', 0, 1)
-('P10', 'Test-Setup', 0, 1)
-('P11', 'Trap-Initial', 0, 1)
-('P12', 'Trap-Sub-Int1', 0, 1)
-('P13', 'Trap-Sub-Int2', 0, 1)
-('P15', 'Trap-SA-Lim', 0, 1)
-('P16', 'Trap-WC-Batch', 0, 1)
-('P17', 'Trap-Scrap-Ceil', 0, 1)
-('SA10', 'Trap-SA-Lim-SA', 1, 1)
-('SA11', 'Trap-WC-Batch-SA', 0, 5)
-('L20', 'Trap-SA-Lim-Leaf', 100, 1)
-('L21', 'Trap-Scrap-Leaf', 1, 1)
-('L22', 'Trap-WC-Batch-Leaf', 100, 1)
-('L15', 'Trap-Initial-Leaf', 9, 1)
-('L16', 'Trap-Sub-Leaf1', 0, 1)
-('L17', 'Trap-Sub-Leaf2', 0, 1)
-('SUB_L16', 'Trap-Sub-Stock', 5, 1)
-('SA30', 'Net-SA', 0, 5)
-('P18', 'Tie-Break-Prod', 0, 1)
-('P30', 'Net-Prod', 0, 1)
-('L14', 'Test-Setup-Leaf', 100, 1)
-('Z9', 'Tie-Break-9', 10, 1)
-('Z10', 'Tie-Break-10', 10, 1)
-('L30', 'Net-Leaf', 109, 1)
-('P40', 'Float-Trap-Prod', 0, 1)
-('P50', 'Sub-Leftover-Prod1', 0, 1)
-('P51', 'Sub-Leftover-Prod2', 0, 1)
-('L50', 'Sub-Leftover-Leaf', 0, 1)
-('SUB_50', 'Sub-Leftover-Sub', 4, 1)
-('P70', 'DFS-Trap-Prod', 0, 1)
-('SA70', 'DFS-Trap-SA1', 0, 1)
-('SA71', 'DFS-Trap-SA2', 0, 1)
-('SA72', 'DFS-Trap-SA-Shared', 0, 1)
-('L70', 'DFS-Trap-Leaf', 100, 1)
-('L40', 'Float-Trap-Leaf', 10, 1)
-('P80', 'Sub-Blindspot-Prod', 0, 1)
-('SA80', 'Sub-Blindspot-SA', 0, 10)
-('L80', 'Sub-Blindspot-Leaf', 0, 1)
-('L81', 'Sub-Blindspot-Raw', 100, 1)
-('P90', 'Shared-Sub-Prod', 0, 1)
-('L91', 'Shared-Sub-L1', 0, 1)
-('L92', 'Shared-Sub-L2', 0, 1)
-('SUB_90', 'Shared-Sub', 1, 1)
-
-=== routing ===
-Columns: [('parent_part_id', 'TEXT'), ('workcenter_id', 'TEXT'), ('setup_hours', 'REAL'), ('run_hours_per_unit', 'REAL')]
-('SA1', 'WC1', 1.0, 0.2)
-('SA2', 'WC2', 0.5, 0.3)
-('SA3', 'WC1', 1.5, 0.4)
-('SA4', 'WC3', 0.8, 0.25)
-('P1', 'WC2', 2.0, 0.5)
-('P2', 'WC1', 1.0, 0.3)
-('P3', 'WC3', 1.2, 0.6)
-('P4', 'WC1', 1.0, 11.0)
-('P4', 'WC3', 0.6, 10.2)
-('P5', 'WC4', 2.0, 1.0)
-('SA5', 'WC4', 1.0, 0.5)
-('SA6', 'WC4', 0.5, 0.2)
-('P10', 'WC5', 2.0, 9.0)
-('P11', 'WC6', 5.0, 2.0)
-('P15', 'WC10', 0.0, 1.0)
-('SA11', 'WC11', 0.0, 1.0)
-('P30', 'WC30', 0.0, 10.0)
-('SA30', 'WC31', 0.0, 1.0)
-('P40', 'WC40', 0.1, 0.2)
-('SA72', 'WC70', 10.0, 1.0)
-
-=== substitutes ===
-Columns: [('primary_part_id', 'TEXT'), ('substitute_part_id', 'TEXT'), ('qty_ratio', 'REAL'), ('preference_rank', 'INTEGER')]
-('L3', 'SUB_L3', 2.0, 1)
-('L6', 'SUB_L6', 1.0, 1)
-('L5', 'SUB_L5', 2.0, 1)
-('L10', 'SUB_L10', 3.0, 1)
-('L12', 'SUB_L12_A', 2.0, 1)
-('L12', 'SUB_L12_B', 1.0, 2)
-('L16', 'SUB_L16', 2.0, 1)
-('L17', 'SUB_L16', 1.0, 1)
-('L50', 'SUB_50', 1.5, 1)
-('SUB_L3', 'L10', 2.0, 3)
-('L80', 'SA80', 1.0, 1)
-('L91', 'SUB_90', 1.0, 1)
-('L92', 'SUB_90', 1.0, 1)
-
-=== workcenters ===
-Columns: [('workcenter_id', 'TEXT'), ('name', 'TEXT'), ('available_hours', 'REAL')]
-('WC1', 'Stamping-Press', 50.0)
-('WC2', 'Assembly-Line', 21.0)
-('WC3', 'Testing-Station', 18.0)
-('WC4', 'Trap-Station', 2.75)
-('WC5', 'Setup-Test', 10.0)
-('WC6', 'Trap-Initial-WC', 8.2)
-('WC10', 'Trap-SA-Lim-WC', 2.0)
-('WC11', 'Trap-WC-Batch-WC', 4.0)
-('WC30', 'Net-WC', 33.0)
-('WC31', 'Net-WC31', 100.0)
-('WC40', 'Float-Trap-WC', 0.3)
-('WC70', 'DFS-Trap-WC', 15.0)
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# cat > /app/solve.py << 'PYEOF'
-[?2004l[?2004h> import sqlite3
-[?2004l[?2004h> import json
-[?2004l[?2004h> import math
-[?2004l[?2004h> from copy import deepcopy
-[?2004l[?2004h> 
-[?2004l[?2004h> # Connect to DB
-[?2004l[?2004h> conn = sqlite3.connect('/app/manufacturing.db')
-[?2004l[?2004h> cur = conn.cursor()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Load data into dictionaries
-[?2004l[?2004h> def load_data():
-[?2004l[?2004h>     cur.execute("SELECT part_id, name, on_hand_qty, batch_size FROM parts")
-[?2004l[?2004h>     parts = {}
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         parts[row[0]] = {'name': row[1], 'on_hand': row[2], 'batch_size': row[3]}
-[?2004l[?2004h>     
-[?2004l[?2004h>     cur.execute("SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty FROM bom")
-[?2004l[?2004h>     bom = {}  # parent -> list of (child, qty_per, scrap_rate, setup_scrap)
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         parent, child, qty_per, scrap_rate, setup_scrap = row
-[?2004l[?2004h>         if parent not in bom:
-[?2004l[?2004h>             bom[parent] = []
-[?2004l[?2004h>         bom[parent].append((child, qty_per, scrap_rate, setup_scrap))
-[?2004l[?2004h>     
-[?2004l[?2004h>     cur.execute("SELECT workcenter_id, name, available_hours FROM workcenters")
-[?2004l[?2004h>     workcenters = {}
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         workcenters[row[0]] = {'name': row[1], 'available': row[2]}
-[?2004l[?2004h>     
-[?2004l[?2004h>     cur.execute("SELECT parent_part_id, workcenter_id, setup_hours, run_hours_per_unit FROM routing")
-[?2004l[?2004h>     routing = {}  # parent -> list of (wc_id, setup_hours, run_hours_per_unit)
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         parent, wc, setup, run = row
-[?2004l[?2004h>         if parent not in routing:
-[?2004l[?2004h>             routing[parent] = []
-[?2004l[?2004h>         routing[parent].append((wc, setup, run))
-[?2004l[?2004h>     
-[?2004l[?2004h>     cur.execute("SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes ORDER BY primary_part_id, preference_rank")
-[?2004l[?2004h>     substitutes = {}  # primary -> list of (sub, qty_ratio, rank)
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         primary, sub, ratio, rank = row
-[?2004l[?2004h>         if primary not in substitutes:
-[?2004l[?2004h>             substitutes[primary] = []
-[?2004l[?2004h>         substitutes[primary].append((sub, ratio, rank))
-[?2004l[?2004h>     
-[?2004l[?2004h>     cur.execute("SELECT order_id, product_part_id, requested_qty, priority FROM orders")
-[?2004l[?2004h>     orders = []
-[?2004l[?2004h>     for row in cur.fetchall():
-[?2004l[?2004h>         orders.append({'order_id': row[0], 'product': row[1], 'requested_qty': row[2], 'priority': row[3]})
-[?2004l[?2004h>     
-[?2004l[?2004h>     return parts, bom, workcenters, routing, substitutes, orders
-[?2004l[?2004h> 
-[?2004l[?2004h> parts, bom, workcenters, routing, substitutes, orders = load_data()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Sort orders: priority ASC, then order_id DESC for ties
-[?2004l[?2004h> orders_sorted = sorted(orders, key=lambda x: (x['priority'], -hash(x['order_id'])))
-[?2004l[?2004h> # Actually need order_id DESCENDING string comparison? Let's sort by priority ASC, then by order_id string DESCENDING
-[?2004l[?2004h> orders_sorted = sorted(orders, key=lambda x: (x['priority'], [-ord(c) for c in x['order_id']]))
-[?2004l[?2004h> # Better: Python's sort is stable, we can sort by order_id descending first, then by priority ascending
-[?2004l[?2004h> orders_sorted = sorted(orders, key=lambda x: x['order_id'], reverse=True)
-[?2004l[?2004h> orders_sorted = sorted(orders_sorted, key=lambda x: x['priority'])
-[?2004l[?2004h> 
-[?2004l[?2004h> print("Orders in processing order:")
-[?2004l[?2004h> for o in orders_sorted:
-[?2004l[?2004h>     print(f"  {o['order_id']}: product={o['product']}, qty={o['requested_qty']}, priority={o['priority']}")
-[?2004l[?2004h> 
-[?2004l[?2004h> conn.close()
-[?2004l[?2004h> PYEOF
-[?2004l[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# python3 /app/solve.py
-[?2004lOrders in processing order:
-  O00_A: product=P5, qty=3, priority=0
-  O00_B: product=P6, qty=10, priority=1
-  O00_C: product=P7, qty=3, priority=2
-  O00_D: product=P8, qty=1, priority=3
-  O00_E: product=P9, qty=9, priority=4
-  O00_F: product=P8, qty=1, priority=5
-  O00_G: product=P10, qty=1, priority=6
-  O00_H: product=P11, qty=2, priority=7
-  O00_I: product=P12, qty=3, priority=8
-  O00_J: product=P13, qty=1, priority=9
-  O01: product=P2, qty=14, priority=11
-  O03: product=P3, qty=15, priority=12
-  O02: product=P1, qty=30, priority=12
-  O04: product=P2, qty=20, priority=14
-  O05: product=P4, qty=5, priority=15
-  O06: product=P3, qty=8, priority=16
-  O00_K: product=P15, qty=3, priority=20
-  O00_L: product=P16, qty=1, priority=21
-  O00_M: product=P17, qty=1, priority=22
-  O00_N: product=P18, qty=20, priority=23
-  O00_O: product=P30, qty=3, priority=24
-  O00_P: product=P30, qty=1, priority=25
-  O00_S2: product=P70, qty=1, priority=989
-  O00_R2: product=P51, qty=1, priority=990
-  O00_R1: product=P51, qty=1, priority=991
-  O00_V: product=P90, qty=1, priority=992
-  O00_U: product=P80, qty=1, priority=993
-  O00_Q: product=P40, qty=1, priority=994
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# cat > /app/solve.py << 'PYEOF'
-[?2004l[?2004h> import sqlite3
-[?2004l['batch_size']
-
-# Function to compute required child quantity given parent build qty and BOM edge
-def child_req(build_qty, qty_per, scrap_rate_pct, setup_scrap_qty):
-    base = build_qty * qty_per
-    # apply running scrap: multiply by (1 + scrap_rate_pct/100) and round UP
-    adj = math.ceil(base * (1 + scrap_rate_pct / 100.0))
-    return adj + setup_scrap_qty
-
-# Recursive demand function that modifies state (inv, wc). Returns True if qty can be satisfied.
-# It consumes stock, manufactures, adds excess.
-def demand(part_id, needed_qty, inv, wc, batch_sizes):
-    if needed_qty <= 0:
-        return True
-    
-    # 1. Consume from own stock
-    avail_own = inv.get(part_id, 0)
-    take = min(needed_qty, avail_own)
-    needed_qty -= take
-    inv[part_id] = avail_own - take
-    
-    if needed_qty == 0:
-        return True
-    
-    # 2. If leaf (no BOM), try substitutes
-    if part_id not in bom:
-        # Try substitutes
-        if part_id in substitutes:
-            for sub_id, ratio, rank in substitutes[part_id]:
-                while needed_qty > 0:
-                    # Try to get 'ratio' units of substitute to cover 1 primary unit
-                    # We need to check if we can get 'ratio' units of sub_id
-                    # But ratio may be float; we need to attempt to consume exactly 'ratio' units
-                    # Save state for rollback if demand fails
-                    saved_inv = deepcopy(inv)
-                    saved_wc = deepcopy(wc)
-                    if demand(sub_id, ratio, saved_inv, saved_wc, batch_sizes):
-                        # success: commit the change
-                        inv.update(saved_inv)
-                        wc.update(saved_wc)
-                        needed_qty -= 1
-                    else:
-                        break  # no more from this sub
-        # If still needed, fail
-        return needed_qty == 0
-    
-    # 3. Has BOM - manufacture
-    batch = batch_sizes.get(part_id, 1)
-    # round up to batch multiple
-    num_batches = (needed_qty + batch - 1) // batch
-    build_qty = num_batches * batch
-    
-    # Che[?2004h> import json
-[?2004l[?2004h> import math
-[?2004l[?2004h> from copy import deepcopy
-[?2004l[?2004h> 
-[?2004l [?2004h> conn = sqlite3.connect('/app/manufacturing.db')
-[?2004l[?2004h> cur = conn.cursor()
-[?2004l[?2004h> 
-[?2004l=[?2004h> # Load data
-[?2004l[?2004h> cur.execute("SELECT part_id, name, on_hand_qty, batch_size FROM parts")
-[?2004l[?2004h> parts_init = {}
-[?2004l[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     parts_init[row[0]] = {'name': row[1], 'on_hand': row[2], 'batch_size': row[3]}
-[?2004l[?2004h> 
-[?2004l[?2004h> cur.execute("SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty FROM bom")
-[?2004l[?2004h> bom = {}
-[?2004lr[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     parent, child, qty_per, scrap_rate, setup_scrap = row
-[?2004l[?2004h>     if parent not in bom:
-[?2004l[?2004h>         bom[parent] = []
-[?2004l[?2004h>     bom[parent].append((child, qty_per, scrap_rate, setup_scrap))
-[?2004l[?2004h> 
-[?2004l [?2004h> cur.execute("SELECT workcenter_id, name, available_hours FROM workcenters")
-[?2004l[?2004h> workcenters_init = {}
-[?2004l[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     workcenters_init[row[0]] = {'name': row[1], 'available': row[2]}
-[?2004l[?2004h> 
-[?2004l[?2004h> cur.execute("SELECT parent_part_id, workcenter_id, setup_hours, run_hours_per_unit FROM routing")
-[?2004l[?2004h> routing = {}
-[?2004l[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     parent, wc, setup, run = row
-[?2004l[?2004h>     if parent not in routing:
-[?2004l[?2004h>         routing[parent] = []
-[?2004l [?2004h>     routing[parent].append((wc, setup, run))
-[?2004l[?2004h> 
-[?2004l[?2004h> cur.execute("SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes ORDER BY primary_part_id, preference_rank")
-[?2004l[?2004h> substitutes = {}
-[?2004l[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     primary, sub, ratio, rank = row
-[?2004l[?2004h>     if primary not in substitutes:
-[?2004l[?2004h>         substitutes[primary] = []
-[?2004l[?2004h>     substitutes[primary].append((sub, ratio, rank))
-[?2004l[?2004h> 
-[?2004ld[?2004h> cur.execute("SELECT order_id, product_part_id, requested_qty, priority FROM orders")
-[?2004l[?2004h> orders_raw = []
-[?2004l[?2004h> for row in cur.fetchall():
-[?2004l[?2004h>     orders_raw.append({'order_id': row[0], 'product': row[1], 'requested_qty': row[2], 'priority': row[3]})
-[?2004l[?2004h> 
-[?2004l[?2004h> conn.close()
-[?2004l[?2004h> 
-[?2004l[?2004h> # Sort orders: priority ASC, ties by order_id DESC
-[?2004l[?2004h> orders_sorted = sorted(orders_raw, key=lambda x: x['order_id'], reverse=True)
-[?2004l[?2004h> orders_sorted = sorted(orders_sorted, key=lambda x: x['priority'])
-[?2004l[?2004h> 
-[?2004l[?2004h> # Helper: get batch size for a part
-[?2004l[?2004h> def get_batch(part_id):
-[?2004l[?2004h>     return parts_init[part_id]['batch_size']
-[?2004l[?2004h> 
-[?2004l[?2004h> # Function to compute required child quantity given parent build qty and BOM edge
-[?2004l[?2004h> def child_req(build_qty, qty_per, scrap_rate_pct, setup_scrap_qty):
-[?2004l[?2004h>     base = build_qty * qty_per
-[?2004l[?2004h>     # apply running scrap: multiply by (1 + scrap_rate_pct/100) and round UP
-[?2004l[?2004h>     adj = math.ceil(base * (1 + scrap_rate_pct / 100.0))
-[?2004l[?2004h>     return adj + setup_scrap_qty
-[?2004ld[?2004h> 
-[?2004le[?2004h> # Recursive demand function that modifies state (inv, wc). Returns True if qty can be satisfied.
-[?2004l[?2004h> # It consumes stock, manufactures, adds excess.
-[?2004l[?2004h> def demand(part_id, needed_qty, inv, wc, batch_sizes):
-[?2004l[?2004h>     if needed_qty <= 0:
-[?2004l[?2004h>         return True
-[?2004l[?2004h>     
-[?2004lh[?2004h>     # 1. Consume from own stock
-[?2004l[?2004h>     avail_own = inv.get(part_id, 0)
-[?2004l[?2004h>     take = min(needed_qty, avail_own)
-[?2004l[?2004h>     needed_qty -= take
-[?2004l[?2004h>     inv[part_id] = avail_own - take
-[?2004l[?2004h>     
-[?2004l[?2004h>     if needed_qty == 0:
-[?2004l[?2004h>         return True
-[?2004l[?2004h>     
-[?2004l[?2004h>     # 2. If leaf (no BOM), try substitutes
-[?2004l[?2004h>     if part_id not in bom:
-[?2004l[?2004h>         # Try substitutes
-[?2004ls[?2004h>         if part_id in substitutes:
-[?2004l[?2004h>             for sub_id, ratio, rank in substitutes[part_id]:
-[?2004l[?2004h>                 while needed_qty > 0:
-[?2004l
-[?2004h>                     # Try to get 'ratio' units of substitute to cover 1 primary unit
-[?2004la[?2004h>                     # We need to check if we can get 'ratio' units of sub_id
-[?2004l[?2004h>                     # But ratio may be float; we need to attempt to consume exactly 'ratio' units
-[?2004l[?2004h>                     # Save state for rollback if demand fails
-[?2004l[?2004h>                     saved_inv = deepcopy(inv)
-[?2004l[?2004h>                     saved_wc = deepcopy(wc)
-[?2004l[?2004h>                     if demand(sub_id, ratio, saved_inv, saved_wc, batch_sizes):
-[?2004l[?2004h>                         # success: commit the change
-[?2004l[?2004h>                         inv.update(saved_inv)
-[?2004l[?2004h>                         wc.update(saved_wc)
-[?2004l[?2004h>                         needed_qty -= 1
-[?2004l[?2004h>                     else:
-[?2004l[?2004h>                         break  # no more from this sub
-[?2004l[?2004h>         # If still needed, fail
-[?2004l[?2004h>         return needed_qty == 0
-[?2004l[?2004h>     
-[?2004l[?2004h>     # 3. Has BOM - manufacture
-[?2004l[?2004h>     batch = batch_sizes.get(part_id, 1)
-[?2004l[?2004h>     # round up to batch multiple
-[?2004l[?2004h>     num_batches = (needed_qty + batch - 1) // batch
-[?2004l[?2004h>     build_qty = num_batches * batch
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Check workcenter capacity
-[?2004l[?2004h>     if part_id in routing:
-[?2004l[?2004h>         for wc_id, setup, run in routing[part_id]:
-[?2004l[?2004h>             hours = setup + build_qty * run
-[?2004l[?2004h>             if wc.get(wc_id, 0) < hours:
-[?2004l[?2004h>                 return False
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Check child components feasibility before committing
-[?2004l[?2004h>     # Save state
-[?2004l[?2004h>     saved_inv = deepcopy(inv)
-[?2004l[?2004h>     saved_wc = deepcopy(wc)
-[?2004l[?2004h>     
-[?2004l[?2004h>     # For each child, compute required quantity and demand it
-[?2004l[?2004h>     for child, qty_per, scrap_rate, setup_scrap in bom[part_id]:
-[?2004l[?2004h>         req = child_req(build_qty, qty_per, scrap_rate, setup_scrap)
-[?2004l[?2004h>         if not demand(child, req, inv, wc, batch_sizes):
-[?2004l[?2004h>             # Rollback
-[?2004l[?2004h>             inv.clear()
-[?2004l[?2004h>             inv.update(saved_inv)
-[?2004l[?2004h>             wc.clear()
-[?2004l[?2004h>             wc.update(saved_wc)
-[?2004l[?2004h>             return False
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Deduct workcenter hours (after children success)
-[?2004l[?2004h>     if part_id in routing:
-[?2004l[?2004h>         for wc_id, setup, run in routing[part_id]:
-[?2004l[?2004h>             hours = setup + build_qty * run
-[?2004l[?2004h>             wc[wc_id] -= hours
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Add excess production to inventory
-[?2004l[?2004h>     excess = build_qty - needed_qty
-[?2004l[?2004h>     if excess > 0:
-[?2004l[?2004h>         inv[part_id] = inv.get(part_id, 0) + excess
-[?2004l[?2004h>     
-[?2004l[?2004h>     return True
-[?2004l[?2004h> 
-[?2004l[?2004h> # Now process orders
-[?2004l[?2004h> inv_current = {pid: parts_init[pid]['on_hand'] for pid in parts_init}
-[?2004l[?2004h> wc_current = {wid: workcenters_init[wid]['available'] for wid in workcenters_init}
-[?2004l[?2004h> batch_sizes = {pid: parts_init[pid]['batch_size'] for pid in parts_init}
-[?2004l[?2004h> 
-[?2004l[?2004h> results = []
-[?2004l[?2004h> 
-[?2004l [?2004h> for order in orders_sorted:
-[?2004l[?2004h>     oid = order['order_id']
-[?2004l[?2004h>     product = order['product']
-[?2004l[?2004h>     requested = order['requested_qty']
-[?2004l[?2004h>     batch = get_batch(product)
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Save state before this order for limiting resource calculation
-[?2004l[?2004h>     state_before_inv = deepcopy(inv_current)
-[?2004l[?2004h>     state_before_wc = deepcopy(wc_current)
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Determine max allocatable qty (multiple of batch_size)
-[?2004l[?2004h>     max_k = 0
-[?2004le[?2004h>     # Try candidates from highest down? Or linear from 0 up.
-[?2004l[?2004h>     # Since requested could be up to maybe 30, we can try all multiples.
-[?2004l[?2004h>     for k in range(0, requested + 1, batch):
-[?2004l[?2004h>         if k == 0:
-[?2004lr[?2004h>             max_k = 0
-[?2004l[?2004h>             continue
-[?2004l
-[?2004h>         # Test feasibility with a copy of current state
-[?2004l[?2004h>         test_inv = deepcopy(inv_current)
-[?2004l[?2004h>         test_wc = deepcopy(wc_current)
-[?2004l[?2004h>         if demand(product, k, test_inv, test_wc, batch_sizes):
-[?2004l[?2004h>             max_k = k
-[?2004l[?2004h>         else:
-[?2004l[?2004h>             break  # larger k won't be feasible either (since more demand can't be easier? Actually rounding might cause non-monotonic? But generally more demand is harder. However, due to batch rounding, it's possible that k=4 is infeasible but k=8 is feasible? Unlikely but possible if batch_size causes different child quantities? But we break early for efficiency; to be safe we could test all, but breaking is typical.
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Now commit max_k
-[?2004l[?2004h>     shortfall = requested - max_k
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Commit allocation
-[?2004l[?2004h>     if max_k > 0:
-[?2004l[?2004h>         success = demand(product, max_k, inv_current, wc_current, batch_sizes)
-[?2004l[?2004h>         if not success:
-[?2004l[?2004h>             print(f"ERROR: Could not commit {max_k} for order {oid}")
-[?2004l[?2004h>             max_k = 0
-[?2004l[?2004h>             shortfall = requested
-[?2004l[?2004h>     
-[?2004l[?2004h>     # Determine limiting resource if shortfall > 0
-[?2004l[?2004h>     limiting = None
-[?2004l[?2004h>     if shortfall > 0:
-[?2004l[?2004h>         target_qty = max_k + batch
-[?2004l[?2004h>         # Simulate explosion for target_qty from state_before
-[?2004l[?2004h>         test_inv = deepcopy(state_before_inv)
-[?2004l[?2004h>         test_wc = deepcopy(state_before_wc)
-[?2004l[?2004h>         
-[?2004l[?2004h>         # We need to compute required for each resource.
-[?2004l[?2004h>         # We'll run a modified explosion that tracks requirements vs available.
-[?2004l[?2004h>         # We need to get required amounts of leaf components and workcenters.
-[?2004l[?2004h>         # Let's compute recursively.
-[?2004l[?2004h>         
-[?2004l[?2004h>         # We'll define a function that, given target qty, returns:
-[?2004l[?2004h>         # - required hours per workcenter
-[?2004l[?2004h>         # - required qty per leaf component (gross after netting)
-[?2004l[?2004h>         # - available qty per leaf component (including substitutes)
-[?2004l[?2004h>         # We'll run a non-mutating version that just computes these numbers.
-[?2004l[?2004h>         
-[?2004l[?2004h>         # Actually, we can run the demand on a copy and track what was consumed.
-[?2004l[?2004h>         # But the requirement for limiting resource is: what would be needed to build target_qty,
-[?2004l[?2004h>         # not necessarily what the current state can satisfy.
-[?2004l[?2004h>         # The ratio is available / required.
-[?2004l[?2004h>         # "required" is gross req after netting of sub-assemblies.
-[?2004l[?2004h>         # "available" for leaf components includes its own stock + substitutes.
-[?2004l[?2004h>         
-[?2004l[?2004h>         # Let's implement a function that computes, for a given demand of a part,
-[?2004l[?2004h>         # the required leaf components and workcenter hours, assuming we consume
-[?2004l[?2004h>         # available stock of that part and its sub-assemblies (but not necessarily leaves? 
-[?2004l[?2004h>         # Actually we net ALL available stock before computing requirements.
-[?2004l[?2004h>         # So we need to run the netting process: start with demand of target_qty of product.
-[?2004l[?2004h>         # Recursively, for each part:
-[?2004l[?2004h>         # - Consume from its stock.
-[?2004l[?2004h>         # - If net > 0, we need to manufacture. This generates child requirements and workcenter hours.
-[?2004l[?2004h>         # - The "required" for a leaf component is the net amount needed after consuming its stock (but before substitutes? The spec says "include available substitute stock in the available supply" for leaves, so for leaves, available = own stock + substitute stock; required = what's needed after consuming all available stock? Actually "required" is the gross requirement after netting out available stock of parent sub-assemblies. For leaf components, we compare available to required. If required > available, ratio < 1.
-[?2004l[?2004h>         # So we compute required amount of each leaf (the amount we would need to consume from that leaf's stock + substitutes). Then available = leaf own stock + available from substitutes.
-[?2004l[?2004h>         
-[?2004l[?2004h>         pass  # placeholder for now; we'll implement properly
-[?2004l[?2004h>     
-[?2004l[?2004h>     results.append({
-[?2004l[?2004h>         'order_id': oid,
-[?2004l[?2004h>         'allocated_qty': max_k,
-[?2004l[?2004h>         'shortfall_qty': shortfall,
-[?2004l[?2004h>         'limiting_resource': limiting
-[?2004l[?2004h>     })
-[?2004l[?2004h> 
-[?2004l[?2004h> # Sort results by order_id ascending
-[?2004l[?2004h> results.sort(key=lambda x: x['order_id'])
-[?2004l[?2004h> 
-[?2004l[?2004h> with open('/app/report.json', 'w') as f:
-[?2004l[?2004h>     json.dump({'orders': results}, f, indent=2)
-[?2004l[?2004h> 
-[?2004l[?2004h> print("Done")
-[?2004l[?2004h> for r in results:
-[?2004l[?2004h>     print(r)
-[?2004l[?2004h> PYEOF
-[?2004l[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# echo "Script written. Now running..."
-[?2004lScript written. Now running...
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# python3 /app/solve.py
-[?2004lDone
-{'order_id': 'O00_A', 'allocated_qty': 0, 'shortfall_qty': 3, 'limiting_resource': None}
-{'order_id': 'O00_B', 'allocated_qty': 10, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_C', 'allocated_qty': 3, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_D', 'allocated_qty': 1, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_E', 'allocated_qty': 9, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_F', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_G', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_H', 'allocated_qty': 1, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_I', 'allocated_qty': 2, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_J', 'allocated_qty': 1, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_K', 'allocated_qty': 2, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_L', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_M', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_N', 'allocated_qty': 10, 'shortfall_qty': 10, 'limiting_resource': None}
-{'order_id': 'O00_O', 'allocated_qty': 3, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_P', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_Q', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_R1', 'allocated_qty': 1, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_R2', 'allocated_qty': 1, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_S2', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O00_U', 'allocated_qty': 1, 'shortfall_qty': 0, 'limiting_resource': None}
-{'order_id': 'O00_V', 'allocated_qty': 0, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O01', 'allocated_qty': 12, 'shortfall_qty': 2, 'limiting_resource': None}
-{'order_id': 'O02', 'allocated_qty': 0, 'shortfall_qty': 30, 'limiting_resource': None}
-{'order_id': 'O03', 'allocated_qty': 14, 'shortfall_qty': 1, 'limiting_resource': None}
-{'order_id': 'O04', 'allocated_qty': 0, 'shortfall_qty': 20, 'limiting_resource': None}
-{'order_id': 'O05', 'allocated_qty': 0, 'shortfall_qty': 5, 'limiting_resource': None}
-{'order_id': 'O06', 'allocated_qty': 2, 'shortfall_qty': 6, 'limiting_resource': None}
-[?2004hroot@ea82b326-ba51-4f3b-918d-1fc23a9e41c2:/app# 
