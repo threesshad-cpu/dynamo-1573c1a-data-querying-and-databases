@@ -7,7 +7,7 @@ You are given a SQLite database at `/app/manufacturing.db` containing a multi-le
 - `substitutes(primary_part_id, substitute_part_id, qty_ratio, preference_rank)`: Substitute parts that can replace a primary part when its on-hand stock is insufficient. Each unit of `primary_part_id` demand requires `qty_ratio` units of `substitute_part_id`. Lower `preference_rank` substitutes are used first. Primary stock is always consumed before substitutes.
 - `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for finished products.
 
-Process production orders one by one, starting with the lowest `priority` number. For each order, follow these 5 rules:
+Process production orders one by one, starting with the lowest `priority` number. For each order, follow these 6 rules:
 
 1. **Use Sub-Assemblies First**: Before you calculate how many raw materials (leaf components) you need, always use up any sub-assemblies you already have in stock. You only need to manufacture the difference.
 2. **Batch Rounding & Scrap**: Whenever you manufacture a part, you must build it in multiples of its `batch_size` (e.g., if you need 7 but batch size is 5, you build 10). Any extra units go into inventory for future orders. When calculating the materials needed, multiply the base requirement by `(1 + scrap_rate_pct / 100)` and round up to the next whole number. Then, add the fixed `setup_scrap_qty`.
@@ -19,6 +19,7 @@ Process production orders one by one, starting with the lowest `priority` number
    - The resource with the lowest ratio strictly below 1.0 is the `limiting_resource`. 
    - If multiple resources tie for the lowest ratio, break the tie by picking the resource whose ID comes first alphabetically as a string (e.g., if `L2` and `WC3` tie, choose `L2` because L comes before W).
    - If you fulfill the entire order (`shortfall_qty == 0`), just set `limiting_resource` to `null`.
+6. **Minimum Fill Rate**: If the maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`), the order is unviable and canceled. You must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
 
 Update the shared inventory and workcenter pools after each order is processed.
 
