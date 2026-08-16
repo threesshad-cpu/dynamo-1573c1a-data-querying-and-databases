@@ -21,7 +21,7 @@ verification_explanation = "Compares the agent's report.json directly against th
 timeout_sec = 120.0
 
 [agent]
-timeout_sec = 600.0
+timeout_sec = 1800.0
 
 [environment]
 build_timeout_sec = 600.0
