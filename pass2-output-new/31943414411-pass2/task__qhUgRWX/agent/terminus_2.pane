@@ -1,0 +1,1365 @@
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# asciinema rec --stdin /logs/agent/recording.cast
+[?2004l[0;32masciinema: recording asciicast to /logs/agent/recording.cast[0m
+[0;32masciinema: press <ctrl-d> or type "exit" when you're done[0m
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# clear
+[?2004l[H[J[3J[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# ls -la
+[?2004ltotal 52
+drwxr-xr-x 1 root root    30 Aug 16 11:13 .
+drwxr-xr-x 1 root root    74 Aug 16 11:13 ..
+drwxr-xr-x 2 root root     6 Aug 16 11:13 data
+-rw-r--r-- 1 root root 53248 Aug 16 11:13 manufacturing.db
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# sqlite3 /app/manufacturing.db ".schema"
+[?2004lbash: sqlite3: command not found
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3
+[?2004l[?2004h> conn=sqlite3.connect('/app/manufacturing.db')
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> cur.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+[?2004l[?2004h> print('TABLES:', cur.fetchall())
+[?2004l[?2004h> for table in ['parts','bom','workcenters','routing','substitutes','orders']:
+[?2004l[?2004h>     print('\n---',table,'---')
+[?2004l[?2004h>     cur.execute(f"PRAGMA table_info({table})")
+[?2004l[?2004h>     print('cols:', cur.fetchall())
+[?2004l[?2004h>     cur.execute(f"SELECT * FROM {table} LIMIT 10")
+[?2004l[?2004h>     print('rows sample:')
+[?2004l[?2004h>     for row in cur.fetchall():
+[?2004l[?2004h>         print(row)
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> PY
+[?2004lTABLES: [('bom',), ('orders',), ('parts',), ('routing',), ('substitutes',), ('workcenters',)]
+
+--- parts ---
+cols: [(0, 'part_id', 'TEXT', 0, None, 1), (1, 'name', 'TEXT', 1, None, 0), (2, 'on_hand_qty', 'INTEGER', 1, None, 0), (3, 'batch_size', 'INTEGER', 1, None, 0)]
+rows sample:
+('L1', 'Bolt', 200, 10)
+('L2', 'Plate', 50, 5)
+('L3', 'Wire', 15, 1)
+('L4', 'Plastic', 10, 1)
+('L_TIE', 'Tie-Break Leaf', 10, 1)
+('SUB_L3_A', 'Wire-Alloy', 12, 1)
+('SUB_L3_B', 'Wire-Copper', 8, 1)
+('SA1', 'Frame', 3, 2)
+('SA2', 'Module', 0, 4)
+('P1', 'Product-BatchNet', 0, 1)
+
+--- bom ---
+cols: [(0, 'parent_part_id', 'TEXT', 1, None, 1), (1, 'child_part_id', 'TEXT', 1, None, 2), (2, 'qty_per', 'INTEGER', 1, None, 0), (3, 'scrap_rate_pct', 'REAL', 1, None, 0), (4, 'setup_scrap_qty', 'INTEGER', 1, None, 0)]
+rows sample:
+('P1', 'SA1', 1, 0.0, 0)
+('SA1', 'L1', 4, 5.0, 2)
+('P2', 'SA1', 1, 0.0, 0)
+('P2', 'SA2', 2, 0.0, 0)
+('SA2', 'SA1', 1, 0.0, 0)
+('SA2', 'L2', 3, 0.0, 1)
+('P3', 'L3', 5, 0.0, 0)
+('P4', 'L4', 10, 0.0, 0)
+('P4', 'L_TIE', 10, 0.0, 0)
+('P5', 'L4', 1, 0.0, 0)
+
+--- workcenters ---
+cols: [(0, 'workcenter_id', 'TEXT', 0, None, 1), (1, 'name', 'TEXT', 1, None, 0), (2, 'available_hours', 'REAL', 1, None, 0)]
+rows sample:
+('WC1', 'Assembly', 250.0)
+('WC2', 'Testing', 100.0)
+('WC_TIE', 'Tie-Break WC', 10.0)
+
+--- routing ---
+cols: [(0, 'parent_part_id', 'TEXT', 1, None, 1), (1, 'workcenter_id', 'TEXT', 1, None, 2), (2, 'setup_hours', 'REAL', 1, None, 0), (3, 'run_hours_per_unit', 'REAL', 1, None, 0)]
+rows sample:
+('SA1', 'WC1', 5.0, 1.0)
+('SA2', 'WC2', 10.0, 2.0)
+('P1', 'WC1', 2.0, 0.5)
+('P2', 'WC1', 3.0, 1.0)
+('P3', 'WC2', 1.0, 1.0)
+('P4', 'WC_TIE', 0.0, 10.0)
+('P5', 'WC1', 0.0, 1.0)
+('P_B', 'WC1', 0.0, 1.0)
+
+--- substitutes ---
+cols: [(0, 'primary_part_id', 'TEXT', 1, None, 1), (1, 'substitute_part_id', 'TEXT', 1, None, 2), (2, 'qty_ratio', 'REAL', 1, None, 0), (3, 'preference_rank', 'INTEGER', 1, None, 0)]
+rows sample:
+('L3', 'SUB_L3_A', 2.0, 1)
+('L3', 'SUB_L3_B', 1.0, 1)
+
+--- orders ---
+cols: [(0, 'order_id', 'TEXT', 0, None, 1), (1, 'product_part_id', 'TEXT', 1, None, 0), (2, 'requested_qty', 'INTEGER', 1, None, 0), (3, 'priority', 'INTEGER', 1, None, 0)]
+rows sample:
+('O1', 'P1', 12, 10)
+('O2', 'P2', 10, 20)
+('O3', 'P3', 10, 30)
+('O3b', 'P_B', 10, 35)
+('O4', 'P4', 5, 40)
+('O5', 'P5', 15, 50)
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3
+[?2004l[?2004h> conn=sqlite3.connect('/app/manufacturing.db')
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> for table in ['parts','bom','workcenters','routing','substitutes','orders']:
+[?2004l[?2004h>     cur.execute(f"SELECT COUNT(*) FROM {table}")
+[?2004l[?2004h>     cnt=cur.fetchone()[0]
+[?2004l[?2004h>     print(f'\n=== {table} ({cnt}) ===')
+[?2004l[?2004h>     cur.execute(f"SELECT * FROM {table}")
+[?2004l[?2004h>     for row in cur.fetchall(): print(row)
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> PY
+[?2004l
+=== parts (15) ===
+('L1', 'Bolt', 200, 10)
+('L2', 'Plate', 50, 5)
+('L3', 'Wire', 15, 1)
+('L4', 'Plastic', 10, 1)
+('L_TIE', 'Tie-Break Leaf', 10, 1)
+('SUB_L3_A', 'Wire-Alloy', 12, 1)
+('SUB_L3_B', 'Wire-Copper', 8, 1)
+('SA1', 'Frame', 3, 2)
+('SA2', 'Module', 0, 4)
+('P1', 'Product-BatchNet', 0, 1)
+('P2', 'Product-Aggregate', 0, 1)
+('P3', 'Product-Subst', 0, 1)
+('P4', 'Product-Limit', 0, 1)
+('P5', 'Product-Stateful', 0, 1)
+('P_B', 'Product-SubstTie', 0, 1)
+
+=== bom (11) ===
+('P1', 'SA1', 1, 0.0, 0)
+('SA1', 'L1', 4, 5.0, 2)
+('P2', 'SA1', 1, 0.0, 0)
+('P2', 'SA2', 2, 0.0, 0)
+('SA2', 'SA1', 1, 0.0, 0)
+('SA2', 'L2', 3, 0.0, 1)
+('P3', 'L3', 5, 0.0, 0)
+('P4', 'L4', 10, 0.0, 0)
+('P4', 'L_TIE', 10, 0.0, 0)
+('P5', 'L4', 1, 0.0, 0)
+('P_B', 'SUB_L3_B', 1, 0.0, 0)
+
+=== workcenters (3) ===
+('WC1', 'Assembly', 250.0)
+('WC2', 'Testing', 100.0)
+('WC_TIE', 'Tie-Break WC', 10.0)
+
+=== routing (8) ===
+('SA1', 'WC1', 5.0, 1.0)
+('SA2', 'WC2', 10.0, 2.0)
+('P1', 'WC1', 2.0, 0.5)
+('P2', 'WC1', 3.0, 1.0)
+('P3', 'WC2', 1.0, 1.0)
+('P4', 'WC_TIE', 0.0, 10.0)
+('P5', 'WC1', 0.0, 1.0)
+('P_B', 'WC1', 0.0, 1.0)
+
+=== substitutes (2) ===
+('L3', 'SUB_L3_A', 2.0, 1)
+('L3', 'SUB_L3_B', 1.0, 1)
+
+=== orders (6) ===
+('O1', 'P1', 12, 10)
+('O2', 'P2', 10, 20)
+('O3', 'P3', 10, 30)
+('O3b', 'P_B', 10, 35)
+('O4', 'P4', 5, 40)
+('O5', 'P5', 15, 50)
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, json, math, copy
+[?2004l      'wc_avail': {w[0]: w[2] for w in cur.execute('')} if False else None,
+        'batch': {p: parts[p]['batch'] for p in parts}
+    }
+
+def order_state():
+    return {
+        'on_hand': {p: parts[p]['on_hand'] for p in parts},
+        'wc_avail': {}
+    }
+
+# Build wc availability
+wc_avail = {}
+conn=sqlite3.connect(db)
+cur=conn.cursor()
+for wc, name, avail in cur.execute('SELECT workcenter_id,name,available_hours FROM workcenters'):
+    wc_avail[wc] = avail
+conn.close()
+
+current_state = {
+    'on_hand': {p: parts[p]['on_hand'] for p in parts},
+    'wc_avail': dict(wc_avail)
+}
+
+def plan_order(product, qty, state):
+    demand = defaultdict(float)
+    build = {}
+    leaf_req = defaultdict(float)
+    hours_req = defaultdict(float)
+    demand[product] = qty
+    for p in topo:
+        d = demand.get(p, 0.0)
+        if d <= 0:
+            continue
+        if p not in bom:
+            # leaf
+            leaf_req[p] += d
+        else:
+            if p == product:
+                need = d
+            else:
+                avail = state['on_hand'].get(p, 0.0)
+                need = max(0.0, d - avail)
+            if need > 0:
+                b = parts[p]['batch']
+                bq = math.ceil(need / b) * b
+                build[p] = bq
+                for edge in bom[p]:
+                    base = bq * edge['qty']
+                    req = math.ceil(base * (1.0 + edge['scrap_pct']/100.0)) + edge['setup']
+                    demand[edge['child']] += req
+            else:
+                build[p] = 0
+            for rt in routing.get(p, []):
+                bq = build.get(p, 0)
+                if bq > 0:
+                    h = rt['setup'] + bq * rt['run']
+                    hours_req[rt['wc']] += h
+    return {'demand': demand, 'build': build, 'leaf_req': leaf_req, 'hours_req': hours_req}
+
+def leaf_available(leaf, qty, state):
+    avail = state['on_hand'].get(leaf, 0.0)
+    used = {}
+    use_own = min(avail, qty)
+    used[leaf] = use_own
+    rem = qty - use_own
+    for sub in subs.get(leaf, []):
+        if rem <= 1e-12:
+            break
+        stock = state['on_hand'[?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004l [?2004h> db='/app/manufacturing.db'
+[?2004le[?2004h> conn=sqlite3.connect(db)
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> 
+[?2004l[?2004h> # Load data
+[?2004l[?2004h> parts = {}
+[?2004l[?2004h> for row in cur.execute('SELECT part_id,name,on_hand_qty,batch_size FROM parts'):
+[?2004l[?2004h>     parts[row[0]] = {'name':row[1], 'on_hand':row[2], 'batch':row[3]}
+[?2004l[?2004h> 
+[?2004l [?2004h> bom = defaultdict(list)
+[?2004l[?2004h> for parent, child, qty, scrap, setup in cur.execute('SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty FROM bom'):
+[?2004l[?2004h>     bom[parent].append({'child': child, 'qty': qty, 'scrap_pct': scrap, 'setup': setup})
+[?2004la[?2004h> 
+[?2004l[?2004h> routing = defaultdict(list)
+[?2004l [?2004h> for parent, wc, setup, run in cur.execute('SELECT parent_part_id, workcenter_id, setup_hours, run_hours_per_unit FROM routing'):
+[?2004l[?2004h>     routing[parent].append({'wc': wc, 'setup': setup, 'run': run})
+[?2004l[?2004h> 
+[?2004l [?2004h> subs = defaultdict(list)
+[?2004l[?2004h> for primary, sub, ratio, rank in cur.execute('SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes'):
+[?2004l     if [?2004h>     subs[primary].append({'sub': sub, 'ratio': ratio, 'rank': rank})
+[?2004l[?2004h> for primary in subs:
+[?2004l[?2004h>     subs[primary].sort(key=lambda x: (x['rank'], x['sub']))
+[?2004l[?2004h> 
+[?2004l[?2004h> orders = []
+[?2004l[?2004h> for oid, prod, qty, prio in cur.execute('SELECT order_id, product_part_id, requested_qty, priority FROM orders'):
+[?2004l[?2004h>     orders.append({'id': oid, 'product': prod, 'qty': qty, 'priority': prio})
+[?2004l[?2004h> orders.sort(key=lambda x: (x['priority'], x['id']))
+[?2004l [?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004l[?2004h> # Topological order of all BOM nodes (parents before children)
+[?2004l[?2004h> all_nodes = set(parts.keys())
+[?2004l[?2004h> bom_nodes = set(bom.keys()) | {x['child'] for children in bom.values() for x in children}
+[?2004l[?2004h> all_nodes |= bom_nodes
+[?2004l[?2004h> visited=set(); temp=set(); post=[]
+[?2004l[?2004h> def dfs(n):
+[?2004l [?2004h>     if n in visited: return
+[?2004ls[?2004h>     if n in temp:
+[?2004l[?2004h>         # cycle, skip
+[?2004l[?2004h>         return
+[?2004l[?2004h>     temp.add(n)
+[?2004l [?2004h>     for edge in bom.get(n, []):
+[?2004ln[?2004h>         dfs(edge['child'])
+[?2004l[?2004h>     temp.discard(n)
+[?2004l[?2004h>     visited.add(n)
+[?2004l[?2004h>     post.append(n)
+[?2004l[?2004h> for n in all_nodes:
+[?2004l[?2004h>     dfs(n)
+[?2004l[?2004h> topo = list(reversed(post))
+[?2004lo[?2004h> print('Topo order:', topo)
+[?2004l'[?2004h> 
+[?2004l][?2004h> def copy_state():
+[?2004l[?2004h>     return {
+[?2004l[?2004h>         'on_hand': {p: parts[p]['on_hand'] for p in parts},
+[?2004l [?2004h>         'wc_avail': {w[0]: w[2] for w in cur.execute('')} if False else None,
+[?2004lo[?2004h>         'batch': {p: parts[p]['batch'] for p in parts}
+[?2004l[?2004h>     }
+[?2004l[?2004h> 
+[?2004l'[?2004h> def order_state():
+[?2004l[?2004h>     return {
+[?2004l[?2004h>         'on_hand': {p: parts[p]['on_hand'] for p in parts},
+[?2004l[?2004h>         'wc_avail': {}
+[?2004l][?2004h>     }
+[?2004l[?2004h> 
+[?2004lo[?2004h> # Build wc availability
+[?2004l[?2004h> wc_avail = {}
+[?2004l[?2004h> conn=sqlite3.connect(db)
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> for wc, name, avail in cur.execute('SELECT workcenter_id,name,available_hours FROM workcenters'):
+[?2004l[?2004h>     wc_avail[wc] = avail
+[?2004l[?2004h> conn.close()
+[?2004l   [?2004h> 
+[?2004l[?2004h> current_state = {
+[?2004le[?2004h>     'on_hand': {p: parts[p]['on_hand'] for p in parts},
+[?2004l[?2004h>     'wc_avail': dict(wc_avail)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004la[?2004h> def plan_order(product, qty, state):
+[?2004l[?2004h>     demand = defaultdict(float)
+[?2004lo[?2004h>     build = {}
+[?2004l[?2004h>     leaf_req = defaultdict(float)
+[?2004ls[?2004h>     hours_req = defaultdict(float)
+[?2004l[?2004h>     demand[product] = qty
+[?2004l0[?2004h>     for p in topo:
+[?2004lrr[?2004h>         d = demand.get(p, 0.0)
+[?2004l[?2004h>         if d <= 0:
+[?2004l[?2004h>             continue
+[?2004l [?2004h>         if p not in bom:
+[?2004l[?2004h>             # leaf
+[?2004l[?2004h>             leaf_req[p] += d
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             if p == product:
+[?2004ln[?2004h>                 need = d
+[?2004l[?2004h>             else:
+[?2004l[?2004h>                 avail = state['on_hand'].get(p, 0.0)
+[?2004l[?2004h>                 need = max(0.0, d - avail)
+[?2004l[?2004h>             if need > 0:
+[?2004l[?2004h>                 b = parts[p]['batch']
+[?2004l[?2004h>                 bq = math.ceil(need / b) * b
+[?2004l[?2004h>                 build[p] = bq
+[?2004l[?2004h>                 for edge in bom[p]:
+[?2004ln[?2004h>                     base = bq * edge['qty']
+[?2004l[?2004h>                     req = math.ceil(base * (1.0 + edge['scrap_pct']/100.0)) + edge['setup']
+[?2004l[?2004h>                     demand[edge['child']] += req
+[?2004l[?2004h>             else:
+[?2004l[?2004h>                 build[p] = 0
+[?2004l[?2004h>             for rt in routing.get(p, []):
+[?2004l[?2004h>                 bq = build.get(p, 0)
+[?2004l[?2004h>                 if bq > 0:
+[?2004l[?2004h>                     h = rt['setup'] + bq * rt['run']
+[?2004l[?2004h>                     hours_req[rt['wc']] += h
+[?2004l[?2004h>     return {'demand': demand, 'build': build, 'leaf_req': leaf_req, 'hours_req': hours_req}
+[?2004l[?2004h> 
+[?2004l[?2004h> def leaf_available(leaf, qty, state):
+[?2004l[?2004h>     avail = state['on_hand'].get(leaf, 0.0)
+[?2004l[?2004h>     used = {}
+[?2004l[?2004h>     use_own = min(avail, qty)
+[?2004l[?2004h>     used[leaf] = use_own
+[?2004l[?2004h>     rem = qty - use_own
+[?2004l[?2004h>     for sub in subs.get(leaf, []):
+[?2004l[?2004h>         if rem <= 1e-12:
+[?2004l[?2004h>             break
+[?2004l[?2004h>         stock = state['on_hand'].get(sub['sub'], 0.0)
+[?2004l[?2004h>         ratio = sub['ratio']
+[?2004l[?2004h>         cover = math.floor(stock / ratio) if ratio else 0
+[?2004l[?2004h>         take = min(cover, rem)
+[?2004l[?2004h>         if take > 0:
+[?2004l[?2004h>             used[sub['sub']] = used.get(sub['sub'], 0.0) + take * ratio
+[?2004l[?2004h>             rem -= take
+[?2004l[?2004h>     return rem <= 1e-12, used
+[?2004l[?2004h> 
+[?2004l[?2004h> def feasible(plan, state):
+[?2004l[?2004h>     # leaves
+[?2004l[?2004h>     for leaf, q in plan['leaf_req'].items():
+[?2004l[?2004h>         ok, used = leaf_available(leaf, q, state)
+[?2004l[?2004h>         if not ok:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     for wc, h in plan['hours_req'].items():
+[?2004l[?2004h>         if h > state['wc_avail'].get(wc, 0.0) + 1e-12:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     return True
+[?2004l[?2004h> 
+[?2004l[?2004h> def commit(plan, state):
+[?2004l[?2004h>     # leaves
+[?2004l[?2004h>     for leaf, q in plan['leaf_req'].items():
+[?2004l[?2004h>         ok, used = leaf_available(leaf, q, state)
+[?2004l[?2004h>         if not ok:
+[?2004l[?2004h>             print('ERROR leaf commitment', leaf, q)
+[?2004l[?2004h>             return
+[?2004l[?2004h>         for part, amt in used.items():
+[?2004l[?2004h>             state['on_hand'][part] -= amt
+[?2004l[?2004h>             if state['on_hand'][part] < -1e-12:
+[?2004l[?2004h>                 print('negative leaf inv', part, state['on_hand'][part])
+[?2004l[?2004h>     # manufactured parts
+[?2004l[?2004h>     for p, bq in plan['build'].items():
+[?2004l[?2004h>         d = plan['demand'].get(p, 0.0)
+[?2004l[?2004h>         if p not in plan['build'] and p not in bom:
+[?2004l[?2004h>             pass
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             if p == parts and p == 'PRODUCT?': pass
+[?2004l[?2004h>             old = state['on_hand'].get(p, 0.0)
+[?2004l[?2004h>             if p != plan['demand'].get('pid'):
+[?2004l[?2004h>                 pass
+[?2004l[?2004h>     for p in plan['build']:
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         d = plan['demand'].get(p, 0.0)
+[?2004l[?2004h>         old = state['on_hand'].get(p, 0.0)
+[?2004l[?2004h>         if p != plan['build'].get('__product'):
+[?2004l[?2004h>             pass
+[?2004l[?2004h>     # Do after leaves
+[?2004l[?2004h>     for p, bq in plan['build'].items():
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         d = plan['demand'].get(p, 0.0)
+[?2004l[?2004h>         old = state['on_hand'].get(p, 0.0)
+[?2004l[?2004h>         if p == plan['__product']:
+[?2004l[?2004h>             pass
+[?2004l[?2004h>         consume = min(d, old)
+[?2004l[?2004h>         state['on_hand'][p] = old - consume
+[?2004l[?2004h>     for p, bq in plan['build'].items():
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if bq > 0:
+[?2004l[?2004h>             state['on_hand'][p] += bq
+[?2004l[?2004h>     for wc, h in plan['hours_req'].items():
+[?2004l[?2004h>         state['wc_avail'][wc] -= h
+[?2004l[?2004h> 
+[?2004l[?2004h> # Let's implement candidate simulation manually for each order
+[?2004l[?2004h> for od in orders:
+[?2004l[?2004h>     prod=od['product']; req=od['qty']; batch=parts[prod]['batch']
+[?2004l[?2004h>     candidates = [x for x in range(req, -1, -batch) if x <= req]
+[?2004l[?2004h>     chosen = None; chosen_plan = None
+[?2004l[?2004h>     for q in candidates:
+[?2004l[?2004h>         st_copy = copy.deepcopy(current_state)
+[?2004l[?2004h>         plan = plan_order(prod, q, st_copy)
+[?2004l[?2004h>         if feasible(plan, st_copy):
+[?2004l[?2004h>             chosen = q; chosen_plan = plan
+[?2004l[?2004h>             break
+[?2004l[?2004h>     print(f"Order {od['id']}: product={prod}, req={req}, chosen={chosen}")
+[?2004l[?2004h>     if chosen is None:
+[?2004l[?2004h>         chosen=0
+[?2004l[?2004h>         chosen_plan=plan_order(prod,0,copy.deepcopy(current_state))
+[?2004l[?2004h>     # if zero or not, print lens
+[?2004l[?2004h>     if chosen_plan:
+[?2004l[?2004h>         print('  demand:', dict(chosen_plan['demand']))
+[?2004l[?2004h>         print('  build:', dict(chosen_plan['build']))
+[?2004l[?2004h>         print('  leaf_req:', dict(chosen_plan['leaf_req']))
+[?2004l[?2004h>         print('  hours_req:', dict(chosen_plan['hours_req']))
+[?2004l[?2004h>     # commit unless unviable
+[?2004l[?2004h>     # We'll not implement full unviable now, just continue
+[?2004l[?2004h>     if chosen > 0:
+[?2004l[?2004h>         commit(chosen_plan, current_state)
+[?2004l[?2004h>     print('  state after order (if committed): on_hand', {k:v for k,v in current_state['on_hand'].items() if v != parts[k]['on_hand']}, 'wc', current_state['wc_avail'])
+[?2004l[?2004h> PY
+[?2004lTopo order: ['P_B', 'SUB_L3_B', 'P4', 'P3', 'L3', 'P1', 'SUB_L3_A', 'P5', 'L4', 'P2', 'SA2', 'L2', 'SA1', 'L1', 'L_TIE']
+Order O1: product=P1, req=12, chosen=12
+  demand: {'P1': 12, 'SA1': 12.0, 'L1': 44.0}
+  build: {'P1': 12, 'SA1': 10}
+  leaf_req: {'L1': 44.0}
+  hours_req: {'WC1': 23.0}
+Traceback (most recent call last):
+  File [35m"<stdin>"[0m, line [35m215[0m, in [35m<module>[0m
+  File [35m"<stdin>"[0m, line [35m179[0m, in [35mcommit[0m
+[1;35mKeyError[0m: [35m'__product'[0m
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, json, math, copy
+[?2004l[?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004l[?2004h> DB = '/app/manufacturing.db'
+[?2004l[?2004h> 
+[?2004l[?2004h> # Load database
+[?2004l[?2004h> conn = sqlite3.connect(DB)
+[?2004l[?2004h> cur = conn.cursor()
+[?2004l[?2004h> 
+[?2004l[?2004h> parts = {}
+[?2004l[?2004h> for pid, name, qty, batch in cur.execute('SELECT part_id, name, on_hand_qty, batch_size FROM parts'):
+[?2004l[?2004h>     parts[pid] = {'name': name, 'on_hand': float(qty), 'batch': int(batch)}
+[?2004l[?2004h> 
+[?2004l[?2004h> bom = defaultdict(list)
+[?2004l[?2004h> for parent, child, qty, scrap, setup in cur.execute('SELECT parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty FROM bom'):
+[?2004l[?2004h>     bom[parent].append({'child': child, 'qty_per': qty, 'scrap_pct': scrap, 'setup_scrap': setup})
+[?2004l[?2004h> 
+[?2004lN[?2004h> routing = defaultdict(list)
+[?2004l[?2004h> for parent, wc, setup, run in cur.execute('SELECT parent_part_id, workcenter_id, setup_hours, run_hours_per_unit FROM routing'):
+[?2004l[?2004h>     routing[parent].append({'wc': wc, 'setup': setup, 'run': run})
+[?2004la[?2004h> 
+[?2004l[?2004h> substitutes = defaultdict(list)
+[?2004l[?2004h> for primary, sub, ratio, rank in cur.execute('SELECT primary_part_id, substitute_part_id, qty_ratio, preference_rank FROM substitutes'):
+[?2004l[?2004h>     substitutes[primary].append({'sub': sub, 'ratio': ratio, 'rank': rank})
+[?2004l[?2004h> for k, v in substitutes.items():
+[?2004l[?2004h>     v.sort(key=lambda x: (x['rank'], x['sub']))
+[?2004l[?2004h> 
+[?2004l[?2004h> workcenters = {}
+[?2004l[?2004h> for wc, name, avail in cur.execute('SELECT workcenter_id, name, available_hours FROM workcenters'):
+[?2004l[?2004h>     workcenters[wc] = float(avail)
+[?2004l[?2004h> 
+[?2004l[?2004h> orders = []
+[?2004l[?2004h> for oid, prod, qty, prio in cur.execute('SELECT order_id, product_part_id, requested_qty, priority FROM orders'):
+[?2004l[?2004h>     orders.append({'id': oid, 'product': prod, 'qty': int(qty), 'priority': int(prio)})
+[?2004l[?2004h> orders.sort(key=lambda x: (x['priority'], x['id']))
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004l[?2004h> # Build topological order: parent before child/leaf.
+[?2004l[?2004h> all_nodes = set(parts.keys())
+[?2004l[?2004h> bom_nodes = set(bom.keys()) | {e['child'] for children in bom.values() for e in children}
+[?2004l[?2004h> all_nodes |= bom_nodes
+[?2004l[?2004h> 
+[?2004l[?2004h> visited = set()
+[?2004l[?2004h> temp = set()
+[?2004l[?2004h> post = []
+[?2004l[?2004h> 
+[?2004l[?2004h> def dfs(node):
+[?2004l[?2004h>     if node in visited:
+[?2004l[?2004h>         return
+[?2004l[?2004h>     if node in temp:
+[?2004l[?2004h>         return
+[?2004l[?2004h>     temp.add(node)
+[?2004l[?2004h>     for edge in bom.get(node, []):
+[?2004l[?2004h>         dfs(edge['child'])
+[?2004l[?2004h>     temp.discard(node)
+[?2004l[?2004h>     visited.add(node)
+[?2004l[?2004h>     post.append(node)
+[?2004l[?2004h> 
+[?2004l[?2004h> for node in all_nodes:
+[?2004l[?2004h>     dfs(node)
+[?2004l[?2004h> topo = list(reversed(post))
+[?2004l[?2004h> 
+[?2004l[?2004h> # Current mutable state
+[?2004l[?2004h> state = {
+[?2004l[?2004h>     'on_hand': {p: parts[p]['on_hand'] for p in parts},
+[?2004l[?2004h>     'wc_avail': dict(workcenters)
+[?2004l[?2004h> }
+[?2004l[?2004h> 
+[?2004lf[?2004h> 
+[?2004l[?2004h> def material_need(base, scrap_pct, setup_scrap):
+[?2004l[?2004h>     return math.ceil(base * (1.0 + scrap_pct / 100.0)) + setup_scrap
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def explode(product, qty, st):
+[?2004l[?2004h>     demand = defaultdict(float)
+[?2004l[?2004h>     demand[product] = float(qty)
+[?2004l[?2004h>     build = {}
+[?2004l[?2004h>     leaf_req = defaultdict(float)
+[?2004l[?2004h>     hours_req = defaultdict(float)
+[?2004l[?2004h> 
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         d = demand.get(p, 0.0)
+[?2004l[?2004h>         if d <= 1e-12:
+[?2004l [?2004h>             continue
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             leaf_req[p] += d
+[?2004l[?2004h>             continue
+[?2004l[?2004h> 
+[?2004l[?2004h>         if p == product:
+[?2004l[?2004h>             need = d
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             avail = st['on_hand'].get(p, 0.0)
+[?2004l[?2004h>             need = max(0.0, d - avail)
+[?2004l[?2004h> 
+[?2004l[?2004h>         if need > 1e-12:
+[?2004l[?2004h>             b = parts[p]['batch']
+[?2004l[?2004h>             bq = math.ceil(need / b) * b
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             bq = 0
+[?2004l[?2004h>         build[p] = bq
+[?2004l[?2004h> 
+[?2004l[?2004h>         if bq > 0:
+[?2004l[?2004h>             for edge in bom[p]:
+[?2004l[?2004h>                 base = bq * edge['qty_per']
+[?2004l[?2004h>                 child_need = material_need(base, edge['scrap_pct'], edge['setup_scrap'])
+[?2004l[?2004h>                 demand[edge['child']] += child_need
+[?2004l[?2004h>             for route in routing.get(p, []):
+[?2004l[?2004h>                 hours_req[route['wc']] += route['setup'] + bq * route['run']
+[?2004l[?2004h> 
+[?2004l[?2004h>     return {'demand': demand, 'build': build, 'leaf_req': leaf_req, 'hours_req': hours_req}
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def consume_leaf_alloc(leaf, qty, st):
+[?2004l[?2004h>     """Return consumed dict if enough, else None."""
+[?2004l[?2004h>     used = defaultdict(float)
+[?2004l[?2004h>     avail_own = st['on_hand'].get(leaf, 0.0)
+[?2004l[?2004h>     take = min(avail_own, qty)
+[?2004l[?2004h>     used[leaf] += take
+[?2004l[?2004h>     rem = qty - take
+[?2004l[?2004h>     if rem <= 1e-12:
+[?2004l[?2004h>         return dict(used)
+[?2004l,[?2004h> 
+[?2004l [?2004h>     for sub in substitutes.get(leaf, []):
+[?2004l'[?2004h>         sub_part = sub['sub']
+[?2004l[?2004h>         ratio = sub['ratio']
+[?2004l[?2004h>         stock = st['on_hand'].get(sub_part, 0.0)
+[?2004l[?2004h>         cover = math.floor(stock / ratio) if ratio > 0 else 0
+[?2004l[?2004h>         take_primary = min(cover, rem)
+[?2004l[?2004h>         if take_primary > 0:
+[?2004l[?2004h>             used[sub_part] += take_primary * ratio
+[?2004l[?2004h>             rem -= take_primary
+[?2004l[?2004h>         if rem <= 1e-12:
+[?2004l[?2004h>             return dict(used)
+[?2004l[?2004h>     return None
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def is_feasible(plan, st):
+[?2004l[?2004h>     for leaf, qty in plan['leaf_req'].items():
+[?2004l[?2004h>         if consume_leaf_alloc(leaf, qty, st) is None:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     for wc, hrs in plan['hours_req'].items():
+[?2004l[?2004h>         if hrs > st['wc_avail'].get(wc, 0.0) + 1e-12:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     return True
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def commit(plan, st, product):
+[?2004l[?2004h>     # Consume leaf materials and substitutes
+[?2004l[?2004h>     for leaf, qty in plan['leaf_req'].items():
+[?2004l[?2004h>         used = consume_leaf_alloc(leaf, qty, st)
+[?2004l[?2004h>         if used is None:
+[?2004l[?2004h>             raise RuntimeError(f"Could not consume leaf {leaf} quantity {qty}")
+[?2004l[?2004h>         for part, amt in used.items():
+[?2004l[?2004h>             st['on_hand'][part] -= amt
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Consume existing sub-assembly inventories, then add manufactured parts
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         d = plan['demand'].get(p, 0.0)
+[?2004l[?2004h>         if d <= 1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if p != product:
+[?2004l[?2004h>             take = min(d, st['on_hand'].get(p, 0.0))
+[?2004l[?2004h>             st['on_hand'][p] -= take
+[?2004l[?2004h>         bq = plan['build'].get(p, 0)
+[?2004l[?2004h>         if bq > 0:
+[?2004l[?2004h>             st['on_hand'][p] += bq
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Consume workcenter hours
+[?2004l[?2004h>     for wc, hrs in plan['hours_req'].items():
+[?2004l[?2004h>         st['wc_avail'][wc] -= hrs
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def leaf_total_available(leaf, st):
+[?2004l[?2004h>     total = st['on_hand'].get(leaf, 0.0)
+[?2004l[?2004h>     for sub in substitutes.get(leaf, []):
+[?2004l[?2004h>         stock = st['on_hand'].get(sub['sub'], 0.0)
+[?2004l[?2004h>         ratio = sub['ratio']
+[?2004l[?2004h>         if ratio > 0:
+[?2004l[?2004h>             total += math.floor(stock / ratio)
+[?2004l[?2004h>     return total
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> def limiting_resource_for(product, probe_qty, st):
+[?2004l[?2004h>     plan = explode(product, probe_qty, st)
+[?2004l[?2004h>     ratios = []
+[?2004l[?2004h>     for leaf, gross in plan['leaf_req'].items():
+[?2004l[?2004h>         if gross <= 1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         avail = leaf_total_available(leaf, st)
+[?2004l[?2004h>         ratios.append((avail / gross, leaf))
+[?2004l[?2004h>     for wc, gross in plan['hours_req'].items():
+[?2004l[?2004h>         if gross <= 1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         avail = st['wc_avail'].get(wc, 0.0)
+[?2004l[?2004h>         ratios.append((avail / gross, wc))
+[?2004l[?2004h>     below = [(r, res) for r, res in ratios if r < 1.0 - 1e-12]
+[?2004l[?2004h>     if not below:
+[?2004l[?2004h>         return None
+[?2004l[?2004h>     min_r = min(r for r, _ in below)
+[?2004l[?2004h>     tied = [res for r, res in below if abs(r - min_r) < 1e-12]
+[?2004l[?2004h>     return sorted(tied)[0]
+[?2004l[?2004h> 
+[?2004l[?2004h> 
+[?2004l[?2004h> results = []
+[?2004l[?2004h> for order in orders:
+[?2004l[?2004h>     prod = order['product']
+[?2004l[?2004h>     req = order['qty']
+[?2004l[?2004h>     batch = parts[prod]['batch']
+[?2004l[?2004h>     largest_multiple = req - (req % batch)
+[?2004l[?2004h> 
+[?2004l[?2004h>     chosen_qty = 0
+[?2004l[?2004h>     chosen_plan = None
+[?2004l[?2004h>     for q in range(largest_multiple, -1, -batch):
+[?2004l[?2004h>         test_state = copy.deepcopy(state)
+[?2004l[?2004h>         plan_candidate = explode(prod, q, test_state)
+[?2004l[?2004h>         if is_feasible(plan_candidate, test_state):
+[?2004l[?2004h>             chosen_qty = q
+[?2004l[?2004h>             chosen_plan = plan_candidate
+[?2004l[?2004h>             break
+[?2004l[?2004h> 
+[?2004l[?2004h>     # If fulfilled entirely, no limiting resource.
+[?2004l[?2004h>     limiting = None
+[?2004l[?2004h>     if chosen_qty < req:
+[?2004l[?2004h>         # Compute limiting resource for one batch beyond maximum buildable quantity.
+[?2004l[?2004h>         probe_qty = chosen_qty + batch
+[?2004l[?2004h>         limiting = limiting_resource_for(prod, probe_qty, state)
+[?2004l[?2004h> 
+[?2004l[?2004h>     # Minimum fill-rate cancellation
+[?2004l[?2004h>     final_alloc = chosen_qty
+[?2004l[?2004h>     shortfall = req - final_alloc
+[?2004l[?2004h>     if req > 0 and (final_alloc / req) < 0.5:
+[?2004l[?2004h>         final_alloc = 0
+[?2004l[?2004h>         shortfall = req
+[?2004l[?2004h>     else:
+[?2004l[?2004h>         if chosen_plan is not None and final_alloc > 0:
+[?2004l[?2004h>             commit(chosen_plan, state, prod)
+[?2004l[?2004h> 
+[?2004l[?2004h>     results.append({
+[?2004l[?2004h>         'order_id': order['id'],
+[?2004l[?2004h>         'allocated_qty': int(final_alloc),
+[?2004l[?2004h>         'shortfall_qty': int(shortfall),
+[?2004l[?2004h>         'limiting_resource': limiting
+[?2004l[?2004h>     })
+[?2004l[?2004h>     print(f"Order {order['id']}: req={req}, max_buildable={chosen_qty}, final_alloc={final_alloc}, short={shortfall}, lim={limiting}")
+[?2004l[?2004h> 
+[?2004l[?2004h> print('\nFinal report:')
+[?2004l[?2004h> print(json.dumps({'orders': results}, indent=2))
+[?2004l[?2004h> print('\nFinal state:')
+[?2004l[?2004h> print('on_hand changed:', {k:v for k,v in state['on_hand'].items() if abs(v - parts[k]['on_hand']) > 1e-12})
+[?2004l[?2004h> print('wc_avail:', state['wc_avail'])
+[?2004l[?2004h> PY
+[?2004lOrder O1: req=12, max_buildable=12, final_alloc=12, short=0, lim=None
+Order O2: req=10, max_buildable=8, final_alloc=8, short=2, lim=L2
+Order O3: req=10, max_buildable=5, final_alloc=5, short=5, lim=L3
+Order O3b: req=10, max_buildable=4, final_alloc=0, short=10, lim=SUB_L3_B
+Order O4: req=5, max_buildable=1, final_alloc=0, short=5, lim=L4
+Order O5: req=15, max_buildable=10, final_alloc=10, short=5, lim=L4
+
+Final report:
+{
+  "orders": [
+    {
+      "order_id": "O1",
+      "allocated_qty": 12,
+      "shortfall_qty": 0,
+      "limiting_resource": null
+    },
+    {
+      "order_id": "O2",
+      "allocated_qty": 8,
+      "shortfall_qty": 2,
+      "limiting_resource": "L2"
+    },
+    {
+      "order_id": "O3",
+      "allocated_qty": 5,
+      "shortfall_qty": 5,
+      "limiting_resource": "L3"
+    },
+    {
+      "order_id": "O3b",
+      "allocated_qty": 0,
+      "shortfall_qty": 10,
+      "limiting_resource": "SUB_L3_B"
+    },
+    {
+      "order_id": "O4",
+      "allocated_qty": 0,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    },
+    {
+      "order_id": "O5",
+      "allocated_qty": 10,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    }
+  ]
+}
+
+Final state:
+on_hand changed: {'L1': 95.0, 'L2': 1.0, 'L3': 0.0, 'L4': 0.0, 'SUB_L3_A': 0.0, 'SUB_L3_B': 4.0, 'SA1': 14.0, 'SA2': 16.0, 'P1': 12.0, 'P2': 8.0, 'P3': 5.0, 'P5': 10.0}
+wc_avail: {'WC1': 187.0, 'WC2': 52.0, 'WC_TIE': 10.0}
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, json, math, copy
+[?2004l[?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004lf[?2004h> DB='/app/manufacturing.db'
+[?2004leq[?2004h> conn=sqlite3.connect(DB)
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> 
+[?2004ls[?2004h> parts={}
+[?2004l[?2004h> for pid,name,q,b in cur.execute('SELECT part_id,name,on_hand_qty,batch_size FROM parts'):
+[?2004l[?2004h>     parts[pid]={'name':name,'on_hand':float(q),'batch':int(b)}
+[?2004l[?2004h> 
+[?2004l [?2004h> bom=defaultdict(list)
+[?2004l[?2004h> for parent,child,q,scrap,setup in cur.execute('SELECT parent_part_id,child_part_id,qty_per,scrap_rate_pct,setup_scrap_qty FROM bom'):
+[?2004l[?2004h>     bom[parent].append({'child':child,'qty_per':q,'scrap_pct':scrap,'setup_scrap':setup})
+[?2004l[?2004h> 
+[?2004l
+[?2004h> routing=defaultdict(list)
+[?2004l[?2004h> for parent,wc,setup,run in cur.execute('SELECT parent_part_id,workcenter_id,setup_hours,run_hours_per_unit FROM routing'):
+[?2004l[?2004h>     routing[parent].append({'wc':wc,'setup':setup,'run':run})
+[?2004l[?2004h> 
+[?2004l'[?2004h> subs=defaultdict(list)
+[?2004l[?2004h> for primary,sub,ratio,rank in cur.execute('SELECT primary_part_id,substitute_part_id,qty_ratio,preference_rank FROM substitutes'):
+[?2004l[?2004h>     subs[primary].append({'sub':sub,'ratio':ratio,'rank':rank})
+[?2004l[?2004h> for k,v in subs.items():
+[?2004l[?2004h>     v.sort(key=lambda x:(x['rank'],x['sub']))
+[?2004l[?2004h> 
+[?2004l[?2004h> wcs={}
+[?2004l[?2004h> for wc,name,av in cur.execute('SELECT workcenter_id,name,available_hours FROM workcenters'):
+[?2004l[?2004h>     wcs[wc]=float(av)
+[?2004l[?2004h> 
+[?2004l[?2004h> orders=[]
+[?2004l[?2004h> for oid,prod,q,prio in cur.execute('SELECT order_id,product_part_id,requested_qty,priority FROM orders'):
+[?2004l[?2004h>     orders.append({'id':oid,'product':prod,'qty':int(q),'priority':int(prio)})
+[?2004l[?2004h> orders.sort(key=lambda x:(x['priority'],x['id']))
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004l[?2004h> # Build a deterministic topo order using Kahn on current BOM, sorted by node where no parents constraints?  
+[?2004l[?2004h> # We'll use a DFS postorder; set iteration is okay for valid parent-before-child but non-deterministic.
+[?2004l[?2004h> all_nodes=set(parts.keys()) | set(bom.keys()) | {e['child'] for ch in bom.values() for e in ch}
+[?2004l[?2004h> visited=set(); temp=set(); post=[]
+[?2004lh)[?2004h> 
+[?2004l[?2004h> def dfs(n):
+[?2004l[?2004h>     if n in visited or n in temp:
+[?2004l[?2004h>         return
+[?2004l,[?2004h>     temp.add(n)
+[?2004l[?2004h>     for e in bom.get(n,[]):
+[?2004l[?2004h>         dfs(e['child'])
+[?2004l[?2004h>     temp.discard(n)
+[?2004l[?2004h>     visited.add(n)
+[?2004l[?2004h>     post.append(n)
+[?2004le[?2004h> for n in sorted(all_nodes):
+[?2004l[?2004h>     dfs(n)
+[?2004l[?2004h> topo=list(reversed(post))
+[?2004l c[?2004h> 
+[?2004lh[?2004h> state={'on_hand':{p:parts[p]['on_hand'] for p in parts},'wc_avail':dict(wcs)}
+[?2004l[?2004h> 
+[?2004l [?2004h> def mat_need(base, scrap, setup):
+[?2004l ([?2004h>     return math.ceil(base*(1.0+scrap/100.0)) + setup
+[?2004l[?2004h> 
+[?2004l[?2004h> def explode(product, qty, st):
+[?2004l[?2004h>     demand=defaultdict(float)
+[?2004lro[?2004h>     demand[product]=float(qty)
+[?2004l[?2004h>     build={}
+[?2004l],'[?2004h>     leaf_req=defaultdict(float)
+[?2004l[?2004h>     hours_req=defaultdict(float)
+[?2004l[?2004h>     for p in topo:
+[?2004lp[?2004h>         d=demand.get(p,0.0)
+[?2004l[?2004h>         if d<=1e-12:
+[?2004l[?2004h>             continue
+[?2004ls[?2004h>         if p not in bom:
+[?2004l[?2004h>             leaf_req[p]+=d
+[?2004lke[?2004h>             continue
+[?2004l[?2004h>         if p==product:
+[?2004l')[?2004h>             need=d
+[?2004l{[?2004h>         else:
+[?2004l[?2004h>             need=max(0.0,d-st['on_hand'].get(p,0.0))
+[?2004l[?2004h>         if need>1e-12:
+[?2004l[?2004h>             bq=math.ceil(need/parts[p]['batch'])*parts[p]['batch']
+[?2004l[?2004h>         else:
+[?2004l
+[?2004h>             bq=0
+[?2004l[?2004h>         build[p]=bq
+[?2004l[?2004h>         if bq>0:
+[?2004l[?2004h>             for e in bom[p]:
+[?2004l[?2004h>                 child_need=mat_need(bq*e['qty_per'], e['scrap_pct'], e['setup_scrap'])
+[?2004l[?2004h>                 demand[e['child']]+=child_need
+[?2004l[?2004h>             for r in routing.get(p,[]):
+[?2004l[?2004h>                 hours_req[r['wc']]+=r['setup'] + bq*r['run']
+[?2004l[?2004h>     return {'demand':demand,'build':build,'leaf_req':leaf_req,'hours_req':hours_req}
+[?2004l[?2004h> 
+[?2004l[?2004h> def consume_leaf(leaf,qty,st,commit=False):
+[?2004l[?2004h>     used=defaultdict(float)
+[?2004l[?2004h>     take=min(st['on_hand'].get(leaf,0.0), qty)
+[?2004l[?2004h>     used[leaf]+=take
+[?2004l[?2004h>     rem=qty-take
+[?2004l[?2004h>     if rem<=1e-12:
+[?2004l[?2004h>         if commit:
+[?2004l[?2004h>             for p,a in used.items(): st['on_hand'][p]-=a
+[?2004l[?2004h>         return True
+[?2004l[?2004h>     for sub in subs.get(leaf,[]):
+[?2004l[?2004h>         sp=sub['sub']; stock=st['on_hand'].get(sp,0.0); ratio=sub['ratio']
+[?2004l[?2004h>         cover=math.floor(stock/ratio) if ratio>0 else 0
+[?2004l[?2004h>         take_p=min(cover, rem)
+[?2004l[?2004h>         if take_p>0:
+[?2004l[?2004h>             used[sp]+=take_p*ratio
+[?2004l[?2004h>             rem-=take_p
+[?2004l[?2004h>         if rem<=1e-12:
+[?2004l[?2004h>             if commit:
+[?2004l[?2004h>                 for p,a in used.items(): st['on_hand'][p]-=a
+[?2004l[?2004h>             return True
+[?2004l[?2004h>     return False
+[?2004l[?2004h> 
+[?2004l[?2004h> def feasible(plan,st):
+[?2004l[?2004h>     for leaf,q in plan['leaf_req'].items():
+[?2004l[?2004h>         if not consume_leaf(leaf,q,st):
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     for wc,h in plan['hours_req'].items():
+[?2004l[?2004h>         if h>st['wc_avail'].get(wc,0.0)+1e-12:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     return True
+[?2004l[?2004h> 
+[?2004l[?2004h> def commit(plan,st,product):
+[?2004l[?2004h>     # consume leaves
+[?2004l[?2004h>     for leaf,q in plan['leaf_req'].items():
+[?2004l[?2004h>         ok=consume_leaf(leaf,q,st,commit=True)
+[?2004l[?2004h>         if not ok:
+[?2004l[?2004h>             raise RuntimeError('leaf commit fail')
+[?2004l[?2004h>     # update manufactured/intermediate parts: old + built - total demand (for component use)
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         d=plan['demand'].get(p,0.0)
+[?2004l[?2004h>         bq=plan['build'].get(p,0)
+[?2004l[?2004h>         if p==product:
+[?2004l[?2004h>             # product itself is not consumed as a component in this order
+[?2004l[?2004h>             st['on_hand'][p] += bq
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             # p is consumed as a component, all demand d is consumed
+[?2004l[?2004h>             st['on_hand'][p] += bq - d
+[?2004l[?2004h>     for wc,h in plan['hours_req'].items():
+[?2004l[?2004h>         st['wc_avail'][wc]-=h
+[?2004l[?2004h> 
+[?2004l[?2004h> def leaf_total_available(leaf,st):
+[?2004l[?2004h>     total=st['on_hand'].get(leaf,0.0)
+[?2004l[?2004h>     for sub in subs.get(leaf,[]):
+[?2004l[?2004h>         ratio=sub['ratio']
+[?2004l[?2004h>         if ratio>0:
+[?2004l[?2004h>             total += math.floor(st['on_hand'].get(sub['sub'],0.0)/ratio)
+[?2004l[?2004h>     return total
+[?2004l[?2004h> 
+[?2004l[?2004h> def limiting(product,probe_q,st):
+[?2004l[?2004h>     plan=explode(product,probe_q,st)
+[?2004l[?2004h>     ratios=[]
+[?2004l[?2004h>     for leaf,gross in plan['leaf_req'].items():
+[?2004l[?2004h>         if gross>1e-12:
+[?2004l[?2004h>             ratios.append((leaf_total_available(leaf,st)/gross, leaf))
+[?2004l[?2004h>     for wc,gross in plan['hours_req'].items():
+[?2004l[?2004h>         if gross>1e-12:
+[?2004l[?2004h>             ratios.append((st['wc_avail'].get(wc,0.0)/gross, wc))
+[?2004l[?2004h>     below=[(r,res) for r,res in ratios if r < 1.0-1e-12]
+[?2004l[?2004h>     if not below:
+[?2004l[?2004h>         return None
+[?2004l[?2004h>     minr=min(r for r,_ in below)
+[?2004l[?2004h>     tied=[res for r,res in below if abs(r-minr)<1e-12]
+[?2004l[?2004h>     return sorted(tied)[0]
+[?2004l[?2004h> 
+[?2004l[?2004h> results=[]
+[?2004l[?2004h> for od in orders:
+[?2004l[?2004h>     prod=od['product']; req=od['qty']; batch=parts[prod]['batch']
+[?2004l[?2004h>     chosen=None; chosen_plan=None
+[?2004l[?2004h>     for q in range(req-(req%batch), -1, -batch):
+[?2004l[?2004h>         test=copy.deepcopy(state)
+[?2004l[?2004h>         pc=explode(prod,q,test)
+[?2004l[?2004h>         if feasible(pc,test):
+[?2004l[?2004h>             chosen=q; chosen_plan=pc; break
+[?2004l[?2004h>     if chosen is None:
+[?2004l[?2004h>         chosen=0; chosen_plan=explode(prod,0,copy.deepcopy(state))
+[?2004l[?2004h>     lim=None
+[?2004l[?2004h>     if chosen<req:
+[?2004l[?2004h>         lim=limiting(prod, chosen+batch, state)
+[?2004l[?2004h>     final=chosen
+[?2004l[?2004h>     short=req-final
+[?2004l[?2004h>     if req>0 and (final/req)<0.5:
+[?2004l[?2004h>         final=0; short=req
+[?2004l[?2004h>     else:
+[?2004l[?2004h>         if final>0:
+[?2004l[?2004h>             commit(chosen_plan, state, prod)
+[?2004l[?2004h>     results.append({'order_id':od['id'],'allocated_qty':int(final),'shortfall_qty':int(short),'limiting_resource':lim})
+[?2004l[?2004h>     print(f"{od['id']}: req={req}, chosen={chosen}, final={final}, short={short}, lim={lim}")
+[?2004l[?2004h> 
+[?2004l[?2004h> results_sorted=sorted(results,key=lambda x:x['order_id'])
+[?2004l[?2004h> print('\nreport:')
+[?2004l[?2004h> print(json.dumps({'orders':results_sorted},indent=2))
+[?2004l[?2004h> print('\nfinal on_hand:')
+[?2004l[?2004h> for k in sorted(state['on_hand']):
+[?2004l[?2004h>     v=state['on_hand'][k]
+[?2004l[?2004h>     if not math.isclose(v,parts[k]['on_hand']):
+[?2004l[?2004h>         print(k, v)
+[?2004l[?2004h> print('wcs:', state['wc_avail'])
+[?2004l[?2004h> PY
+[?2004lO1: req=12, chosen=12, final=12, short=0, lim=None
+O2: req=10, chosen=8, final=8, short=2, lim=L2
+O3: req=10, chosen=5, final=5, short=5, lim=L3
+O3b: req=10, chosen=4, final=0, short=10, lim=SUB_L3_B
+O4: req=5, chosen=1, final=0, short=5, lim=L4
+O5: req=15, chosen=10, final=10, short=5, lim=L4
+
+report:
+{
+  "orders": [
+    {
+      "order_id": "O1",
+      "allocated_qty": 12,
+      "shortfall_qty": 0,
+      "limiting_resource": null
+    },
+    {
+      "order_id": "O2",
+      "allocated_qty": 8,
+      "shortfall_qty": 2,
+      "limiting_resource": "L2"
+    },
+    {
+      "order_id": "O3",
+      "allocated_qty": 5,
+      "shortfall_qty": 5,
+      "limiting_resource": "L3"
+    },
+    {
+      "order_id": "O3b",
+      "allocated_qty": 0,
+      "shortfall_qty": 10,
+      "limiting_resource": "SUB_L3_B"
+    },
+    {
+      "order_id": "O4",
+      "allocated_qty": 0,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    },
+    {
+      "order_id": "O5",
+      "allocated_qty": 10,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    }
+  ]
+}
+
+final on_hand:
+L1 53.0
+L2 1.0
+L3 0.0
+L4 0.0
+P1 12.0
+P2 8.0
+P3 5.0
+P5 10.0
+SA1 1.0
+SUB_L3_A 0.0
+SUB_L3_B 4.0
+wcs: {'WC1': 177.0, 'WC2': 52.0, 'WC_TIE': 10.0}
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# python3 - <<'PY'
+[?2004l[?2004h> import sqlite3, json, math, copy
+[?2004lt(float)
+    demand[product]=float(qty)
+    build={}
+    leaf_req=defaultdict(float)
+    hours_req=defaultdict(float)
+    for p in topo:
+        d=demand.get(p,0.0)
+        if d<=1e-12:
+            continue
+        if p not in bom:
+            leaf_req[p]+=d
+            continue
+        if p==product:
+            need=d
+        else:
+            need=max(0.0, d - st['on_hand'].get(p,0.0))
+        if need>1e-12:
+            bq=math.ceil(need/parts[p]['batch'])*parts[p]['batch']
+        else:
+            bq=0
+        build[p]=bq
+        if bq>0:
+            for e in bom[p]:
+                child_need=mat_need(bq*e['qty_per'], e['scrap_pct'], e['setup_scrap'])
+                demand[e['child']]+=child_need
+            for r in routing.get(p,[]):
+                hours_req[r['wc']]+=r['setup'] + bq*r['run']
+    return {'demand':demand,'build':build,'leaf_req':leaf_req,'hours_req':hours_req}
+
+def consume_leaf(leaf, qty, st, commit=False):
+    used=defaultdict(float)
+    take=min(st['on_hand'].get(leaf,0.0), qty)
+    used[leaf]+=take
+    rem=qty-take
+    if rem<=1e-12:
+        if commit:
+            for p,a in used.items(): st['on_hand'][p]-=a
+        return True
+    for sub in subs.get(leaf,[]):
+        sp=sub['sub']; stock=st['on_hand'].get(sp,0.0); ratio=sub['ratio']
+        cover=math.floor(stock/ratio) if ratio>0 else 0
+        take_p=min(cover, rem)
+        if take_p>0:
+            used[sp]+=take_p*ratio
+            rem-=take_p
+        if rem<=1e-12:
+            if commit:
+                for p,a in used.items(): st['on_hand'][p]-=a
+            return True
+    return False
+
+def feasible(plan, st):
+    for leaf,q in plan['leaf_req'].items():
+        if not consume_leaf(leaf,q,st):
+            return False
+    for wc,h in plan['hours_req'].items():
+        if h > st['wc_avail'].get(wc,0.0) + 1e-12:
+            return False
+    return True
+
+def commit(plan, st, product):
+    for leaf,q in plan['leaf_req'].items():
+        if not consume_leaf(leaf,q,st,commit=True):
+            raise RuntimeError('leaf commit fail')
+    for p in topo:
+        if p not in bom:
+      [?2004h> from collections import defaultdict
+[?2004l[?2004h> 
+[?2004ld[?2004h> DB='/app/manufacturing.db'
+[?2004l[?2004h> conn=sqlite3.connect(DB)
+[?2004l[?2004h> cur=conn.cursor()
+[?2004l[?2004h> 
+[?2004l
+[?2004h> parts={}
+[?2004l[?2004h> for pid,name,q,b in cur.execute('SELECT part_id,name,on_hand_qty,batch_size FROM parts'):
+[?2004l[?2004h>     parts[pid]={'on_hand':float(q),'batch':int(b)}
+[?2004l[?2004h> 
+[?2004ll[?2004h> bom=defaultdict(list)
+[?2004l[?2004h> for parent,child,q,scrap,setup in cur.execute('SELECT parent_part_id,child_part_id,qty_per,scrap_rate_pct,setup_scrap_qty FROM bom'):
+[?2004l[?2004h>     bom[parent].append({'child':child,'qty_per':q,'scrap_pct':scrap,'setup_scrap':setup})
+[?2004l[?2004h> 
+[?2004l[?2004h> routing=defaultdict(list)
+[?2004l[?2004h> for parent,wc,setup,run in cur.execute('SELECT parent_part_id,workcenter_id,setup_hours,run_hours_per_unit FROM routing'):
+[?2004l[?2004h>     routing[parent].append({'wc':wc,'setup':setup,'run':run})
+[?2004l[?2004h> 
+[?2004l[?2004h> subs=defaultdict(list)
+[?2004l[?2004h> for primary,sub,ratio,rank in cur.execute('SELECT primary_part_id,substitute_part_id,qty_ratio,preference_rank FROM substitutes'):
+[?2004l[?2004h>     subs[primary].append({'sub':sub,'ratio':ratio,'rank':rank})
+[?2004l[?2004h> for k,v in subs.items():
+[?2004l[?2004h>     v.sort(key=lambda x:(x['rank'], x['sub']))
+[?2004l[?2004h> 
+[?2004l[?2004h> wcs={}
+[?2004l)[?2004h> for wc,name,av in cur.execute('SELECT workcenter_id,name,available_hours FROM workcenters'):
+[?2004l[?2004h>     wcs[wc]=float(av)
+[?2004l [?2004h> 
+[?2004l [?2004h> orders=[]
+[?2004l[?2004h> for oid,prod,q,prio in cur.execute('SELECT order_id,product_part_id,requested_qty,priority FROM orders'):
+[?2004l[?2004h>     orders.append({'id':oid,'product':prod,'qty':int(q),'priority':int(prio)})
+[?2004l[?2004h> orders.sort(key=lambda x:(x['priority'], x['id']))
+[?2004l[?2004h> conn.close()
+[?2004l[?2004h> 
+[?2004ln[?2004h> all_nodes=set(parts.keys()) | set(bom.keys()) | {e['child'] for ch in bom.values() for e in ch}
+[?2004l[?2004h> visited=set(); temp=set(); post=[]
+[?2004l[?2004h> 
+[?2004ll[?2004h> def dfs(n):
+[?2004l[?2004h>     if n in visited or n in temp:
+[?2004l[?2004h>         return
+[?2004l[?2004h>     temp.add(n)
+[?2004l[?2004h>     for e in bom.get(n,[]):
+[?2004l[?2004h>         dfs(e['child'])
+[?2004l[?2004h>     temp.discard(n)
+[?2004l[?2004h>     visited.add(n)
+[?2004l[?2004h>     post.append(n)
+[?2004l[?2004h> 
+[?2004ll[?2004h> for n in sorted(all_nodes):
+[?2004l
+[?2004h>     dfs(n)
+[?2004l
+ [?2004h> topo=list(reversed(post))
+[?2004l[?2004h> 
+[?2004l [?2004h> state={'on_hand':{p:parts[p]['on_hand'] for p in parts}, 'wc_avail':dict(wcs)}
+[?2004l[?2004h> 
+[?2004ld[?2004h> def mat_need(base, scrap, setup):
+[?2004l[?2004h>     return math.ceil(base*(1.0+scrap/100.0)) + setup
+[?2004l[?2004h> 
+[?2004ll[?2004h> def explode(product, qty, st):
+[?2004lx[?2004h>     demand=defaultdict(float)
+[?2004l[?2004h>     demand[product]=float(qty)
+[?2004l[?2004h>     build={}
+[?2004l[?2004h>     leaf_req=defaultdict(float)
+[?2004l[?2004h>     hours_req=defaultdict(float)
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         d=demand.get(p,0.0)
+[?2004l[?2004h>         if d<=1e-12:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             leaf_req[p]+=d
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         if p==product:
+[?2004l[?2004h>             need=d
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             need=max(0.0, d - st['on_hand'].get(p,0.0))
+[?2004l[?2004h>         if need>1e-12:
+[?2004l[?2004h>             bq=math.ceil(need/parts[p]['batch'])*parts[p]['batch']
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             bq=0
+[?2004l[?2004h>         build[p]=bq
+[?2004l[?2004h>         if bq>0:
+[?2004l[?2004h>             for e in bom[p]:
+[?2004l[?2004h>                 child_need=mat_need(bq*e['qty_per'], e['scrap_pct'], e['setup_scrap'])
+[?2004l[?2004h>                 demand[e['child']]+=child_need
+[?2004l[?2004h>             for r in routing.get(p,[]):
+[?2004l[?2004h>                 hours_req[r['wc']]+=r['setup'] + bq*r['run']
+[?2004l[?2004h>     return {'demand':demand,'build':build,'leaf_req':leaf_req,'hours_req':hours_req}
+[?2004l[?2004h> 
+[?2004l[?2004h> def consume_leaf(leaf, qty, st, commit=False):
+[?2004l[?2004h>     used=defaultdict(float)
+[?2004l[?2004h>     take=min(st['on_hand'].get(leaf,0.0), qty)
+[?2004l[?2004h>     used[leaf]+=take
+[?2004l[?2004h>     rem=qty-take
+[?2004l[?2004h>     if rem<=1e-12:
+[?2004l[?2004h>         if commit:
+[?2004l[?2004h>             for p,a in used.items(): st['on_hand'][p]-=a
+[?2004l[?2004h>         return True
+[?2004l[?2004h>     for sub in subs.get(leaf,[]):
+[?2004l[?2004h>         sp=sub['sub']; stock=st['on_hand'].get(sp,0.0); ratio=sub['ratio']
+[?2004l[?2004h>         cover=math.floor(stock/ratio) if ratio>0 else 0
+[?2004l[?2004h>         take_p=min(cover, rem)
+[?2004l[?2004h>         if take_p>0:
+[?2004l[?2004h>             used[sp]+=take_p*ratio
+[?2004l[?2004h>             rem-=take_p
+[?2004l[?2004h>         if rem<=1e-12:
+[?2004l[?2004h>             if commit:
+[?2004l[?2004h>                 for p,a in used.items(): st['on_hand'][p]-=a
+[?2004l[?2004h>             return True
+[?2004l[?2004h>     return False
+[?2004l[?2004h> 
+[?2004l[?2004h> def feasible(plan, st):
+[?2004l[?2004h>     for leaf,q in plan['leaf_req'].items():
+[?2004l[?2004h>         if not consume_leaf(leaf,q,st):
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     for wc,h in plan['hours_req'].items():
+[?2004l[?2004h>         if h > st['wc_avail'].get(wc,0.0) + 1e-12:
+[?2004l[?2004h>             return False
+[?2004l[?2004h>     return True
+[?2004l[?2004h> 
+[?2004l[?2004h> def commit(plan, st, product):
+[?2004l[?2004h>     for leaf,q in plan['leaf_req'].items():
+[?2004l[?2004h>         if not consume_leaf(leaf,q,st,commit=True):
+[?2004l[?2004h>             raise RuntimeError('leaf commit fail')
+[?2004l[?2004h>     for p in topo:
+[?2004l[?2004h>         if p not in bom:
+[?2004l[?2004h>             continue
+[?2004l[?2004h>         d=plan['demand'].get(p,0.0)
+[?2004l[?2004h>         bq=plan['build'].get(p,0)
+[?2004l[?2004h>         if p==product:
+[?2004l[?2004h>             st['on_hand'][p] += bq
+[?2004l[?2004h>         else:
+[?2004l[?2004h>             st['on_hand'][p] += bq - d
+[?2004l[?2004h>     for wc,h in plan['hours_req'].items():
+[?2004l[?2004h>         st['wc_avail'][wc]-=h
+[?2004l[?2004h> 
+[?2004l[?2004h> def leaf_total_available(leaf, st):
+[?2004l[?2004h>     total=st['on_hand'].get(leaf,0.0)
+[?2004l[?2004h>     for sub in subs.get(leaf,[]):
+[?2004l[?2004h>         ratio=sub['ratio']
+[?2004l[?2004h>         if ratio>0:
+[?2004l[?2004h>             total += math.floor(st['on_hand'].get(sub['sub'],0.0)/ratio)
+[?2004l[?2004h>     return total
+[?2004l[?2004h> 
+[?2004l[?2004h> def limiting(product, probe_qty, st):
+[?2004l[?2004h>     plan=explode(product, probe_qty, st)
+[?2004l[?2004h>     ratios=[]
+[?2004l[?2004h>     for leaf,gross in plan['leaf_req'].items():
+[?2004l[?2004h>         if gross>1e-12:
+[?2004l[?2004h>             ratios.append((leaf_total_available(leaf,st)/gross, leaf))
+[?2004l[?2004h>     for wc,gross in plan['hours_req'].items():
+[?2004l[?2004h>         if gross>1e-12:
+[?2004l[?2004h>             ratios.append((st['wc_avail'].get(wc,0.0)/gross, wc))
+[?2004l[?2004h>     below=[(r,res) for r,res in ratios if r < 1.0-1e-12]
+[?2004l[?2004h>     if not below:
+[?2004l[?2004h>         return None
+[?2004l[?2004h>     minr=min(r for r,_ in below)
+[?2004l[?2004h>     tied=[res for r,res in below if abs(r-minr)<1e-12]
+[?2004l[?2004h>     return sorted(tied)[0]
+[?2004l[?2004h> 
+[?2004l[?2004h> results=[]
+[?2004l[?2004h> for od in orders:
+[?2004l[?2004h>     prod=od['product']; req=od['qty']; batch=parts[prod]['batch']
+[?2004l[?2004h>     chosen=None; chosen_plan=None
+[?2004l[?2004h>     for q in range(req-(req%batch), -1, -batch):
+[?2004l[?2004h>         test=copy.deepcopy(state)
+[?2004l[?2004h>         pc=explode(prod,q,test)
+[?2004l[?2004h>         if feasible(pc,test):
+[?2004l[?2004h>             chosen=q; chosen_plan=pc
+[?2004l[?2004h>             break
+[?2004l[?2004h>     if chosen is None:
+[?2004l[?2004h>         chosen=0; chosen_plan=explode(prod,0,copy.deepcopy(state))
+[?2004l[?2004h>     lim=None
+[?2004l[?2004h>     if chosen < req:
+[?2004l[?2004h>         lim=limiting(prod, chosen+batch, state)
+[?2004l[?2004h>     final_alloc=chosen
+[?2004l[?2004h>     shortfall=req-final_alloc
+[?2004l[?2004h>     if req>0 and (final_alloc/req) < 0.5:
+[?2004l[?2004h>         final_alloc=0
+[?2004l[?2004h>         shortfall=req
+[?2004l[?2004h>     else:
+[?2004l[?2004h>         if final_alloc>0:
+[?2004l[?2004h>             commit(chosen_plan, state, prod)
+[?2004l[?2004h>     results.append({'order_id':od['id'],'allocated_qty':int(final_alloc),'shortfall_qty':int(shortfall),'limiting_resource':lim})
+[?2004l[?2004h> 
+[?2004l[?2004h> results.sort(key=lambda x:x['order_id'])
+[?2004l[?2004h> with open('/app/report.json','w') as f:
+[?2004l[?2004h>     json.dump({'orders':results}, f, indent=2)
+[?2004l[?2004h> print(json.dumps({'orders':results}, indent=2))
+[?2004l[?2004h> PY
+[?2004l{
+  "orders": [
+    {
+      "order_id": "O1",
+      "allocated_qty": 12,
+      "shortfall_qty": 0,
+      "limiting_resource": null
+    },
+    {
+      "order_id": "O2",
+      "allocated_qty": 8,
+      "shortfall_qty": 2,
+      "limiting_resource": "L2"
+    },
+    {
+      "order_id": "O3",
+      "allocated_qty": 5,
+      "shortfall_qty": 5,
+      "limiting_resource": "L3"
+    },
+    {
+      "order_id": "O3b",
+      "allocated_qty": 0,
+      "shortfall_qty": 10,
+      "limiting_resource": "SUB_L3_B"
+    },
+    {
+      "order_id": "O4",
+      "allocated_qty": 0,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    },
+    {
+      "order_id": "O5",
+      "allocated_qty": 10,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    }
+  ]
+}
+[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# cat /app/report.json
+[?2004l{
+  "orders": [
+    {
+      "order_id": "O1",
+      "allocated_qty": 12,
+      "shortfall_qty": 0,
+      "limiting_resource": null
+    },
+    {
+      "order_id": "O2",
+      "allocated_qty": 8,
+      "shortfall_qty": 2,
+      "limiting_resource": "L2"
+    },
+    {
+      "order_id": "O3",
+      "allocated_qty": 5,
+      "shortfall_qty": 5,
+      "limiting_resource": "L3"
+    },
+    {
+      "order_id": "O3b",
+      "allocated_qty": 0,
+      "shortfall_qty": 10,
+      "limiting_resource": "SUB_L3_B"
+    },
+    {
+      "order_id": "O4",
+      "allocated_qty": 0,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    },
+    {
+      "order_id": "O5",
+      "allocated_qty": 10,
+      "shortfall_qty": 5,
+      "limiting_resource": "L4"
+    }
+  ]
+}[?2004hroot@c1bca28e-fe7d-42f0-97e9-868cb11bd491:/app# 

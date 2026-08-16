@@ -1,0 +1,150 @@
+===
+## Task Similarity Check ✅
+
+No delivered Dynamo task is too similar to this task.
+
+| Artifact | Highest similarity score |
+|---|---:|
+| Instruction | 0.7407953269991288 |
+| Verifier | 0.7842554700619833 |
+| Task fingerprint | 0.7822102557497775 |
+
+- **Threshold:** `0.9` (a score at or above this value is blocked)
+
+This check is enforced. The matched task and its contents are intentionally hidden.
+
+<!-- Sticky Pull Request Commentdynamo-task-similarity -->
+===
+<!-- dynamo-static -->
+### Static checks ✅
+All deterministic checks passed.
+
+<details><summary>Checks</summary>
+
+|  | Check |
+|---|---|
+| ✅ | all 5 required task files are present and correctly placed |
+| ✅ | task.toml has all required metadata fields |
+| ✅ | all required task.toml fields are filled in (no placeholders) |
+| ✅ | task.toml category/objective/artifact labels are from the taxonomy |
+| ✅ | task slug is concise (<=3 tokens) |
+| ✅ | instruction.md uses absolute paths |
+| ✅ | instruction.md is <= 1500 tokens (Qwen3 — the client's tokenizer) |
+| ✅ | expected output files are documented in instruction.md |
+| ✅ | allow_internet is true |
+| ✅ | agent/verifier timeouts within the cap |
+| ✅ | gpu_types are canonical names |
+| ✅ | verifier writes /logs/verifier/reward.txt (not pre-created) |
+| ✅ | Dockerfile base image is a pre-approved image (non-approved → warning) |
+| ✅ | non-trivial build context has a .dockerignore |
+| ✅ | no source embedded via Dockerfile heredoc |
+| ✅ | no apt-get upgrade in Dockerfiles |
+| ✅ | no broad recursive chmod in Dockerfiles |
+| ✅ | Dockerfile does not COPY solution/ or tests/ |
+| ✅ | Dockerfile apt hygiene (no pins, update + cleanup) |
+| ✅ | Dockerfile is not pinned to a CPU platform |
+| ✅ | no bare nproc (use a fixed CPU count) |
+| ✅ | pip/uv installs are version-pinned |
+| ✅ | verifier does not fetch external resources at trial time |
+| ✅ | tests/test.sh installs nothing at verify time |
+| ✅ | tests/ has test_outputs.py and test.sh runs it |
+
+</details>
+===
+<!-- dynamo-eval -->
+### Dynamo eval — ✅ PASS
+
+# Dynamo Eval — dynamo/bom-shortage-cascade
+Format: Harbor
+Verdict: PASS (all criteria pass / only N/A)
+
+## Criteria
+| # | Criterion | Result | Note |
+|---|-----------|--------|------|
+| 1 | code_dependent | PASS | Requires DB querying + iterative multi-order simulation; not doable by reasoning or one command. |
+| 2 | essential_difficulty | PASS | Six interacting MRP rules (DAG aggregation, gross-vs-net, substitution, min-fill, stateful pools) are genuinely error-prone for an expert. |
+| 3 | interesting_realistic | PASS | Realistic MRP/ERP capacity-allocation problem; requested outputs (allocated/shortfall/limiting resource) are what a planner wants. |
+| 4 | novel | PASS | Custom synthetic dataset and bespoke rule combination; not a memorizable textbook problem. |
+| 5 | solvable | PASS | Working `solve.py` (~330 lines) legitimately reproduces every oracle value; ~2h expert effort is plausible. |
+| 6 | unambiguous | PASS | Rules 1–6 pin down every non-standard convention (order of scrap ops, gross-limiting netting, tie-breaks, min-fill). |
+| 7 | outcome_verified | PASS | Rules define required semantics (the "what"); tests grade the final `report.json`, no tool/method mandated. |
+| 8 | instruction_concision | PASS | Absolute paths, backticks, no time-budget string, no tool listing, no fluff. |
+| 9 | structured_data_schema | PASS | JSON schema with types and sort order documented normatively in `instruction.md`. |
+| 10 | verifiable | PASS | Deterministic exact-match on `/app/report.json` (matches `artifacts`); synthetic data resists online/analytic bypass. |
+| 11 | functional_verification | PASS | Tests load JSON and assert values; no source string-matching. |
+| 12 | deterministic_reproducible | PASS | Pure deterministic sim; base image pinned by digest, pytest pinned; no live services. |
+| 13 | test_instruction_alignment | PASS | One atomic docstring'd test per mechanic; assertions trace to instruction rules; schema/sort covered. |
+| 14 | anti_cheat | PASS | Oracle values live only in `tests/`; `generate_data.py` is deleted at build; no answer in agent-visible inputs. |
+| 15 | solution_quality | PASS | Derives answers by genuine computation (binary search over feasible units); no hardcoded results; solution in its own file. |
+| 16 | task_security | PASS | No malicious/obfuscated/exfil code in any file. |
+| 17 | difficulty_explanation_quality | PASS | Names expertise, traps, synthetic provenance, and real-world audience; no results/pass-rates. |
+| 18 | solution_explanation_quality | PASS | High-level strategy congruent with `solve.py`; another expert could reimplement. |
+| 19 | verification_explanation_quality | PASS | Describes per-order checks; exact matching used, so no tolerances to justify. |
+| 20 | accurate_taxonomy_labels | PASS | data_querying_and_databases / graph_and_semantic_queries fits BOM DAG; objective/artifact labels match. |
+| 21 | expert_time_estimate | PASS | 2.0h, non-zero and consistent with described complexity. |
+| 22 | open_internet | PASS | `allow_internet = true`; synthetic answer not retrievable online. |
+| 23 | reviewable | PASS | Expected values derived in solution and mirrored in test docstrings; a non-specialist can follow. |
+| 24 | typos | PASS | Table/column/path identifiers consistent across instruction, data, solution, tests. |
+| 25 | no_extraneous_files | PASS | Only the eight required files; no cruft or unreferenced inputs. |
+| 26 | verifier_configuration | PASS | `artifacts` top-level; single image; pytest baked; `test.sh` installs nothing; ground truth in `tests/`. |
+| 27 | environment_hygiene | PASS | Dockerfile does not COPY `solution/`/`tests/`; verifier deps baked/pinned; no apt misuse (pip-only). |
+| 28 | resource_configuration | PASS | verifier 120s, agent 1800s, 1 cpu / 2GB / 0 gpu — appropriate; difficulty is intellectual. |
+| 29 | task_name | PASS | `[task].name = "dynamo/bom-shortage-cascade"` — org/name, kebab-case, 3 tokens, descriptive. |
+| 30 | task_readme | N/A | No development README present (optional). |
+| 31 | task_toml_schema | PASS | Recognized fields throughout; `[task].description` is a benign, plausibly-recognized field (see Notes). |
+
+## Failures
+None.
+
+## Notes
+- `task_toml_schema`: `task.toml` includes a `description` key inside the `[task]` table. The rubric's enumerated schema highlights `[task].name` but does not explicitly list a `[task].description`. It is a natural, harmless field (not an invented pseudo-field like "skills"/"prerequisites"), and I cannot concretely demonstrate Harbor rejects it, so I graded PASS. If a human maintainer confirms `[task].description` is not part of the Harbor schema, this would flip to a minor FAIL — the fix is trivial (remove the line or move the text into `[metadata]`).
+- `unambiguous`/`outcome_verified`: The instruction is rule-heavy (six explicit rules). This is disclosure of non-standard MRP conventions required for deterministic verification, not tool/procedure mandating, and implementation remains genuinely hard — so no defect. Flagging only so a human reviewer can confirm they agree the rule detail is specification rather than solution hand-holding.
+- I could not execute anything (read-only); the PASS on `solvable`/`verifiable` rests on hand-tracing all six orders through `solve.py` and matching the hardcoded oracle, which was internally consistent at every step.
+
+---
+*Automated read-only review against `.dynamo/dynamo-rubric.toml`. Address the
+failing criteria above, then `git commit` and `git push` to re-run. All
+criteria must pass to be accepted.*
+===
+<!-- dynamo-similarity -->
+### Duplicate check — ✅ no duplicate found
+
+Verdict: UNIQUE
+
+The closest candidates are TB3 / erp-procurement-planning and TB3 / production-planning, which share the manufacturing/BOM/workcenter-capacity domain. However, both of those are ERP-integration tasks — they require driving an Odoo instance or a multi-database gateway to create/confirm sales, purchase, and manufacturing orders (or SQL writebacks) with document lineage, budgets, margins, and lead-time scheduling. The submitted task is instead a self-contained, purely algorithmic SQLite simulation with a distinct and precisely specified rule set (sub-assembly netting, batch-multiple rounding with percentage plus setup scrap, ranked substitute fallback with alphabetical tie-breaks, a gross-requirement fulfillment-ratio "limiting resource" computation, and a 50% minimum fill-rate cancellation), emitting a JSON report. A correct solution to either ERP task would not solve this deterministic computation problem, so it is a different problem.
+
+<details><summary>Most similar existing TB2/TB3 tasks (lexical)</summary>
+
+| Rank | Existing task | Benchmark | Lexical similarity |
+|------|---------------|-----------|--------------------|
+| 1 | `erp-procurement-planning` | TB3 | 0.203 |
+| 2 | `satb-audio-transcription` | TB3 | 0.173 |
+| 3 | `production-planning` | TB3 | 0.169 |
+| 4 | `batched-eval-parity` | TB3 | 0.086 |
+| 5 | `torch-pipeline-parallelism` | TB2 | 0.065 |
+| 6 | `fp8-rmsnorm-gemm` | TB3 | 0.063 |
+</details>
+
+---
+*Compared your `instruction.md` against the Terminal-Bench 2 & 3 task sets. Your
+task must be **novel** — not a reworded or reskinned version of an existing benchmark
+task. If this is a false match, adjust `instruction.md` to make the distinct problem
+clear, then `git commit` and `git push` to re-run.*
+===
+## 🔍 Task Validation Results
+
+| Docker | Oracle | Nop |
+|--------|--------|-----|
+| ✅ | ✅ | ✅ |
+
+<details><summary>Legend</summary>
+
+- **Docker**: `environment/` image builds on the runner
+- **Oracle**: `solution/solve.sh` makes the verifier pass (reward 1.0)
+- **Nop**: doing nothing fails the verifier (reward < 1.0) — proves the task is non-trivial
+- ⏭️ = skipped (prerequisite failed) · ➖ = not run (remote backend builds the image, or environment/ is unchanged since the last green run)
+</details>
+
+<sub><a href="https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31943414411">Ran</a> on <code>ecdebbd</code> after static checks + rubric review passed.</sub>
+
+<!-- Sticky Pull Request Commenttask-validation -->
