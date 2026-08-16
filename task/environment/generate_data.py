@@ -13,8 +13,8 @@ parts_data = [
     ("L1", "Bolt", 200, 10),
     ("L2", "Plate", 50, 5),
     ("L3", "Wire", 15, 1),
-    ("L4", "Plastic", 30, 2),
-    ("L_TIE", "Tie-Break Leaf", 100, 1),
+    ("L4", "Plastic", 10, 1),
+    ("L_TIE", "Tie-Break Leaf", 10, 1),
     
     # Substitutes
     ("SUB_L3_A", "Wire-Alloy", 12, 1), # ratio 2.0, rank 1
@@ -29,6 +29,8 @@ parts_data = [
     ("P2", "Product-Aggregate", 0, 1),
     ("P3", "Product-Subst", 0, 1),
     ("P4", "Product-Limit", 0, 1),
+    ("P5", "Product-Stateful", 0, 1),
+    ("P_B", "Product-SubstTie", 0, 1),
 ]
 
 bom_data = [
@@ -52,13 +54,19 @@ bom_data = [
     
     # P4: Tests Gross Limiting Resource & ASCII tie-break
     ("P4", "L4", 10, 0.0, 0),
-    ("P4", "L_TIE", 100, 0.0, 0),
+    ("P4", "L_TIE", 10, 0.0, 0),
+    
+    # P5: Tests Stateful Inventory Depletion
+    ("P5", "L4", 1, 0.0, 0),
+    
+    # P_B: Tests Substitute Tie-Break Remaining Inventory
+    ("P_B", "SUB_L3_B", 1, 0.0, 0),
 ]
 
 workcenters_data = [
     ("WC1", "Assembly", 250.0),
     ("WC2", "Testing", 100.0),
-    ("WC_TIE", "Tie-Break WC", 1000.0),
+    ("WC_TIE", "Tie-Break WC", 10.0),
 ]
 
 routing_data = [
@@ -69,12 +77,14 @@ routing_data = [
     ("P2", "WC1", 3.0, 1.0),
     ("P3", "WC2", 1.0, 1.0),
     ("P4", "WC_TIE", 0.0, 10.0),
+    ("P5", "WC1", 0.0, 1.0),
+    ("P_B", "WC1", 0.0, 1.0),
 ]
 
 substitutes_data = [
     # primary, substitute, ratio, rank
     ("L3", "SUB_L3_A", 2.0, 1), # 1 L3 needs 2 SUB_L3_A
-    ("L3", "SUB_L3_B", 1.0, 2), # 1 L3 needs 1 SUB_L3_B
+    ("L3", "SUB_L3_B", 1.0, 1), # both rank 1 to force ASCII tie-break
 ]
 
 orders_data = [
@@ -82,7 +92,9 @@ orders_data = [
     ("O1", "P1", 12, 10),
     ("O2", "P2", 10, 20),
     ("O3", "P3", 10, 30),
+    ("O3b", "P_B", 10, 35),
     ("O4", "P4", 5, 40),
+    ("O5", "P5", 100, 50),
 ]
 
 def create_database(db_path: Path):
