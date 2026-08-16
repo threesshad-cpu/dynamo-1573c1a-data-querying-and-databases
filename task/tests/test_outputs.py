@@ -102,17 +102,19 @@ def test_order_O3b_substitute_tie_break():
     It should exactly allocate 4 units.
     """
     m = _get_orders_map()
-    assert m["O3b"]["allocated_qty"] == 4
-    assert m["O3b"]["shortfall_qty"] == 6
+    assert m["O3b"]["allocated_qty"] == 0
+    assert m["O3b"]["shortfall_qty"] == 10
     assert m["O3b"]["limiting_resource"] == "SUB_L3_B"
 
 
 def test_order_O4_gross_limiting_resource_and_tie_break():
     """
-    Verify Order 4 computes limiting resource using gross propagated requirement and ASCII tie-break.
+    Verify Order 4 computes limiting resource using gross propagated requirement and ASCII tie-break,
+    and then correctly cancels the order due to Minimum Fill Rate.
     P4 requires 10 L4 and 10 L_TIE, plus 10 hours WC_TIE.
     Available: L4 (10), L_TIE (10), WC_TIE (10.0).
-    Batch size = 1. O4 requests 5. Allocates 1. Shortfall = 4.
+    Batch size = 1. O4 requests 5. Can only allocate 1.
+    Since 1/5 = 0.2 < 0.5, the order is canceled (allocated=0, shortfall=5).
     Next batch needs 20 of each.
     Ratios: L4 (10/20 = 0.5), L_TIE (10/20 = 0.5), WC_TIE (10/20 = 0.5).
     Tie between "L4", "L_TIE", "WC_TIE". 
@@ -120,20 +122,21 @@ def test_order_O4_gross_limiting_resource_and_tie_break():
     "L4" comes first alphabetically.
     """
     m = _get_orders_map()
-    assert m["O4"]["allocated_qty"] == 1
-    assert m["O4"]["shortfall_qty"] == 4
+    assert m["O4"]["allocated_qty"] == 0
+    assert m["O4"]["shortfall_qty"] == 5
     assert m["O4"]["limiting_resource"] == "L4"
 
 
 def test_order_O5_stateful_depletion():
     """
-    Verify Order 5 is limited by the inventory depleted during Order 4 (Statefulness).
-    O5 requests 100 P5 (requires 1 L4 each).
-    Initial L4 was 10, but O4 consumed 10 L4.
-    So L4 is 0. O5 should allocate 0.
-    A stateless solver would incorrectly allocate 10.
+    Verify Order 5 correctly utilizes inventory preserved by Order 4's cancellation.
+    O4 was canceled because it couldn't meet the 50% fill rate, so it consumed 0 L4.
+    O5 requests 15 P5 (requires 1 L4 each). L4 has 10 units available.
+    O5 allocates 10 (66% >= 50%), which is valid.
+    An incorrect stateful solver that misses the Minimum Fill Rate rule would allocate
+    1 for O4 (depleting L4) and then fail O5 completely.
     """
     m = _get_orders_map()
-    assert m["O5"]["allocated_qty"] == 0
-    assert m["O5"]["shortfall_qty"] == 100
+    assert m["O5"]["allocated_qty"] == 10
+    assert m["O5"]["shortfall_qty"] == 5
     assert m["O5"]["limiting_resource"] == "L4"

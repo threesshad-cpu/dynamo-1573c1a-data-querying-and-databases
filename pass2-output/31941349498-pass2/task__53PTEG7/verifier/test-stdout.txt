@@ -1,0 +1,9 @@
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-8.3.4, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.5.3
+collected 9 items
+
+../tests/test_outputs.py .........                                       [100%]
+
+============================== 9 passed in 0.03s ===============================

@@ -1,0 +1,151 @@
+===
+## Task Similarity Check ✅
+
+No delivered Dynamo task is too similar to this task.
+
+| Artifact | Highest similarity score |
+|---|---:|
+| Instruction | 0.7261217509694963 |
+| Verifier | 0.7828150670768328 |
+| Task fingerprint | 0.7672099332338546 |
+
+- **Threshold:** `0.9` (a score at or above this value is blocked)
+
+This check is enforced. The matched task and its contents are intentionally hidden.
+
+<!-- Sticky Pull Request Commentdynamo-task-similarity -->
+===
+<!-- dynamo-static -->
+### Static checks ✅
+All deterministic checks passed.
+
+<details><summary>Checks</summary>
+
+|  | Check |
+|---|---|
+| ✅ | all 5 required task files are present and correctly placed |
+| ✅ | task.toml has all required metadata fields |
+| ✅ | all required task.toml fields are filled in (no placeholders) |
+| ✅ | task.toml category/objective/artifact labels are from the taxonomy |
+| ✅ | task slug is concise (<=3 tokens) |
+| ✅ | instruction.md uses absolute paths |
+| ✅ | instruction.md is <= 1500 tokens (Qwen3 — the client's tokenizer) |
+| ✅ | expected output files are documented in instruction.md |
+| ✅ | allow_internet is true |
+| ✅ | agent/verifier timeouts within the cap |
+| ✅ | gpu_types are canonical names |
+| ✅ | verifier writes /logs/verifier/reward.txt (not pre-created) |
+| ✅ | Dockerfile base image is a pre-approved image (non-approved → warning) |
+| ✅ | non-trivial build context has a .dockerignore |
+| ✅ | no source embedded via Dockerfile heredoc |
+| ✅ | no apt-get upgrade in Dockerfiles |
+| ✅ | no broad recursive chmod in Dockerfiles |
+| ✅ | Dockerfile does not COPY solution/ or tests/ |
+| ✅ | Dockerfile apt hygiene (no pins, update + cleanup) |
+| ✅ | Dockerfile is not pinned to a CPU platform |
+| ✅ | no bare nproc (use a fixed CPU count) |
+| ✅ | pip/uv installs are version-pinned |
+| ✅ | verifier does not fetch external resources at trial time |
+| ✅ | tests/test.sh installs nothing at verify time |
+| ✅ | tests/ has test_outputs.py and test.sh runs it |
+
+</details>
+===
+<!-- dynamo-eval -->
+### Dynamo eval — ✅ PASS
+
+# Dynamo Eval — dynamo/bom-shortage-cascade
+Format: Harbor
+Verdict: PASS (all criteria pass / only N/A)
+
+## Criteria
+| # | Criterion | Result | Note |
+|---|-----------|--------|------|
+| 1 | code_dependent | PASS | Requires SQLite exploration + a multi-step MRP simulation (~150 lines of interlocking logic); not solvable by reasoning or one command. |
+| 2 | essential_difficulty | PASS | Difficulty is the correct composition of 5 intersecting rules (aggregated explosion, netting, batch/scrap, deterministic substitution, gross limiting-resource tie-breaks) — genuine domain/algorithmic reasoning. |
+| 3 | interesting_realistic | PASS | Multi-level BOM/MRP allocation is a real ERP/supply-chain workflow; outputs (allocated/shortfall/bottleneck) are what a planner wants. |
+| 4 | novel | PASS | Custom synthetic dataset with a bespoke rule set; not a verbatim textbook problem. |
+| 5 | solvable | PASS | `solution/solve.py` runs an actual simulation whose outputs I traced to match all test values; well within a few hours for an expert. |
+| 6 | unambiguous | PASS | Rules spell out every non-standard choice (netting, scrap order, substitute rank + ASCII tie-break, gross ratio, strict <1.0, null case, sort). See Notes. |
+| 7 | outcome_verified | PASS | Tests grade the final `report.json` values; no tool/library is mandated — the numbered rules are the problem's business semantics, not an implementation procedure. |
+| 8 | instruction_concision | PASS | Absolute paths in backticks, `$U$` math, no tool listings, no time-budget string, no fluff/roleplay. |
+| 9 | structured_data_schema | PASS | Exact JSON schema with per-field types and sort order given as the required output format. |
+| 10 | verifiable | PASS | Deterministic exact-match on `/app/report.json` (matches `artifacts`); synthetic data unretrievable online. |
+| 11 | functional_verification | PASS | Tests load and check JSON values; no source-string matching. |
+| 12 | deterministic_reproducible | PASS | pytest/plugin pinned, base image by digest, no live services, pure deterministic computation. |
+| 13 | test_instruction_alignment | PASS | Atomic per-order functions with docstrings; schema + sorting + all 5 mechanics covered, nothing beyond instruction. |
+| 14 | anti_cheat | PASS | `solution/`, `tests/` not copied into image; `generate_data.py` deleted after build; only the input DB is agent-visible. |
+| 15 | solution_quality | PASS | Genuine computation, no hardcoded answers; solution kept as a separate file, invoked by `solve.sh`. |
+| 16 | task_security | PASS | No exfiltration, obfuscation, destructive ops, or injection. |
+| 17 | difficulty_explanation_quality | PASS | Names expertise, traps, synthetic provenance, and real-world audience; not results-based. |
+| 18 | solution_explanation_quality | PASS | Describes the explosion/aggregation/netting/substitution/limiting-ratio strategy; congruent with `solve.py`. |
+| 19 | verification_explanation_quality | PASS | Accurately maps each order to a mechanic; exact matching means no tolerances to justify. |
+| 20 | accurate_taxonomy_labels | PASS | data_querying_and_databases / graph_and_semantic_queries (BOM DAG); analyze/generate/implement and report artifact types fit. |
+| 21 | expert_time_estimate | PASS | 2.0 h, non-zero and plausible for this implementation. |
+| 22 | open_internet | PASS | `allow_internet = true`; synthetic answer not online. |
+| 23 | reviewable | PASS | Expected values derived in `solve.py` (and echoed in test docstrings), so a non-specialist can follow the derivation. |
+| 24 | typos | PASS | Table/column/part identifiers consistent across instruction, generator, solution, tests. |
+| 25 | no_extraneous_files | PASS | Only the required 8 files; no cruft or unreferenced inputs. |
+| 26 | verifier_configuration | PASS | `artifacts` top-level; pytest baked in image; `test.sh` installs nothing; ground truth stays in `tests/`. |
+| 27 | environment_hygiene | PASS | Dockerfile does not COPY `solution/`/`tests/`; verifier deps baked and pinned; pip-only (no apt to manage). |
+| 28 | resource_configuration | PASS | verifier 120s, agent 1800s, 1 cpu/2GB/0 gpu — appropriate; difficulty is intellectual, not compute. |
+| 29 | task_name | PASS | `[task] name = "dynamo/bom-shortage-cascade"` — org/name, kebab-case, 3 tokens, descriptive. |
+| 30 | task_readme | N/A | No development README present (optional). |
+| 31 | task_toml_schema | PASS | Only recognized Harbor fields (incl. `model_tested`/`agent_tested`); `[task].description` is a standard task field. |
+
+## Failures
+None.
+
+## Notes
+- **unambiguous (borderline-safe PASS):** The rule set is intricate, but each non-standard convention the verifier depends on is disclosed in `instruction.md` — netting sub-assemblies but not leaves in the gross requirement, scrap applied as `ceil(base × (1+rate/100)) + setup_scrap`, substitute preference by rank then ASCII ID, the limiting resource being the lowest ratio strictly `< 1.0` with alphabetical tie-break, and computing the gross requirement from pre-order inventory. I could not construct a coherent, competent expert approach that follows these stated rules yet fails verification, so this is a PASS rather than a defect.
+- **outcome_verified / instruction_concision:** The instruction is written as five numbered rules, which reads slightly procedural, but they specify the *semantics of the correct answer* (not an implementation recipe or mandated tools), so this is acceptable rather than over-specification.
+- **task_toml_schema:** I treated `[task].description` as a legitimate Harbor field; if a stricter schema check disallows it, this would drop to a non-blocking note, not a substantive failure.
+- The `generate_data.py` fallback also writes a copy of the input DB to `/data`, but that is only the agent-visible input (never the expected answers), so it does not affect anti-cheat.
+
+---
+*Automated read-only review against `.dynamo/dynamo-rubric.toml`. Address the
+failing criteria above, then `git commit` and `git push` to re-run. All
+criteria must pass to be accepted.*
+===
+<!-- dynamo-similarity -->
+### Duplicate check — ✅ no duplicate found
+
+Verdict: UNIQUE
+
+The closest candidates are TB3 / production-planning and TB3 / erp-procurement-planning, which share the manufacturing/BOM/workcenter-capacity domain. However, the submitted task is a self-contained deterministic simulation over a SQLite database with a very specific rule set — sub-assembly netting, batch-multiple rounding with percentage plus fixed setup scrap, single consolidated production runs, ranked substitute fallback, and identifying a single `limiting_resource` via lowest fulfillment ratio — producing a computed JSON report. The candidates instead require driving an Odoo ERP to create/confirm SO/PO/MO documents under margin/budget constraints (erp-procurement-planning) or writing multi-system ERP/MES/WMS SQL through a gateway (production-planning); neither asks for this shortfall/limiting-resource computation, so a correct solution to either would not solve the submitted task.
+
+<details><summary>Most similar existing TB2/TB3 tasks (lexical)</summary>
+
+| Rank | Existing task | Benchmark | Lexical similarity |
+|------|---------------|-----------|--------------------|
+| 1 | `erp-procurement-planning` | TB3 | 0.216 |
+| 2 | `satb-audio-transcription` | TB3 | 0.192 |
+| 3 | `production-planning` | TB3 | 0.161 |
+| 4 | `batched-eval-parity` | TB3 | 0.093 |
+| 5 | `torch-pipeline-parallelism` | TB2 | 0.072 |
+| 6 | `fp8-rmsnorm-gemm` | TB3 | 0.069 |
+</details>
+
+---
+*Compared your `instruction.md` against the Terminal-Bench 2 & 3 task sets. Your
+task must be **novel** — not a reworded or reskinned version of an existing benchmark
+task. If this is a false match, adjust `instruction.md` to make the distinct problem
+clear, then `git commit` and `git push` to re-run.*
+===
+## 🔍 Task Validation Results
+
+| Docker | Oracle | Nop |
+|--------|--------|-----|
+| ✅ | ✅ | ✅ |
+
+<details><summary>Legend</summary>
+
+- **Docker**: `environment/` image builds on the runner
+- **Oracle**: `solution/solve.sh` makes the verifier pass (reward 1.0)
+- **Nop**: doing nothing fails the verifier (reward < 1.0) — proves the task is non-trivial
+- ⏭️ = skipped (prerequisite failed) · ➖ = not run (remote backend builds the image, or environment/ is unchanged since the last green run)
+</details>
+
+<sub><a href="https://github.com/handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases/actions/runs/31941349498">Ran</a> on <code>00f1c70</code> after static checks + rubric review passed.</sub>
+
+<!-- Sticky Pull Request Commenttask-validation -->

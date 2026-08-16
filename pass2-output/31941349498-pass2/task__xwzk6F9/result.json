@@ -1,0 +1,139 @@
+{
+    "id": "bbe87ba9-d127-46a9-991a-e8cec07d0e50",
+    "task_name": "dynamo/bom-shortage-cascade",
+    "trial_name": "task__xwzk6F9",
+    "trial_uri": "file:///home/runner/_work/dynamo-1573c1a-data-querying-and-databases/dynamo-1573c1a-data-querying-and-databases/pass2-output/31941349498-pass2/task__xwzk6F9",
+    "task_id": {
+        "path": "submission/task"
+    },
+    "source": null,
+    "task_checksum": "3e506fb5ad3bc76a7d8259375473f4c3c3992ca20531595db0defb032cbac076",
+    "config": {
+        "task": {
+            "path": "submission/task",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": null
+        },
+        "trial_name": "task__xwzk6F9",
+        "trials_dir": "pass2-output/31941349498-pass2",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": null,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "openrouter/deepseek/deepseek-v4-pro",
+            "skills": [],
+            "override_timeout_sec": 1800.0,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "extra_allowed_hosts": [],
+            "kwargs": {
+                "llm_kwargs": {
+                    "reasoning": {
+                        "effort": "high"
+                    },
+                    "max_tokens": 128000
+                }
+            },
+            "env": {},
+            "mcp_servers": []
+        },
+        "environment": {
+            "type": "daytona",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "cpu_enforcement_policy": "auto",
+            "memory_enforcement_policy": "auto",
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "override_tpu": null,
+            "mounts": null,
+            "extra_docker_compose": [],
+            "env": {},
+            "kwargs": {
+                "auto_stop_interval_mins": 60,
+                "labels": {
+                    "dynamo.task": "dynamo/bom-shortage-cascade",
+                    "dynamo.repository": "handshake-project-dynamo/dynamo-1573c1a-data-querying-and-databases",
+                    "dynamo.sha": "00f1c7050ade980c9d9142e48694ee590b29c40a",
+                    "dynamo.github_run_id": "31941349498",
+                    "dynamo.github_job": "pass2"
+                }
+            },
+            "extra_allowed_hosts": []
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "extra_instruction_paths": [],
+        "job_id": "598517a0-5e51-4f0c-8add-e90f55154c47"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "deepseek/deepseek-v4-pro",
+            "provider": "openrouter"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 60764,
+        "n_cache_tokens": 39424,
+        "n_output_tokens": 47826,
+        "cost_usd": 0.1392014,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 7,
+            "api_request_times_msec": [
+                57408.9035987854,
+                5349.36261177063,
+                24445.08147239685,
+                307829.3845653534,
+                214834.65766906738,
+                101726.52506828308,
+                148473.60563278198
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-08-16T10:26:27.211050Z",
+    "finished_at": "2026-08-16T10:42:24.737226Z",
+    "environment_setup": {
+        "started_at": "2026-08-16T10:26:27.227277Z",
+        "finished_at": "2026-08-16T10:26:43.333838Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-08-16T10:26:43.333888Z",
+        "finished_at": "2026-08-16T10:27:08.902610Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-08-16T10:27:08.902803Z",
+        "finished_at": "2026-08-16T10:42:03.416647Z"
+    },
+    "verifier": {
+        "started_at": "2026-08-16T10:42:14.853149Z",
+        "finished_at": "2026-08-16T10:42:24.529148Z"
+    },
+    "step_results": null
+}

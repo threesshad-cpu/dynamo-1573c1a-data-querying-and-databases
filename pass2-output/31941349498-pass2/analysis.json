@@ -1,0 +1,92 @@
+{
+  "job_summary": "## Per-Trajectory Rubric\n\n| Trial | Reward | task_specification | reward_hacking | difficulty_crux | near_miss | refusals | low_timeout | approach_validity |\n|---|---|---|---|---|---|---|---|---|\n| task__xwzk6F9 | 1.0 | PASS | PASS | NA | PASS | PASS | PASS | PASS |\n| task__53PTEG7 | 1.0 | PASS | PASS | NA | PASS | PASS | PASS | PASS |\n\n---\n\n## Fail Reasons\n\nNo failures. Both trials achieved reward = 1.0 with all 9 tests passing. There are no failure root causes to classify or group.\n\n---\n\n## Golden vs Agent Values\n\nAll six orders matched the golden expected values exactly in both trials. No tolerance is reported (exact integer/null match required).\n\n| Quantity | Golden Expected | Agent Values | Off By | Trial(s) |\n|---|---|---|---|---|\n| O1 allocated_qty | 12 | 12 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O1 shortfall | 0 | 0 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O1 limiting_resource | null | null | — | task__xwzk6F9, task__53PTEG7 |\n| O2 allocated_qty | 8 | 8 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O2 shortfall | 2 | 2 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O2 limiting_resource | \"L2\" | \"L2\" | — | task__xwzk6F9, task__53PTEG7 |\n| O3 allocated_qty | 5 | 5 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O3 shortfall | 5 | 5 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O3 limiting_resource | \"L3\" | \"L3\" | — | task__xwzk6F9, task__53PTEG7 |\n| O3b allocated_qty | 4 | 4 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O3b shortfall | 6 | 6 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O3b limiting_resource | \"SUB_L3_B\" | \"SUB_L3_B\" | — | task__xwzk6F9, task__53PTEG7 |\n| O4 allocated_qty | 1 | 1 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O4 shortfall | 4 | 4 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O4 limiting_resource | \"L4\" | \"L4\" | — | task__xwzk6F9, task__53PTEG7 |\n| O5 allocated_qty | 0 | 0 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O5 shortfall | 100 | 100 | 0 | task__xwzk6F9, task__53PTEG7 |\n| O5 limiting_resource | \"L4\" | \"L4\" | — | task__xwzk6F9, task__53PTEG7 |\n\n---\n\n## Failing Tests\n\nNo tests failed across either trial. Both trials report 9/9 tests passed and 0 failures in `verifier/ctrf.json`. The structured per-test source (ctrf.json) was confirmed present in both trials. There are no uniformly failing or partially failing tests to report.\n\n---\n\n## Golden Solution Approach\n\nBoth per-trial summaries describe the same reference method (no discrepancy):\n\n1. Read inventory and BOM data from SQLite (`manufacturing.db`).\n2. Build a top-down BOM DAG and explode requirements in topological order.\n3. Aggregate shared demand into a **single production run** per component (not one run per parent order).\n4. Net sub-assemblies against existing inventory before computing raw-material demand.\n5. Apply **batch rounding** via binary search over batch multiples; scrap formula charges percentage scrap plus a fixed setup scrap once per aggregated run.\n6. Charge workcenter hours as setup (once per run) plus run-rate × units produced.\n7. Select substitute parts by **preference rank**, breaking ties **alphabetically by part ID**.\n8. Identify the **limiting resource** by the minimum fulfillment ratio computed against the **gross requirement** (using pre-order inventory state, not post-allocation state).\n9. Process orders sequentially with state (inventory) carried forward across orders.\n10. Write sorted `report.json`.\n\n---\n\n## Agent Approach\n\nBoth agents converged on the same technique independently:\n\n- **Tooling discovery**: Both agents first attempted the `sqlite3` CLI, found it unavailable, and immediately pivoted to Python's built-in `sqlite3` module (task__xwzk6F9 step 2–3; task__53PTEG7 steps 2–3).\n- **Schema introspection**: Both agents inspected schema and data rows before writing any logic (task__xwzk6F9 steps 3–4; task__53PTEG7 steps 4–5).\n- **BOM simulation script**: Both wrote a single comprehensive Python script performing topological BOM explosion, demand propagation with scrap factors, batch rounding, substitute allocation with rank/alphabetical tiebreak, workcenter capacity tracking, and gross-requirement-based limiting resource identification (task__xwzk6F9 step 5; task__53PTEG7 step 6).\n- **Output validation**: Both verified the output JSON before completing (task__xwzk6F9 steps 7–8; task__53PTEG7 steps 7–8).\n- **Runtime**: ~15 minutes (task__xwzk6F9) and ~14 minutes (task__53PTEG7) — nearly identical durations.\n\nThe tight convergence in methodology (same pivot, same architecture, same tiebreak handling, same timing profile) across two independent runs suggests the agent model has reliable training-data familiarity with MRP/BOM simulation patterns rather than deriving the approach from first principles.\n\n---\n\n## Approach Diff\n\nNone. Both agents implemented approaches that were functionally identical to the golden reference solution across all five core mechanics: aggregated BOM explosion, sub-assembly netting, batch rounding with scrap, deterministic substitute selection (rank then alphabetical), and gross-requirement limiting resource ratio. Neither trial exhibited any divergence that produced value or test failures.\n\n---\n\n## Validity of Agent Approach\n\n`approach_validity` is PASS in both trials. Both agents used sound, instruction-permitted approaches — Python BOM simulation via topological sort — and both were confirmed correct by the verifier (9/9 tests, reward = 1.0). There is no clustering of `approach_validity` FAILs and no evidence of a task/verifier problem such as over-tight tolerance, undisclosed convention, or spec gap. The difficulty appears genuine (the task.toml cites five intersecting constraints) and the agents handled all five correctly.\n\n---\n\n## Rubric Aggregate\n\n| Criterion | PASS | FAIL | NA | Pattern |\n|---|---|---|---|---|\n| task_specification | 2 | 0 | 0 | Both trials confirm the specification was complete and unambiguous — all five mechanics were precisely described. |\n| reward_hacking | 2 | 0 | 0 | Both agents worked legitimately via database inspection and Python scripting; no access to test/solution/reward files. |\n| difficulty_crux | 0 | 0 | 2 | NA in both because both trials passed; the five-constraint crux was not a barrier here. |\n| near_miss | 2 | 0 | 0 | No near-misses; both trials achieved perfect scores. The task is not easier than it looks — agents genuinely solved all constraints. |\n| refusals | 2 | 0 | 0 | No refusals in either trial. The task framing (manufacturing/MRP) contained no triggering language. |\n| low_timeout | 2 | 0 | 0 | Both agents finished in ~14–15 minutes against a 30-minute timeout; no time pressure in either run. |\n| approach_validity | 2 | 0 | 0 | Both valid; the difficulty is genuine and the agents cleared it. No task/verifier fix indicated. |\n\n---\n\n## Summary\n\nANALYSIS COMPLETE — Both trials passed all 9 tests with reward = 1.0; the task specification is clear and complete, the five-constraint MRP simulation difficulty is genuine, and the agents solved it reliably within half the allotted time using a legitimate Python BOM-explosion approach.",
+  "trials": [
+    {
+      "trial_name": "task__xwzk6F9",
+      "summary": "Outcome: PASS. Reward = 1.0. All 9 verifier tests passed.\n\nFailing tests: None — all 9 tests in test_outputs.py passed (sourced from verifier/ctrf.json, which is present).\n\nGolden vs agent values: All 6 orders match golden exactly. O1: allocated_qty=12, shortfall=0, limiting_resource=null ✓. O2: allocated_qty=8, shortfall=2, limiting_resource=\"L2\" ✓. O3: allocated_qty=5, shortfall=5, limiting_resource=\"L3\" ✓. O3b: allocated_qty=4, shortfall=6, limiting_resource=\"SUB_L3_B\" ✓. O4: allocated_qty=1, shortfall=4, limiting_resource=\"L4\" ✓. O5: allocated_qty=0, shortfall=100, limiting_resource=\"L4\" ✓. Confirmed from artifacts/app/report.json.\n\nGolden approach: Reference solution (solution/solve.py) reads SQLite, builds top-down BOM DAG with aggregate demand, nets sub-assemblies, batch-rounds, applies scrap, handles substitutes by preference rank (then alphabetical ID), uses binary search over batch multiples, and identifies limiting resource via minimum fulfillment ratio across leaf parts and workcenters. Setup scrap and hours are charged once per aggregated run.\n\nAgent approach: The agent (deepseek/deepseek-v4-pro via terminus-2) ran 8 trajectory steps. It first discovered sqlite3 CLI was unavailable (Step 2) and pivoted to Python3 (Step 3). It inspected the schema (Step 3) and all data rows (Step 4). In Step 5, it wrote a comprehensive multi-level BOM simulation script implementing all 5 rules: sub-assembly netting, batch rounding, aggregated single runs, substitute selection with rank/alphabetical tiebreak, and gross-requirement limiting-resource identification. Step 7 validated the JSON output; Step 8 marked task complete.\n\nApproach diff: None — the agent's approach was functionally correct and aligned with the reference solution. The core mechanics (topology-ordered BOM explosion, binary search, gross-demand ratio for limiting resource, alphabetical tiebreak) were all correctly implemented.\n\nArtifacts: Present. artifacts/app/report.json contains the correct output for all 6 orders. Agent execution took ~15 minutes (10:27:08 to 10:42:03 UTC), well within the 1800-second (30-minute) timeout.",
+      "checks": {
+        "task_specification": {
+          "explanation": "The instruction.md provides comprehensive, precise rules for all 5 mechanics (sub-assembly netting, batch rounding + scrap formula, single aggregated runs, substitute selection with rank/alphabetical tiebreak, gross-requirement limiting-resource with ratio computation). The test file expectations — 6 named orders each testing specific mechanics — are fully derivable from these instructions. The agent succeeded on all tests, confirming the specification was sufficient.",
+          "outcome": "pass"
+        },
+        "reward_hacking": {
+          "explanation": "The agent's 8-step trajectory shows legitimate engagement: it explored the database schema, queried data, wrote a multi-level BOM simulation script, ran it, validated the output with 'python3 -m json.tool', and marked the task complete. No access to tests/, solution/, or verifier reward files is present in the trajectory. The agent earned reward by solving the task correctly.",
+          "outcome": "pass"
+        },
+        "difficulty_crux": {
+          "explanation": "The agent succeeded (reward = 1.0). The difficulty_explanation in task.toml cites 5 intersecting constraints (aggregated BOM explosion, parent/SA netting, batch rounding, deterministic substitution, gross limiting resource identification). The agent correctly implemented all five, so there is no failure to attribute to any crux.",
+          "outcome": "not_applicable"
+        },
+        "near_miss": {
+          "explanation": "All 9 tests passed with reward = 1.0. There is no near-miss — the agent achieved a perfect score. Not applicable as a near-miss signal.",
+          "outcome": "pass"
+        },
+        "refusals": {
+          "explanation": "The agent fully engaged with the task from step 2 onward. No refusal language, policy citations, or safety-motivated exits appear anywhere in the trajectory. The agent immediately analyzed the problem and began executing commands.",
+          "outcome": "pass"
+        },
+        "low_timeout": {
+          "explanation": "Agent execution ran from 10:27:08 to 10:42:03 UTC (~15 minutes), against a 1800-second (30-minute) timeout. The task was completed in approximately half the allowed time. Step 8 marks task_complete well before any timeout pressure, and there is no sign of the agent being cut off mid-work.",
+          "outcome": "pass"
+        },
+        "approach_validity": {
+          "explanation": "The agent succeeded — reward = 1.0, all 9 tests passed. The approach was sound and the verifier confirmed it. This criterion applies to failing trials; marked pass because the trial passed cleanly.",
+          "outcome": "pass"
+        },
+        "decisive_rule_disclosed": {
+          "explanation": "The trial passed (reward = 1.0). This criterion is only graded for trials that genuinely engaged and failed the verifier.",
+          "outcome": "not_applicable"
+        },
+        "spec_consistency": {
+          "explanation": "The trial passed (reward = 1.0). This criterion is only graded for trials that genuinely engaged and failed the verifier.",
+          "outcome": "not_applicable"
+        }
+      },
+      "estimated_cost_usd": 0.32760989999999995
+    },
+    {
+      "trial_name": "task__53PTEG7",
+      "summary": "Outcome: PASS, reward = 1.0 (all 9 tests passed).\n\nFailing tests: None — all 9 tests in test_outputs.py passed per verifier/ctrf.json (9/9 passed, 0 failed).\n\nGolden vs agent values: All 6 orders matched expected values exactly: O1 (allocated=12, shortfall=0, limiting=null ✓), O2 (allocated=8, shortfall=2, limiting=\"L2\" ✓), O3 (allocated=5, shortfall=5, limiting=\"L3\" ✓), O3b (allocated=4, shortfall=6, limiting=\"SUB_L3_B\" ✓), O4 (allocated=1, shortfall=4, limiting=\"L4\" ✓), O5 (allocated=0, shortfall=100, limiting=\"L4\" ✓).\n\nGolden approach: Reads SQLite database, performs top-down BOM DAG explosion with aggregation of shared demand into a single run, nets sub-assemblies, enforces batch_size lot rounding with scrap (percentage + fixed setup scrap), computes workcenter hours (setup + run*units), applies substitute parts by preference rank with alphabetical tie-breaking, identifies limiting resource by minimum fulfillment ratio (gross requirement from pre-order inventory state), and writes sorted report.json. State is maintained across sequential orders.\n\nAgent approach: Over 7 agent steps (~14 minutes), the agent first discovered sqlite3 CLI was unavailable (steps 2-3), pivoted to Python's built-in sqlite3 module, inspected schema and data (steps 4-5), then implemented a full Python simulation script that performs BOM explosion using topological sort, computes demand propagation with scrap factors, applies batch rounding, handles substitute parts with priority/alphabetical tie-breaking, computes workcenter hour consumption, and identifies the limiting resource by minimum fulfillment ratio (step 6). The script wrote report.json directly to /app/report.json and produced the correct values. Steps 7-8 confirmed the file was valid and sorted.\n\nApproach diff: None — the agent's approach matched the golden method. The agent correctly implemented all 5 core mechanics including the nuanced \"gross requirement\" calculation for limiting resource identification (using pre-order inventory state) and alphabetical tie-breaking.\n\nArtifacts: Present at artifacts/app/report.json with all 6 order records matching golden expected values.",
+      "checks": {
+        "task_specification": {
+          "explanation": "The agent succeeded with all 9 tests passing. The instruction.md provided sufficient detail for all mechanics: batch rounding, BOM explosion, substitute preference with alphabetical tie-breaking, gross requirement for limiting resource identification, and stateful sequential order processing. No specification gaps caused failure.",
+          "outcome": "pass"
+        },
+        "reward_hacking": {
+          "explanation": "The agent implemented a legitimate Python simulation script reading from /app/manufacturing.db and writing to /app/report.json. Examination of all tool_calls in agent/trajectory.json shows no access to tests/ directory, solution/ directory, or reward.txt. The agent used only cp, python3, and cat commands to implement and verify its solution.",
+          "outcome": "pass"
+        },
+        "difficulty_crux": {
+          "explanation": "The agent succeeded. The task.toml difficulty_explanation highlights complex multi-level MRP simulation with BOM DAG explosion, batch rounding, scrap, substitutes, and limiting resource identification. The agent handled all these correctly, but since it passed, there is no failure to align or misalign with the intended difficulty.",
+          "outcome": "not_applicable"
+        },
+        "near_miss": {
+          "explanation": "The agent passed all 9 tests with reward = 1.0. There is no near-miss scenario — the agent produced exact correct values for all 6 orders including the subtle O4 alphabetical tie-break (L4 vs L_TIE vs WC_TIE) and the stateful O5 test.",
+          "outcome": "pass"
+        },
+        "refusals": {
+          "explanation": "The agent engaged fully with the task across 7 productive steps, inspecting the database, implementing the BOM simulation algorithm, and writing the report. No refusal language or policy-based stoppage is present in the trajectory.",
+          "outcome": "pass"
+        },
+        "low_timeout": {
+          "explanation": "The agent finished at 10:40:57 after starting at 10:27:08, taking approximately 13 minutes 49 seconds against the 1800-second (30-minute) agent timeout. The agent completed well before the timeout with no sign of being cut off or time-pressured.",
+          "outcome": "pass"
+        },
+        "approach_validity": {
+          "explanation": "The agent used a sound approach that the instruction explicitly permitted: Python-based BOM explosion with topological ordering, batch rounding, scrap computation, substitute allocation, workcenter capacity tracking, and gross-requirement-based limiting resource identification. The trial passed with reward = 1.0, confirming the approach was both valid and correct.",
+          "outcome": "pass"
+        },
+        "decisive_rule_disclosed": {
+          "explanation": "The trial passed (reward = 1.0), so this criterion does not apply.",
+          "outcome": "not_applicable"
+        },
+        "spec_consistency": {
+          "explanation": "The trial passed (reward = 1.0), so this criterion does not apply.",
+          "outcome": "not_applicable"
+        }
+      },
+      "estimated_cost_usd": 0.36700445000000004
+    }
+  ],
+  "estimated_total_cost_usd": 0.75959765
+}

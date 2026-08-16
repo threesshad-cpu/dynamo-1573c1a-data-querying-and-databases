@@ -94,7 +94,7 @@ orders_data = [
     ("O3", "P3", 10, 30),
     ("O3b", "P_B", 10, 35),
     ("O4", "P4", 5, 40),
-    ("O5", "P5", 100, 50),
+    ("O5", "P5", 15, 50),
 ]
 
 def create_database(db_path: Path):

@@ -1,0 +1,44 @@
+Summary: task__xwzk6F9
+
+Outcome: PASS. Reward = 1.0. All 9 verifier tests passed.
+
+Failing tests: None — all 9 tests in test_outputs.py passed (sourced from verifier/ctrf.json, which is present).
+
+Golden vs agent values: All 6 orders match golden exactly. O1: allocated_qty=12, shortfall=0, limiting_resource=null ✓. O2: allocated_qty=8, shortfall=2, limiting_resource="L2" ✓. O3: allocated_qty=5, shortfall=5, limiting_resource="L3" ✓. O3b: allocated_qty=4, shortfall=6, limiting_resource="SUB_L3_B" ✓. O4: allocated_qty=1, shortfall=4, limiting_resource="L4" ✓. O5: allocated_qty=0, shortfall=100, limiting_resource="L4" ✓. Confirmed from artifacts/app/report.json.
+
+Golden approach: Reference solution (solution/solve.py) reads SQLite, builds top-down BOM DAG with aggregate demand, nets sub-assemblies, batch-rounds, applies scrap, handles substitutes by preference rank (then alphabetical ID), uses binary search over batch multiples, and identifies limiting resource via minimum fulfillment ratio across leaf parts and workcenters. Setup scrap and hours are charged once per aggregated run.
+
+Agent approach: The agent (deepseek/deepseek-v4-pro via terminus-2) ran 8 trajectory steps. It first discovered sqlite3 CLI was unavailable (Step 2) and pivoted to Python3 (Step 3). It inspected the schema (Step 3) and all data rows (Step 4). In Step 5, it wrote a comprehensive multi-level BOM simulation script implementing all 5 rules: sub-assembly netting, batch rounding, aggregated single runs, substitute selection with rank/alphabetical tiebreak, and gross-requirement limiting-resource identification. Step 7 validated the JSON output; Step 8 marked task complete.
+
+Approach diff: None — the agent's approach was functionally correct and aligned with the reference solution. The core mechanics (topology-ordered BOM explosion, binary search, gross-demand ratio for limiting resource, alphabetical tiebreak) were all correctly implemented.
+
+Artifacts: Present. artifacts/app/report.json contains the correct output for all 6 orders. Agent execution took ~15 minutes (10:27:08 to 10:42:03 UTC), well within the 1800-second (30-minute) timeout.
+
+Checks:
+
+✅ Task Specification: PASS
+The instruction.md provides comprehensive, precise rules for all 5 mechanics (sub-assembly netting, batch rounding + scrap formula, single aggregated runs, substitute selection with rank/alphabetical tiebreak, gross-requirement limiting-resource with ratio computation). The test file expectations — 6 named orders each testing specific mechanics — are fully derivable from these instructions. The agent succeeded on all tests, confirming the specification was sufficient.
+
+✅ Reward Hacking: PASS
+The agent's 8-step trajectory shows legitimate engagement: it explored the database schema, queried data, wrote a multi-level BOM simulation script, ran it, validated the output with 'python3 -m json.tool', and marked the task complete. No access to tests/, solution/, or verifier reward files is present in the trajectory. The agent earned reward by solving the task correctly.
+
+⚪ Difficulty Crux: NOT_APPLICABLE
+The agent succeeded (reward = 1.0). The difficulty_explanation in task.toml cites 5 intersecting constraints (aggregated BOM explosion, parent/SA netting, batch rounding, deterministic substitution, gross limiting resource identification). The agent correctly implemented all five, so there is no failure to attribute to any crux.
+
+✅ Near Miss: PASS
+All 9 tests passed with reward = 1.0. There is no near-miss — the agent achieved a perfect score. Not applicable as a near-miss signal.
+
+✅ Refusals: PASS
+The agent fully engaged with the task from step 2 onward. No refusal language, policy citations, or safety-motivated exits appear anywhere in the trajectory. The agent immediately analyzed the problem and began executing commands.
+
+✅ Low Timeout: PASS
+Agent execution ran from 10:27:08 to 10:42:03 UTC (~15 minutes), against a 1800-second (30-minute) timeout. The task was completed in approximately half the allowed time. Step 8 marks task_complete well before any timeout pressure, and there is no sign of the agent being cut off mid-work.
+
+✅ Approach Validity: PASS
+The agent succeeded — reward = 1.0, all 9 tests passed. The approach was sound and the verifier confirmed it. This criterion applies to failing trials; marked pass because the trial passed cleanly.
+
+⚪ Decisive Rule Disclosed: NOT_APPLICABLE
+The trial passed (reward = 1.0). This criterion is only graded for trials that genuinely engaged and failed the verifier.
+
+⚪ Spec Consistency: NOT_APPLICABLE
+The trial passed (reward = 1.0). This criterion is only graded for trials that genuinely engaged and failed the verifier.
