@@ -64,7 +64,7 @@ bom_data = [
 ]
 
 workcenters_data = [
-    ("WC1", "Assembly", 250.0),
+    ("WC1", "Assembly", 120.0),
     ("WC2", "Testing", 100.0),
     ("WC_TIE", "Tie-Break WC", 10.0),
 ]
@@ -83,7 +83,7 @@ routing_data = [
 
 substitutes_data = [
     # primary, substitute, ratio, rank
-    ("L3", "SUB_L3_A", 2.0, 1), # 1 L3 needs 2 SUB_L3_A
+    ("L3", "SUB_L3_A", 2.5, 1), # 1 L3 needs 2.5 SUB_L3_A
     ("L3", "SUB_L3_B", 1.0, 1), # both rank 1 to force ASCII tie-break
 ]
 

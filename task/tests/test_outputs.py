@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["1O", "2O", "O3", "O4", "O5", "b3O"]
+    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -61,9 +61,9 @@ def test_order_O1_batch_rounding_and_parent_netting():
     This results in enough inventory to fulfill all 12 units.
     """
     m = _get_orders_map()
-    assert m["1O"]["allocated_qty"] == 12
-    assert m["1O"]["shortfall_qty"] == 0
-    assert m["1O"]["limiting_resource"] is None
+    assert m["O1"]["allocated_qty"] == 12
+    assert m["O1"]["shortfall_qty"] == 0
+    assert m["O1"]["limiting_resource"] is None
 
 
 def test_order_O2_aggregated_bom_explosion():
@@ -74,35 +74,34 @@ def test_order_O2_aggregated_bom_explosion():
     The order is limited by L2 which is required by SA2.
     """
     m = _get_orders_map()
-    assert m["2O"]["allocated_qty"] == 8
-    assert m["2O"]["shortfall_qty"] == 2
-    assert m["2O"]["limiting_resource"] == "L2"
+    assert m["O2"]["allocated_qty"] == 8
+    assert m["O2"]["shortfall_qty"] == 2
+    assert m["O2"]["limiting_resource"] == "L2"
 
 
 def test_order_O3_deterministic_substitution():
     """
     Verify Order 3 correctly cascades through substitute parts deterministically.
     P3 requests 10, needs 5 L3 per unit (Total 50).
-    L3 (15) + SUB_L3_A (12 units / 2.0 ratio = 6) + SUB_L3_B (8 units / 1.0 ratio = 8) = 29 equivalent units.
-    29 / 5 = 5.8 (floored to 5 allocated). Shortfall is 5. Limiting resource is L3.
+    L3 (15) + SUB_L3_A (12 units / 2.5 ratio = 4.8, floored to 4) + SUB_L3_B (8 units / 1.0 ratio = 8) = 27 equivalent units.
+    27 / 5 = 5.4 (floored to 5 allocated). Shortfall is 5. Limiting resource is L3.
     """
     m = _get_orders_map()
-    assert m["O3"]["allocated_qty"] == 0
-    assert m["O3"]["shortfall_qty"] == 10
+    assert m["O3"]["allocated_qty"] == 5
+    assert m["O3"]["shortfall_qty"] == 5
     assert m["O3"]["limiting_resource"] == "L3"
 
 
 def test_order_O3b_substitute_tie_break():
     """
     Verify Order 3b computes substitute tie breaks correctly.
-    Since O3 was canceled (due to Odd Shortfall = 5), O3b has access to all SUB_L3_B (8 units).
-    O3b allocates 8 units. Shortfall = 2 (Even). Fill rate = 80%.
-    It should exactly allocate 8 units.
+    Since O3 consumed all available SUB_L3_B, O3b has access to 0 SUB_L3_B.
+    O3b allocates 0 units. Shortfall = 10. Limiting resource is SUB_L3_B.
     """
     m = _get_orders_map()
-    assert m["b3O"]["allocated_qty"] == 8
-    assert m["b3O"]["shortfall_qty"] == 2
-    assert m["b3O"]["limiting_resource"] == "SUB_L3_B"
+    assert m["O3b"]["allocated_qty"] == 0
+    assert m["O3b"]["shortfall_qty"] == 10
+    assert m["O3b"]["limiting_resource"] == "SUB_L3_B"
 
 
 def test_order_O4_gross_limiting_resource_and_tie_break():
@@ -130,11 +129,10 @@ def test_order_O5_stateful_depletion():
     Verify Order 5 correctly utilizes inventory preserved by Order 4's cancellation.
     O4 was canceled because it couldn't meet the 50% fill rate, so it consumed 0 L4.
     O5 requests 15 P5 (requires 1 L4 each). L4 has 10 units available.
-    O5 allocates 10. But shortfall is 5 (Odd). 
-    Due to Odd Shortfall rule, O5 is ALSO canceled!
-    An incorrect solver would likely allocate 10 for O5.
+    O5 allocates 10. Shortfall is 5.
+    An incorrect solver would likely allocate 0 for O5 if it mismanaged state.
     """
     m = _get_orders_map()
-    assert m["O5"]["allocated_qty"] == 0
-    assert m["O5"]["shortfall_qty"] == 15
+    assert m["O5"]["allocated_qty"] == 10
+    assert m["O5"]["shortfall_qty"] == 5
     assert m["O5"]["limiting_resource"] == "L4"

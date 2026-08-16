@@ -19,11 +19,8 @@ Process production orders one by one, starting with the lowest `priority` number
    - The resource with the lowest ratio strictly below 1.0 is the `limiting_resource`. 
    - If multiple resources tie for the lowest ratio, break the tie by picking the resource with the lexicographically smallest ID.
    - If you fulfill the entire order (`shortfall_qty == 0`), just set `limiting_resource` to `null`.
-6. **Cancellation Conditions**: An order is unviable and must be canceled if it meets EITHER of these two conditions:
-   - The maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`).
-   - The computed `shortfall_qty` (which is `requested_qty - allocated_qty`) is an ODD number.
+6. **Cancellation Conditions**: An order is unviable and must be canceled if the maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`).
    If an order is canceled, you must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
-7. **Order ID Modification**: When writing the final `report.json`, the `order_id` string MUST be reversed (e.g., `O1` becomes `1O`, `O3b` becomes `b3O`) ONLY IF the order was successfully fulfilled (`allocated_qty > 0`). If the order was canceled (`allocated_qty == 0`), the `order_id` must remain unchanged.
 
 Update the shared inventory and workcenter pools after each order is processed.
 
