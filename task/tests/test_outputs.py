@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 24, "Expected 24 order results in report"
+    assert len(orders) == 28, "Expected 28 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_O", "O00_P", "O00_R1", "O00_R2", "O00_S2", "O01", "O02", "O03", "O04", "O05", "O06"]
+    expected_ids = ["O00_A", "O00_B", "O00_C", "O00_D", "O00_E", "O00_F", "O00_G", "O00_H", "O00_I", "O00_J", "O00_K", "O00_L", "O00_M", "O00_N", "O00_O", "O00_P", "O00_R1", "O00_R2", "O00_S2", "O00_W", "O00_X", "O00_Y", "O01", "O02", "O03", "O04", "O05", "O06"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -232,3 +232,31 @@ def test_order_O00_S2_allocation():
     assert m["O00_S2"]["limiting_resource"] is None
 
 
+
+def test_order_O00_N_allocation():
+    """Verifies O00_N handles multi-level subassembly netting correctly."""
+    m = _get_orders_map()
+    assert m["O00_N"]["allocated_qty"] == 4
+    assert m["O00_N"]["shortfall_qty"] == 1
+    assert m["O00_N"]["limiting_resource"] == "L104"
+
+def test_order_O00_W_allocation():
+    """Verifies O00_W successfully consumes shared resource stock without limiting."""
+    m = _get_orders_map()
+    assert m["O00_W"]["allocated_qty"] == 2
+    assert m["O00_W"]["shortfall_qty"] == 0
+    assert m["O00_W"]["limiting_resource"] is None
+
+def test_order_O00_X_allocation():
+    """Verifies O00_X applies global ASCII tie-breaker on shared resources correctly after O00_W."""
+    m = _get_orders_map()
+    assert m["O00_X"]["allocated_qty"] == 1
+    assert m["O00_X"]["shortfall_qty"] == 1
+    assert m["O00_X"]["limiting_resource"] == "L105"
+
+def test_order_O00_Y_allocation():
+    """Verifies O00_Y correctly aggregates setup hours exactly once after batch rounding."""
+    m = _get_orders_map()
+    assert m["O00_Y"]["allocated_qty"] == 0
+    assert m["O00_Y"]["shortfall_qty"] == 1
+    assert m["O00_Y"]["limiting_resource"] == "WC105"
