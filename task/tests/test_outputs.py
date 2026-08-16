@@ -68,27 +68,29 @@ def test_order_O1_batch_rounding_and_parent_netting():
 
 def test_order_O2_aggregated_bom_explosion():
     """
-    Verify Order 2 correctly aggregates BOM demand across multiple paths.
-    P2 requires SA1 and SA2. SA2 also requires SA1.
-    SA1 must be aggregated into a single manufacturing run to correctly apply setup hours and batching.
-    The order is limited by L2 which is required by SA2.
+    Verify Order 2 fully completes by utilizing SUB_SHARED to cover its L2 shortfall.
+    P2 requests 10, needing 20 SA2 (batch 4, so 5 runs).
+    SA2 needs 3 L2 per unit, so 60 L2. Plus 1 setup scrap = 61 L2 required.
+    L2 has 50 units. It consumes 50 L2 and 11 SUB_SHARED (ratio 1.0).
+    It fully allocates 10 P2.
     """
     m = _get_orders_map()
-    assert m["O2"]["allocated_qty"] == 8
-    assert m["O2"]["shortfall_qty"] == 2
-    assert m["O2"]["limiting_resource"] == "L2"
+    assert m["O2"]["allocated_qty"] == 10
+    assert m["O2"]["shortfall_qty"] == 0
+    assert m["O2"]["limiting_resource"] is None
 
 
 def test_order_O3_deterministic_substitution():
     """
-    Verify Order 3 correctly cascades through substitute parts deterministically.
+    Verify Order 3 correctly cascades through substitute parts deterministically,
+    including shared substitutes depleted by previous orders.
     P3 requests 10, needs 5 L3 per unit (Total 50).
-    L3 (15) + SUB_L3_A (12 units / 2.5 ratio = 4.8, floored to 4) + SUB_L3_B (8 units / 1.0 ratio = 8) = 27 equivalent units.
-    27 / 5 = 5.4 (floored to 5 allocated). Shortfall is 5. Limiting resource is L3.
+    L3 (15) + SUB_L3_A (12 units / 2.5 ratio = 4.8, floored to 4) + SUB_L3_B (8 units / 1.0 ratio = 8) + SUB_SHARED (9 units remaining after O2 / 1.0 ratio = 9) = 36 equivalent units.
+    36 / 5 = 7.2 (floored to 7 allocated). Shortfall is 3. Limiting resource is L3.
     """
     m = _get_orders_map()
-    assert m["O3"]["allocated_qty"] == 5
-    assert m["O3"]["shortfall_qty"] == 5
+    assert m["O3"]["allocated_qty"] == 7
+    assert m["O3"]["shortfall_qty"] == 3
     assert m["O3"]["limiting_resource"] == "L3"
 
 

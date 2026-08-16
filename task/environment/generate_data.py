@@ -17,8 +17,9 @@ parts_data = [
     ("L_TIE", "Tie-Break Leaf", 10, 1),
     
     # Substitutes
-    ("SUB_L3_A", "Wire-Alloy", 12, 1), # ratio 2.0, rank 1
-    ("SUB_L3_B", "Wire-Copper", 8, 1),  # ratio 1.0, rank 2
+    ("SUB_L3_A", "Wire-Alloy", 12, 1), # ratio 2.5, rank 1
+    ("SUB_L3_B", "Wire-Copper", 8, 1),  # ratio 1.0, rank 1
+    ("SUB_SHARED", "Shared-Substitute", 20, 1), # ratio 1.0, rank 1
     
     # Sub-assemblies
     ("SA1", "Frame", 3, 2),
@@ -83,8 +84,10 @@ routing_data = [
 
 substitutes_data = [
     # primary, substitute, ratio, rank
+    ("L2", "SUB_SHARED", 1.0, 1), # L2 can use SUB_SHARED
     ("L3", "SUB_L3_A", 2.5, 1), # 1 L3 needs 2.5 SUB_L3_A
     ("L3", "SUB_L3_B", 1.0, 1), # both rank 1 to force ASCII tie-break
+    ("L3", "SUB_SHARED", 1.0, 1), # L3 can also use SUB_SHARED
 ]
 
 orders_data = [
