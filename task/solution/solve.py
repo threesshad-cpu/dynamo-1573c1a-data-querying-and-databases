@@ -298,7 +298,7 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
 
     results.append(
         {
-            "order_id": order_id,
+            "order_id": order_id if allocated_qty == 0 else str(order_id)[::-1],
             "allocated_qty": allocated_qty,
             "shortfall_qty": shortfall_qty,
             "limiting_resource": limiting_resource,
@@ -315,6 +315,8 @@ for report_path in [
 ]:
     try:
         report_path.parent.mkdir(parents=True, exist_ok=True)
+        results.sort(key=lambda x: x["order_id"])
+        report_data = {"orders": results}
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report_data, f, indent=2)
         if report_path.exists() and report_path.is_file():

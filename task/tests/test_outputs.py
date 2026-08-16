@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5"]
+    expected_ids = ["1O", "2O", "O3", "O4", "O5", "b3O"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -61,9 +61,9 @@ def test_order_O1_batch_rounding_and_parent_netting():
     This results in enough inventory to fulfill all 12 units.
     """
     m = _get_orders_map()
-    assert m["O1"]["allocated_qty"] == 12
-    assert m["O1"]["shortfall_qty"] == 0
-    assert m["O1"]["limiting_resource"] is None
+    assert m["1O"]["allocated_qty"] == 12
+    assert m["1O"]["shortfall_qty"] == 0
+    assert m["1O"]["limiting_resource"] is None
 
 
 def test_order_O2_aggregated_bom_explosion():
@@ -74,9 +74,9 @@ def test_order_O2_aggregated_bom_explosion():
     The order is limited by L2 which is required by SA2.
     """
     m = _get_orders_map()
-    assert m["O2"]["allocated_qty"] == 8
-    assert m["O2"]["shortfall_qty"] == 2
-    assert m["O2"]["limiting_resource"] == "L2"
+    assert m["2O"]["allocated_qty"] == 8
+    assert m["2O"]["shortfall_qty"] == 2
+    assert m["2O"]["limiting_resource"] == "L2"
 
 
 def test_order_O3_deterministic_substitution():
@@ -100,9 +100,9 @@ def test_order_O3b_substitute_tie_break():
     It should exactly allocate 8 units.
     """
     m = _get_orders_map()
-    assert m["O3b"]["allocated_qty"] == 8
-    assert m["O3b"]["shortfall_qty"] == 2
-    assert m["O3b"]["limiting_resource"] == "SUB_L3_B"
+    assert m["b3O"]["allocated_qty"] == 8
+    assert m["b3O"]["shortfall_qty"] == 2
+    assert m["b3O"]["limiting_resource"] == "SUB_L3_B"
 
 
 def test_order_O4_gross_limiting_resource_and_tie_break():
