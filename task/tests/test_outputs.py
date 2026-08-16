@@ -87,23 +87,21 @@ def test_order_O3_deterministic_substitution():
     29 / 5 = 5.8 (floored to 5 allocated). Shortfall is 5. Limiting resource is L3.
     """
     m = _get_orders_map()
-    assert m["O3"]["allocated_qty"] == 5
-    assert m["O3"]["shortfall_qty"] == 5
+    assert m["O3"]["allocated_qty"] == 0
+    assert m["O3"]["shortfall_qty"] == 10
     assert m["O3"]["limiting_resource"] == "L3"
 
 
 def test_order_O3b_substitute_tie_break():
     """
-    Verify Order 3b accurately reflects the exact substitute consumed by Order 3.
-    Since SUB_L3_A and SUB_L3_B have the same preference_rank (1), O3 must break the tie
-    using ASCII part ID ("SUB_L3_A" < "SUB_L3_B") and consume SUB_L3_A first.
-    O3 needs 10 eq units. It consumes all 12 SUB_L3_A (6 eq) and 4 SUB_L3_B (4 eq).
-    This leaves 4 SUB_L3_B. O3b requests 10 P_B (requires 1 SUB_L3_B per P_B).
-    It should exactly allocate 4 units.
+    Verify Order 3b computes substitute tie breaks correctly.
+    Since O3 was canceled (due to Odd Shortfall = 5), O3b has access to all SUB_L3_B (8 units).
+    O3b allocates 8 units. Shortfall = 2 (Even). Fill rate = 80%.
+    It should exactly allocate 8 units.
     """
     m = _get_orders_map()
-    assert m["O3b"]["allocated_qty"] == 0
-    assert m["O3b"]["shortfall_qty"] == 10
+    assert m["O3b"]["allocated_qty"] == 8
+    assert m["O3b"]["shortfall_qty"] == 2
     assert m["O3b"]["limiting_resource"] == "SUB_L3_B"
 
 
@@ -132,11 +130,11 @@ def test_order_O5_stateful_depletion():
     Verify Order 5 correctly utilizes inventory preserved by Order 4's cancellation.
     O4 was canceled because it couldn't meet the 50% fill rate, so it consumed 0 L4.
     O5 requests 15 P5 (requires 1 L4 each). L4 has 10 units available.
-    O5 allocates 10 (66% >= 50%), which is valid.
-    An incorrect stateful solver that misses the Minimum Fill Rate rule would allocate
-    1 for O4 (depleting L4) and then fail O5 completely.
+    O5 allocates 10. But shortfall is 5 (Odd). 
+    Due to Odd Shortfall rule, O5 is ALSO canceled!
+    An incorrect solver would likely allocate 10 for O5.
     """
     m = _get_orders_map()
-    assert m["O5"]["allocated_qty"] == 10
-    assert m["O5"]["shortfall_qty"] == 5
+    assert m["O5"]["allocated_qty"] == 0
+    assert m["O5"]["shortfall_qty"] == 15
     assert m["O5"]["limiting_resource"] == "L4"

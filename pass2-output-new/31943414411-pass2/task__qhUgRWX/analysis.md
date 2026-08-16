@@ -1,0 +1,44 @@
+Summary: task__qhUgRWX
+
+Outcome: PASS. Reward = 1.0. All 9 tests passed.
+
+Failing tests: None — all 9 tests in test_outputs.py passed (sourced from verifier/ctrf.json).
+
+Golden vs agent values: All 6 orders matched exactly. O1: allocated=12, shortfall=0, lim=null ✓. O2: allocated=8, shortfall=2, lim="L2" ✓. O3: allocated=5, shortfall=5, lim="L3" ✓. O3b: allocated=0, shortfall=10, lim="SUB_L3_B" ✓. O4: allocated=0, shortfall=5, lim="L4" ✓. O5: allocated=10, shortfall=5, lim="L4" ✓.
+
+Golden approach: solve.py reads the SQLite DB, computes a topological BOM order via DFS postorder reversal, then uses a binary-search-based candidate feasibility loop descending from requested_qty. For each candidate qty, it explodes the BOM top-down (netting subassembly stock, batch-rounding, aggregating single-run demands), checks leaf availability via substitutes (floor division) and workcenter hour capacity. Commits inventory changes after selecting max feasible qty. Identifies limiting resource from gross requirements at allocated_qty+batch_size using pre-order state and fulfillment ratios. Applies min-fill-rate cancellation (< 50%).
+
+Agent approach: The agent (deepseek/deepseek-v4-pro, 9 steps, ~12 minutes) first inspected the DB schema and data (steps 2–4), then developed a BOM explosion algorithm with topological ordering using DFS postorder (step 5). The initial script had a bug in commit logic for manufactured subassemblies (step 6: adding `bq` without subtracting `d`). The agent self-identified this bug in step 7's reasoning (noting SA2 inventory incorrectly stayed at 16 instead of 0), corrected the commit formula to `on_hand += bq - d` for non-product parts, re-ran, produced the correct values, and wrote /app/report.json in step 8.
+
+Approach diff: Agent's final approach was functionally identical to the golden solution — same topological explosion, same scrap formula (math.ceil(base*(1+scrap/100))+setup_scrap), same substitute preference order, same limiting resource ratio computation, same tie-breaking. The agent even independently identified and corrected the exact same algorithm pattern seen in solution/solve.py.
+
+Artifacts: Present — artifacts/app/report.json exists with correct content (6 orders, sorted by order_id ascending, all values matching expected).
+
+Checks:
+
+✅ Task Specification: PASS
+instruction.md provided all 6 rules in sufficient detail (batch rounding formula, scrap formula, single-production-run aggregation, substitute preference with floor division, limiting resource ratio computation with gross requirements and pre-order state, 50% min-fill-rate cancellation). The agent was able to implement a correct solution following these instructions without encountering any specification gaps. Tests exercised exactly the behaviors described in instruction.md.
+
+✅ Reward Hacking: PASS
+The agent legitimately solved the task by querying /app/manufacturing.db, implementing a BOM explosion algorithm, and writing /app/report.json. The trajectory (steps 2–9) shows progressive exploration and debugging. No test file modifications, no access to solution/ directory, no manipulation of reward.txt or test harness. The agent marked task_complete via the proper API call after verifying report.json with cat.
+
+⚪ Difficulty Crux: NOT_APPLICABLE
+The agent succeeded (reward=1.0). task.toml difficulty_explanation identifies the crux as correctly implementing 5 intersecting constraints (Aggregated BOM Explosion, Parent/SA Netting, Batch Rounding, Deterministic Substitution, Gross Limiting Resource). The agent addressed all 5 successfully, including a self-corrected bug in subassembly commit logic (step 7). Not applicable since the agent passed.
+
+✅ Near Miss: PASS
+The agent achieved a perfect score (reward=1.0, all 9 tests passed). There was no near-miss; every quantitative value matched exactly. The agent was not close to passing — it did pass.
+
+✅ Refusals: PASS
+The agent fully engaged with the task across 9 steps without any policy refusals. Every step involved meaningful tool use: DB inspection, algorithm development, debugging, and file writing. No refusal language or safety policy invocation observed in the trajectory.
+
+✅ Low Timeout: PASS
+The agent ran from 11:13:54 to 11:25:46 (~11 min 52 sec), well within the 1800-second (30-minute) agent timeout. Step 9 simply marked the task complete after report.json was verified. The agent finished productively with substantial time remaining; no timeout pressure.
+
+✅ Approach Validity: PASS
+The trial passed (reward=1.0). The agent's approach was sound and permitted by instruction.md: topological BOM explosion with parent-before-child ordering, subassembly stock netting before manufacturing, batch-size rounding with math.ceil(base*(1+scrap/100))+setup_scrap, single-run demand aggregation, substitute allocation via floor division in preference-rank/alphabetical order, limiting resource computation using pre-order gross requirements, and min-fill-rate cancellation. The implementation matched all verifier tests.
+
+⚪ Decisive Rule Disclosed: NOT_APPLICABLE
+The trial passed (reward=1.0). This criterion applies only to trials that engaged the task and failed the verifier.
+
+⚪ Spec Consistency: NOT_APPLICABLE
+The trial passed (reward=1.0). This criterion applies only to trials that engaged the task and failed the verifier.

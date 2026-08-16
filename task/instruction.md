@@ -19,7 +19,10 @@ Process production orders one by one, starting with the lowest `priority` number
    - The resource with the lowest ratio strictly below 1.0 is the `limiting_resource`. 
    - If multiple resources tie for the lowest ratio, break the tie by picking the resource whose ID comes first alphabetically as a string (e.g., if `L2` and `WC3` tie, choose `L2` because L comes before W).
    - If you fulfill the entire order (`shortfall_qty == 0`), just set `limiting_resource` to `null`.
-6. **Minimum Fill Rate**: If the maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`), the order is unviable and canceled. You must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
+6. **Cancellation Conditions**: An order is unviable and must be canceled if it meets EITHER of these two conditions:
+   - The maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`).
+   - The computed `shortfall_qty` (which is `requested_qty - allocated_qty`) is an ODD number.
+   If an order is canceled, you must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
 
 Update the shared inventory and workcenter pools after each order is processed.
 
