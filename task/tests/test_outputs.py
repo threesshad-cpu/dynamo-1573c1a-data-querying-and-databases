@@ -61,7 +61,7 @@ def test_order_O01_allocation():
 
 
 def test_order_O02_allocation():
-    """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to order_id descending tie-breaker."""
+    """Verify O02 allocation (P1 x 30, batch=5): Processed AFTER O03 due to priority ordering."""
     m = _get_orders_map()
     assert m["O02"]["allocated_qty"] == 25
     assert m["O02"]["shortfall_qty"] == 5
@@ -69,7 +69,7 @@ def test_order_O02_allocation():
 
 
 def test_order_O03_allocation():
-    """Verify O03 allocation (P3 x 15, batch=2): Processed BEFORE O02 due to order_id descending tie-breaker. alloc=14, sf=1, limiting=None."""
+    """Verify O03 allocation (P3 x 15, batch=2): Processed BEFORE O02 due to priority ordering. alloc=14, sf=1, limiting=None."""
     m = _get_orders_map()
     assert m["O03"]["allocated_qty"] == 14
     assert m["O03"]["shortfall_qty"] == 1
@@ -77,7 +77,7 @@ def test_order_O03_allocation():
 
 
 def test_order_O04_allocation():
-    """Verify O04 allocation (P2 x 20, batch=4): SA1 requires SA2 which needs L5 — fully depleted by O01+O03. alloc=0, sf=20, limiting=L5."""
+    """Verify O04 allocation (P2 x 20, batch=4): SA1 requires SA2 which needs L5 — fully depleted by O01+O03. alloc=4, sf=16, limiting=WC2."""
     m = _get_orders_map()
     assert m["O04"]["allocated_qty"] == 4
     assert m["O04"]["shortfall_qty"] == 16
