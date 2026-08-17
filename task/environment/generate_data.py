@@ -47,8 +47,8 @@ bom_data = [
     # SA2 also requires SA1 (so SA1 appears in multiple paths)
     ("P2", "SA1", 1, 0.0, 0),
     ("P2", "SA2", 2, 0.0, 0),
-    ("SA2", "SA1", 1, 0.0, 0),
-    ("SA2", "L2", 3, 0.0, 1),
+    ("SA2", "SA1", 1, 0.0, 1),
+    ("SA2", "L2", 3, 3.0, 1),
     
     # P3: Tests Deterministic Substitution
     ("P3", "L3", 5, 0.0, 0),
@@ -65,7 +65,7 @@ bom_data = [
 ]
 
 workcenters_data = [
-    ("WC1", "Assembly", 120.0),
+    ("WC1", "Assembly", 80.0),
     ("WC2", "Testing", 100.0),
     ("WC_TIE", "Tie-Break WC", 10.0),
 ]
