@@ -68,11 +68,12 @@ def test_order_O1_batch_rounding_and_parent_netting():
 
 def test_order_O2_aggregated_bom_explosion():
     """
-    Verify Order 2 fully completes by utilizing SUB_SHARED to cover its L2 shortfall.
-    P2 requests 10, needing 20 SA2 (batch 4, so 5 runs).
-    SA2 needs 3 L2 per unit, so 60 L2. Plus 1 setup scrap = 61 L2 required.
-    L2 has 50 units. It consumes 50 L2 and 11 SUB_SHARED (ratio 1.0).
-    It fully allocates 10 P2.
+    Verify Order 2 aggregates shared BOM demand and handles scrap cascading.
+    P2 requests 10, needing 10 SA1 (direct) + 20 SA2.
+    SA2 needs 21 SA1 (setup_scrap=1 + 20*1) and 63 L2 (setup_scrap=1 + ceil(60*1.03)=62).
+    Total SA1 = 31, net 30 (1 on-hand from O1). Build 30 SA1.
+    L2 has 50 units. Shortfall of 13 covered by SUB_SHARED (ratio 1.0).
+    SUB_SHARED goes from 20 to 7. Fully allocates 10 P2.
     """
     m = _get_orders_map()
     assert m["O2"]["allocated_qty"] == 10
@@ -85,20 +86,22 @@ def test_order_O3_deterministic_substitution():
     Verify Order 3 correctly cascades through substitute parts deterministically,
     including shared substitutes depleted by previous orders.
     P3 requests 10, needs 5 L3 per unit (Total 50).
-    L3 (15) + SUB_L3_A (12 units / 2.5 ratio = 4.8, floored to 4) + SUB_L3_B (8 units / 1.0 ratio = 8) + SUB_SHARED (9 units remaining after O2 / 1.0 ratio = 9) = 36 equivalent units.
-    36 / 5 = 7.2 (floored to 7 allocated). Shortfall is 3. Limiting resource is L3.
+    L3 (15) + SUB_L3_A (floor(12/2.5)=4) + SUB_L3_B (floor(8/1.0)=8) +
+    SUB_SHARED (floor(7/1.0)=7, only 7 remaining after O2's larger L2 demand) = 34.
+    34 / 5 = 6.8 (floored to 6 allocated). Shortfall is 4. Limiting resource is L3.
     """
     m = _get_orders_map()
-    assert m["O3"]["allocated_qty"] == 7
-    assert m["O3"]["shortfall_qty"] == 3
+    assert m["O3"]["allocated_qty"] == 6
+    assert m["O3"]["shortfall_qty"] == 4
     assert m["O3"]["limiting_resource"] == "L3"
 
 
 def test_order_O3b_substitute_tie_break():
     """
-    Verify Order 3b computes substitute tie breaks correctly.
-    Since O3 consumed all available SUB_L3_B, O3b has access to 0 SUB_L3_B.
-    O3b allocates 0 units. Shortfall = 10. Limiting resource is SUB_L3_B.
+    Verify Order 3b correctly reflects inventory depleted by O3's substitute usage.
+    O3 consumed all 8 SUB_L3_B (used as substitute for L3 at rank 1).
+    P_B directly requires SUB_L3_B, so with 0 remaining, O3b allocates nothing.
+    Shortfall = 10. Limiting resource is SUB_L3_B (ratio 0/1 = 0).
     """
     m = _get_orders_map()
     assert m["O3b"]["allocated_qty"] == 0
@@ -128,13 +131,14 @@ def test_order_O4_gross_limiting_resource_and_tie_break():
 
 def test_order_O5_stateful_depletion():
     """
-    Verify Order 5 correctly utilizes inventory preserved by Order 4's cancellation.
-    O4 was canceled because it couldn't meet the 50% fill rate, so it consumed 0 L4.
-    O5 requests 15 P5 (requires 1 L4 each). L4 has 10 units available.
-    O5 allocates 10. Shortfall is 5.
-    An incorrect solver would likely allocate 0 for O5 if it mismanaged state.
+    Verify Order 5 correctly tracks shared workcenter depletion across orders.
+    O4 was canceled (no resource consumption). O5 requests 15 P5.
+    P5 needs 1 L4 each (10 available) and WC1 hours (setup=0 + 1.0/unit).
+    After O1 (23h) and O2 (48h), WC1 has only 9 hours remaining.
+    WC1 limits O5 to 9 units (not L4's 10). 9/15=0.6>=0.5 so allocate 9.
+    Limiting resource is WC1 (ratio 9/10=0.9 < L4's 10/10=1.0).
     """
     m = _get_orders_map()
-    assert m["O5"]["allocated_qty"] == 10
-    assert m["O5"]["shortfall_qty"] == 5
-    assert m["O5"]["limiting_resource"] == "L4"
+    assert m["O5"]["allocated_qty"] == 9
+    assert m["O5"]["shortfall_qty"] == 6
+    assert m["O5"]["limiting_resource"] == "WC1"
