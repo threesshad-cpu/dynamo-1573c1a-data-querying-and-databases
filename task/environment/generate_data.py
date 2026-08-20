@@ -13,8 +13,10 @@ parts_data = [
     ("L1", "Bolt", 200, 10),
     ("L2", "Plate", 50, 5),
     ("L3", "Wire", 15, 1),
-    ("L4", "Plastic", 10, 1),
-    ("L_TIE", "Tie-Break Leaf", 10, 1),
+    ("L4", "Plastic", 25, 1),
+    ("L_TIE", "Tie-Break Leaf", 17, 1),
+    
+    ("SA_LIMIT", "Limiting Subassembly", 2, 3),
     
     # Substitutes
     ("SUB_L3_A", "Wire-Alloy", 12, 1), # ratio 2.5, rank 1
@@ -54,8 +56,9 @@ bom_data = [
     ("P3", "L3", 5, 0.0, 0),
     
     # P4: Tests Gross Limiting Resource & ASCII tie-break
-    ("P4", "L4", 10, 0.0, 0),
-    ("P4", "L_TIE", 10, 0.0, 0),
+    ("P4", "SA_LIMIT", 1, 0.0, 0),
+    ("SA_LIMIT", "L4", 5, 0.0, 0),
+    ("P4", "L_TIE", 5, 0.0, 0),
     
     # P5: Tests Stateful Inventory Depletion
     ("P5", "L4", 1, 0.0, 0),
@@ -67,7 +70,7 @@ bom_data = [
 workcenters_data = [
     ("WC1", "Assembly", 80.0),
     ("WC2", "Testing", 100.0),
-    ("WC_TIE", "Tie-Break WC", 10.0),
+    ("WC_TIE", "Tie-Break WC", 17.0),
 ]
 
 routing_data = [
@@ -77,7 +80,7 @@ routing_data = [
     ("P1", "WC1", 2.0, 0.5),
     ("P2", "WC1", 3.0, 1.0),
     ("P3", "WC2", 1.0, 1.0),
-    ("P4", "WC_TIE", 0.0, 10.0),
+    ("P4", "WC_TIE", 0.0, 5.0),
     ("P5", "WC1", 0.0, 1.0),
     ("P_B", "WC1", 0.0, 1.0),
 ]
@@ -96,7 +99,7 @@ orders_data = [
     ("O2", "P2", 10, 20),
     ("O3", "P3", 10, 30),
     ("O3b", "P_B", 10, 35),
-    ("O4", "P4", 5, 40),
+    ("O4", "P4", 6, 40),
     ("O5", "P5", 15, 50),
 ]
 
@@ -202,3 +205,4 @@ if __name__ == "__main__":
 
     local_db = Path(__file__).resolve().parent.parent / "data" / "manufacturing.db"
     create_database(local_db)
+

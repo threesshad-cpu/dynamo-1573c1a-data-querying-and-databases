@@ -111,32 +111,32 @@ def test_order_O3b_substitute_tie_break():
 
 def test_order_O4_gross_limiting_resource_and_tie_break():
     """
-    Verify Order 4 computes limiting resource using gross propagated requirement and ASCII tie-break,
-    and then correctly cancels the order due to Minimum Fill Rate.
-    P4 requires 10 L4 and 10 L_TIE, plus 10 hours WC_TIE.
-    Available: L4 (10), L_TIE (10), WC_TIE (10.0).
-    Batch size = 1. O4 requests 5. Can only allocate 1.
-    Since 1/5 = 0.2 < 0.5, the order is canceled (allocated=0, shortfall=5).
-    Next batch needs 20 of each.
-    Ratios: L4 (10/20 = 0.5), L_TIE (10/20 = 0.5), WC_TIE (10/20 = 0.5).
-    Tie between "L4", "L_TIE", "WC_TIE". 
-    "L4" is ASCII 76, 52. "L_TIE" is 76, 95. "WC_TIE" is 87...
-    "L4" comes first alphabetically.
+    Verify Order 4 computes limiting resource using gross propagated requirement (netting subassemblies) and ASCII tie-break.
+    P4 requires SA_LIMIT, L_TIE (5), and WC_TIE (5h). SA_LIMIT needs L4 (5).
+    Target 3 P4 needs 3 SA_LIMIT. On hand = 2. Net = 1. Batch = 3. Build = 3 SA_LIMIT (uses 15 L4).
+    Available L4 = 25, so target 3 is possible.
+    Target 4 P4 needs 4 SA_LIMIT. Net = 2. Build = 3 SA_LIMIT (uses 15 L4).
+    Gross L4 = 15. Ratio = 25/15 = 1.66.
+    Target 4 P4 needs 20 L_TIE and 20h WC_TIE.
+    Available L_TIE = 17, WC_TIE = 17.0h.
+    Ratios: L_TIE = 17/20 = 0.85, WC_TIE = 17.0/20 = 0.85.
+    Tie between "L_TIE" and "WC_TIE". "L_TIE" comes first alphabetically.
+    If an agent incorrectly calculates zero-inventory gross requirements, they will build 6 SA_LIMIT (30 L4) and incorrectly pick L4 (25/30 = 0.83 < 0.85).
     """
     m = _get_orders_map()
-    assert m["O4"]["allocated_qty"] == 0
-    assert m["O4"]["shortfall_qty"] == 5
-    assert m["O4"]["limiting_resource"] == "L4"
+    assert m["O4"]["allocated_qty"] == 3
+    assert m["O4"]["shortfall_qty"] == 3
+    assert m["O4"]["limiting_resource"] == "L_TIE"
 
 
 def test_order_O5_stateful_depletion():
     """
     Verify Order 5 correctly tracks shared workcenter depletion across orders.
-    O4 was canceled (no resource consumption). O5 requests 15 P5.
-    P5 needs 1 L4 each (10 available) and WC1 hours (setup=0 + 1.0/unit).
+    O4 consumed 15 L4, leaving 10 available (from 25).
+    O5 requests 15 P5. P5 needs 1 L4 each (10 available) and WC1 hours (1.0/unit).
     After O1 (23h) and O2 (48h), WC1 has only 9 hours remaining.
-    WC1 limits O5 to 9 units (not L4's 10). 9/15=0.6>=0.5 so allocate 9.
-    Limiting resource is WC1 (ratio 9/10=0.9 < L4's 10/10=1.0).
+    WC1 limits O5 to 9 units. 9/15=0.6>=0.5 so allocate 9.
+    Limiting resource is WC1 (ratio 9/10 = 0.9, while L4 ratio is 10/10 = 1.0).
     """
     m = _get_orders_map()
     assert m["O5"]["allocated_qty"] == 9
