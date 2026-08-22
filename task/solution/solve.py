@@ -279,7 +279,7 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
             constrained_ratios.sort(key=lambda x: (x[0], x[1]))
             limiting_resource = constrained_ratios[0][1]
 
-    if allocated_qty / requested_qty < 0.5:
+    if requested_qty > 0 and allocated_qty / requested_qty < 0.6:
         allocated_qty = 0
         shortfall_qty = requested_qty
         best_inv_cons = None
