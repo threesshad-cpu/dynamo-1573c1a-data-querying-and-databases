@@ -1,12 +1,13 @@
 import sqlite3
 from pathlib import Path
 
-# Dataset focuses on 5 core mechanics:
+# Dataset focuses on 6 core mechanics:
 # 1. Batch Rounding
 # 2. Parent Netting
 # 3. Aggregated BOM Explosion
 # 4. Deterministic Substitution
 # 5. Gross Limiting Resource
+# 6. Cancellation without state consumption
 
 parts_data = [
     # Leaf raw materials
@@ -15,6 +16,7 @@ parts_data = [
     ("L3", "Wire", 15, 1),
     ("L4", "Plastic", 25, 1),
     ("L_TIE", "Tie-Break Leaf", 17, 1),
+    ("L_CANCEL", "Cancellation-Test Leaf", 2, 1),
     
     ("SA_LIMIT", "Limiting Subassembly", 2, 3),
     
@@ -34,6 +36,8 @@ parts_data = [
     ("P4", "Product-Limit", 0, 1),
     ("P5", "Product-Stateful", 0, 1),
     ("P_B", "Product-SubstTie", 0, 1),
+    ("P_CANCEL", "Product-Cancel", 0, 1),
+    ("P_AFTER", "Product-AfterCancel", 0, 1),
 ]
 
 bom_data = [
@@ -65,6 +69,11 @@ bom_data = [
     
     # P_B: Tests Substitute Tie-Break Remaining Inventory
     ("P_B", "SUB_L3_B", 1, 0.0, 0),
+
+    # P_CANCEL: deliberately buildable to 2/5 (<50%), so the order must cancel.
+    # The later P_AFTER order proves cancellation consumes no inventory.
+    ("P_CANCEL", "L_CANCEL", 1, 0.0, 0),
+    ("P_AFTER", "L_CANCEL", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -101,6 +110,8 @@ orders_data = [
     ("O3b", "P_B", 10, 35),
     ("O4", "P4", 6, 40),
     ("O5", "P5", 15, 50),
+    ("O6C", "P_CANCEL", 5, 60),
+    ("O7", "P_AFTER", 2, 70),
 ]
 
 def create_database(db_path: Path):
