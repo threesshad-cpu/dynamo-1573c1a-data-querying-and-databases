@@ -5,10 +5,12 @@ REPORT_PATH = os.environ.get("TEST_REPORT_PATH", "/app/report.json")
 
 
 def test_file_exists_and_not_symlink():
+    """Verify Rule 7 output artifact exists as a regular file."""
     assert os.path.exists(REPORT_PATH) and not os.path.islink(REPORT_PATH)
 
 
 def test_report_schema_and_keys():
+    """Verify the normative report schema, types, and 13-order cardinality."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
@@ -24,6 +26,7 @@ def test_report_schema_and_keys():
 
 
 def test_output_sorting():
+    """Verify Rule 7 requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
@@ -37,6 +40,7 @@ def _get_orders_map():
 
 
 def test_order_O1_batch_rounding_and_parent_netting():
+    """Verify Rule 2 parent netting and Rule 3 batch rounding for O1."""
     m = _get_orders_map()
     assert m["O1"]["allocated_qty"] == 12
     assert m["O1"]["shortfall_qty"] == 0
@@ -44,6 +48,7 @@ def test_order_O1_batch_rounding_and_parent_netting():
 
 
 def test_order_O2_aggregated_bom_explosion():
+    """Verify Rule 1 shared-demand aggregation across the O2 BOM DAG."""
     m = _get_orders_map()
     assert m["O2"]["allocated_qty"] == 10
     assert m["O2"]["shortfall_qty"] == 0
@@ -51,6 +56,7 @@ def test_order_O2_aggregated_bom_explosion():
 
 
 def test_order_O3_deterministic_substitution():
+    """Verify Rule 4 preference-ranked substitution for O3."""
     m = _get_orders_map()
     assert m["O3"]["allocated_qty"] == 6
     assert m["O3"]["shortfall_qty"] == 4
@@ -58,6 +64,7 @@ def test_order_O3_deterministic_substitution():
 
 
 def test_order_O3b_substitute_tie_break():
+    """Verify Rule 4 alphabetical tie-breaking among equal-rank substitutes."""
     m = _get_orders_map()
     assert m["O3b"]["allocated_qty"] == 0
     assert m["O3b"]["shortfall_qty"] == 10
@@ -65,6 +72,7 @@ def test_order_O3b_substitute_tie_break():
 
 
 def test_order_O4_gross_limiting_resource_and_tie_break():
+    """Verify Rule 5 gross limiting-resource ratio and deterministic tie-break."""
     m = _get_orders_map()
     assert m["O4"]["allocated_qty"] == 3
     assert m["O4"]["shortfall_qty"] == 3
@@ -72,6 +80,7 @@ def test_order_O4_gross_limiting_resource_and_tie_break():
 
 
 def test_order_O5_stateful_depletion():
+    """Verify Rule 6 stateful inventory and workcenter depletion across orders."""
     m = _get_orders_map()
     assert m["O5"]["allocated_qty"] == 9
     assert m["O5"]["shortfall_qty"] == 6
@@ -79,6 +88,7 @@ def test_order_O5_stateful_depletion():
 
 
 def test_order_O6C_positive_partial_build_is_canceled_without_consumption():
+    """Verify the Rule 6 50-percent cancellation threshold for O6C."""
     m = _get_orders_map()
     assert m["O6C"]["allocated_qty"] == 0
     assert m["O6C"]["shortfall_qty"] == 5
@@ -86,6 +96,7 @@ def test_order_O6C_positive_partial_build_is_canceled_without_consumption():
 
 
 def test_order_O7_proves_canceled_order_consumes_no_inventory():
+    """Verify Rule 6 cancellation leaves inventory and capacity available to O7."""
     m = _get_orders_map()
     assert m["O7"]["allocated_qty"] == 2
     assert m["O7"]["shortfall_qty"] == 0
@@ -93,6 +104,7 @@ def test_order_O7_proves_canceled_order_consumes_no_inventory():
 
 
 def test_order_O8_deep_shared_bom_aggregation():
+    """Verify Rule 1 aggregation through the deeper shared SA4-to-SA3 BOM."""
     m = _get_orders_map()
     assert m["O8"]["allocated_qty"] == 4
     assert m["O8"]["shortfall_qty"] == 0
@@ -100,6 +112,7 @@ def test_order_O8_deep_shared_bom_aggregation():
 
 
 def test_order_O9_carries_deep_subassembly_state_forward():
+    """Verify Rule 6 state carryover changes the later O9 allocation."""
     m = _get_orders_map()
     assert m["O9"]["allocated_qty"] == 0
     assert m["O9"]["shortfall_qty"] == 6
@@ -107,6 +120,7 @@ def test_order_O9_carries_deep_subassembly_state_forward():
 
 
 def test_order_OA_equal_rank_substitutes_and_batch_rounding():
+    """Verify Rules 3 and 4 interact for equal-rank L5 substitutes in OA."""
     m = _get_orders_map()
     assert m["OA"]["allocated_qty"] == 4
     assert m["OA"]["shortfall_qty"] == 4
@@ -114,6 +128,7 @@ def test_order_OA_equal_rank_substitutes_and_batch_rounding():
 
 
 def test_order_OB_deep_branch_cancellation():
+    """Verify Rule 6 cancellation propagates through the deeper O11 branch."""
     m = _get_orders_map()
     assert m["OB"]["allocated_qty"] == 0
     assert m["OB"]["shortfall_qty"] == 5
@@ -121,6 +136,7 @@ def test_order_OB_deep_branch_cancellation():
 
 
 def test_order_OC_proves_second_cancellation_is_side_effect_free():
+    """Verify a canceled deep-branch order does not consume state needed by OC."""
     m = _get_orders_map()
     assert m["OC"]["allocated_qty"] == 2
     assert m["OC"]["shortfall_qty"] == 0
