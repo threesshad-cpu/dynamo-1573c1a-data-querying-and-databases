@@ -1,13 +1,14 @@
 import sqlite3
 from pathlib import Path
 
-# Dataset focuses on 6 core mechanics:
+# Dataset focuses on interacting MRP mechanics:
 # 1. Batch Rounding
-# 2. Parent Netting
+# 2. Parent/Sub-Assembly Netting
 # 3. Aggregated BOM Explosion
 # 4. Deterministic Substitution
 # 5. Gross Limiting Resource
 # 6. Cancellation without state consumption
+# 7. Multi-order state carried through a deeper shared BOM branch
 
 parts_data = [
     # Leaf raw materials
@@ -20,14 +21,23 @@ parts_data = [
     
     ("SA_LIMIT", "Limiting Subassembly", 2, 3),
     
-    # Substitutes
-    ("SUB_L3_A", "Wire-Alloy", 12, 1), # ratio 2.5, rank 1
-    ("SUB_L3_B", "Wire-Copper", 8, 1),  # ratio 1.0, rank 1
-    ("SUB_SHARED", "Shared-Substitute", 20, 1), # ratio 1.0, rank 1
+    # Existing substitutes
+    ("SUB_L3_A", "Wire-Alloy", 12, 1),
+    ("SUB_L3_B", "Wire-Copper", 8, 1),
+    ("SUB_SHARED", "Shared-Substitute", 20, 1),
     
-    # Sub-assemblies
+    # Existing sub-assemblies
     ("SA1", "Frame", 3, 2),
     ("SA2", "Module", 0, 4),
+    
+    # New deep/shared branch used only by O8-O12
+    ("L5", "Composite Leaf", 30, 2),
+    ("L6", "Fastener Leaf", 20, 1),
+    ("L7", "Cancellation Leaf", 2, 1),
+    ("SUB5A", "Composite Substitute A", 9, 1),
+    ("SUB5B", "Composite Substitute B", 7, 1),
+    ("SA3", "Deep Frame", 3, 3),
+    ("SA4", "Deep Module", 2, 2),
     
     # Finished products
     ("P1", "Product-BatchNet", 0, 1),
@@ -38,52 +48,58 @@ parts_data = [
     ("P_B", "Product-SubstTie", 0, 1),
     ("P_CANCEL", "Product-Cancel", 0, 1),
     ("P_AFTER", "Product-AfterCancel", 0, 1),
+    ("P6", "Product-DeepCascade", 0, 1),
+    ("P7", "Product-CrossOrder", 0, 1),
+    ("P8", "Product-SubstituteCascade", 0, 1),
+    ("P11", "Product-DeepCancel", 0, 1),
+    ("P12", "Product-DeepAfterCancel", 0, 1),
 ]
 
 bom_data = [
     # parent, child, qty_per, scrap_rate_pct, setup_scrap
-    
-    # P1: Tests Batch Rounding + Parent Netting
-    # Requires SA1. We have 3 SA1s in stock.
+    # Existing coverage
     ("P1", "SA1", 1, 0.0, 0),
-    ("SA1", "L1", 4, 5.0, 2), # 5% scrap, 2 setup scrap
-    
-    # P2: Tests Aggregated BOM Explosion
-    # P2 requires both SA1 and SA2.
-    # SA2 also requires SA1 (so SA1 appears in multiple paths)
+    ("SA1", "L1", 4, 5.0, 2),
     ("P2", "SA1", 1, 0.0, 0),
     ("P2", "SA2", 2, 0.0, 0),
     ("SA2", "SA1", 1, 0.0, 1),
     ("SA2", "L2", 3, 3.0, 1),
-    
-    # P3: Tests Deterministic Substitution
     ("P3", "L3", 5, 0.0, 0),
-    
-    # P4: Tests Gross Limiting Resource & ASCII tie-break
     ("P4", "SA_LIMIT", 1, 0.0, 0),
     ("SA_LIMIT", "L4", 5, 0.0, 0),
     ("P4", "L_TIE", 5, 0.0, 0),
-    
-    # P5: Tests Stateful Inventory Depletion
     ("P5", "L4", 1, 0.0, 0),
-    
-    # P_B: Tests Substitute Tie-Break Remaining Inventory
     ("P_B", "SUB_L3_B", 1, 0.0, 0),
-
-    # P_CANCEL: deliberately buildable to 2/5 (<50%), so the order must cancel.
-    # The later P_AFTER order proves cancellation consumes no inventory.
     ("P_CANCEL", "L_CANCEL", 1, 0.0, 0),
     ("P_AFTER", "L_CANCEL", 1, 0.0, 0),
+    
+    # New deeper branch: P6 -> SA4/SA3, while SA4 -> SA3.
+    # This creates shared demand for SA3 within one order and carries its
+    # resulting inventory/state into later orders.
+    ("SA3", "L5", 3, 10.0, 1),
+    ("SA3", "L6", 1, 0.0, 0),
+    ("SA4", "SA3", 1, 0.0, 0),
+    ("SA4", "L6", 2, 5.0, 1),
+    ("P6", "SA4", 1, 0.0, 0),
+    ("P6", "SA3", 1, 0.0, 0),
+    ("P6", "L5", 2, 0.0, 0),
+    ("P7", "SA4", 1, 0.0, 0),
+    ("P7", "L5", 5, 0.0, 0),
+    ("P8", "L5", 6, 0.0, 0),
+    # Positive partial build (2/5) must cancel; P12 proves no state was consumed.
+    ("P11", "L7", 1, 0.0, 0),
+    ("P12", "L7", 1, 0.0, 0),
 ]
 
 workcenters_data = [
     ("WC1", "Assembly", 80.0),
     ("WC2", "Testing", 100.0),
     ("WC_TIE", "Tie-Break WC", 17.0),
+    ("WC3", "Deep Assembly", 50.0),
+    ("WC4", "Deep Testing", 35.0),
 ]
 
 routing_data = [
-    # parent, wc, setup, run
     ("SA1", "WC1", 5.0, 1.0),
     ("SA2", "WC2", 10.0, 2.0),
     ("P1", "WC1", 2.0, 0.5),
@@ -92,18 +108,26 @@ routing_data = [
     ("P4", "WC_TIE", 0.0, 5.0),
     ("P5", "WC1", 0.0, 1.0),
     ("P_B", "WC1", 0.0, 1.0),
+    ("SA3", "WC3", 4.0, 1.5),
+    ("SA4", "WC4", 3.0, 2.0),
+    ("P6", "WC3", 1.0, 0.5),
+    ("P7", "WC4", 1.0, 1.0),
+    ("P8", "WC3", 0.0, 1.0),
+    ("P11", "WC4", 0.0, 1.0),
+    ("P12", "WC4", 0.0, 1.0),
 ]
 
 substitutes_data = [
-    # primary, substitute, ratio, rank
-    ("L2", "SUB_SHARED", 1.0, 1), # L2 can use SUB_SHARED
-    ("L3", "SUB_L3_A", 2.5, 1), # 1 L3 needs 2.5 SUB_L3_A
-    ("L3", "SUB_L3_B", 1.0, 1), # both rank 1 to force ASCII tie-break
-    ("L3", "SUB_SHARED", 1.0, 1), # L3 can also use SUB_SHARED
+    ("L2", "SUB_SHARED", 1.0, 1),
+    ("L3", "SUB_L3_A", 2.5, 1),
+    ("L3", "SUB_L3_B", 1.0, 1),
+    ("L3", "SUB_SHARED", 1.0, 1),
+    # Equal-rank substitutes force deterministic selection after earlier state changes.
+    ("L5", "SUB5A", 1.5, 1),
+    ("L5", "SUB5B", 1.0, 1),
 ]
 
 orders_data = [
-    # order_id, product, requested_qty, priority
     ("O1", "P1", 12, 10),
     ("O2", "P2", 10, 20),
     ("O3", "P3", 10, 30),
@@ -112,7 +136,13 @@ orders_data = [
     ("O5", "P5", 15, 50),
     ("O6C", "P_CANCEL", 5, 60),
     ("O7", "P_AFTER", 2, 70),
+    ("O8", "P6", 4, 80),
+    ("O9", "P7", 6, 90),
+    ("O10", "P8", 8, 100),
+    ("O11", "P11", 5, 110),
+    ("O12", "P12", 2, 120),
 ]
+
 
 def create_database(db_path: Path):
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -122,19 +152,15 @@ def create_database(db_path: Path):
     conn = sqlite3.connect(str(db_path))
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE parts (
             part_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             on_hand_qty INTEGER NOT NULL,
             batch_size INTEGER NOT NULL
         )
-    """
-    )
-
-    cursor.execute(
-        """
+    """)
+    cursor.execute("""
         CREATE TABLE bom (
             parent_part_id TEXT NOT NULL,
             child_part_id TEXT NOT NULL,
@@ -143,21 +169,15 @@ def create_database(db_path: Path):
             setup_scrap_qty INTEGER NOT NULL,
             PRIMARY KEY (parent_part_id, child_part_id)
         )
-    """
-    )
-
-    cursor.execute(
-        """
+    """)
+    cursor.execute("""
         CREATE TABLE workcenters (
             workcenter_id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             available_hours REAL NOT NULL
         )
-    """
-    )
-
-    cursor.execute(
-        """
+    """)
+    cursor.execute("""
         CREATE TABLE routing (
             parent_part_id TEXT NOT NULL,
             workcenter_id TEXT NOT NULL,
@@ -165,11 +185,8 @@ def create_database(db_path: Path):
             run_hours_per_unit REAL NOT NULL,
             PRIMARY KEY (parent_part_id, workcenter_id)
         )
-    """
-    )
-
-    cursor.execute(
-        """
+    """)
+    cursor.execute("""
         CREATE TABLE substitutes (
             primary_part_id TEXT NOT NULL,
             substitute_part_id TEXT NOT NULL,
@@ -177,29 +194,21 @@ def create_database(db_path: Path):
             preference_rank INTEGER NOT NULL,
             PRIMARY KEY (primary_part_id, substitute_part_id)
         )
-    """
-    )
-
-    cursor.execute(
-        """
+    """)
+    cursor.execute("""
         CREATE TABLE orders (
             order_id TEXT PRIMARY KEY,
             product_part_id TEXT NOT NULL,
             requested_qty INTEGER NOT NULL,
             priority INTEGER NOT NULL
         )
-    """
-    )
+    """)
 
     cursor.executemany("INSERT INTO parts VALUES (?, ?, ?, ?)", parts_data)
     cursor.executemany("INSERT INTO bom VALUES (?, ?, ?, ?, ?)", bom_data)
-    cursor.executemany(
-        "INSERT INTO workcenters VALUES (?, ?, ?)", workcenters_data
-    )
+    cursor.executemany("INSERT INTO workcenters VALUES (?, ?, ?)", workcenters_data)
     cursor.executemany("INSERT INTO routing VALUES (?, ?, ?, ?)", routing_data)
-    cursor.executemany(
-        "INSERT INTO substitutes VALUES (?, ?, ?, ?)", substitutes_data
-    )
+    cursor.executemany("INSERT INTO substitutes VALUES (?, ?, ?, ?)", substitutes_data)
     cursor.executemany("INSERT INTO orders VALUES (?, ?, ?, ?)", orders_data)
 
     conn.commit()
@@ -216,4 +225,3 @@ if __name__ == "__main__":
 
     local_db = Path(__file__).resolve().parent.parent / "data" / "manufacturing.db"
     create_database(local_db)
-
