@@ -8,7 +8,8 @@ from pathlib import Path
 # 4. Deterministic Substitution
 # 5. Gross Limiting Resource
 # 6. Cancellation without state consumption
-# 7. Multi-order state carried through a deeper shared BOM branch
+# 7. Multi-order state carried through deeper shared BOM branches
+# 8. Multi-parent deep BOM with shared sub-assembly production and capacity
 
 parts_data = [
     ("L1", "Bolt", 200, 10), ("L2", "Plate", 50, 5), ("L3", "Wire", 15, 1),
@@ -20,6 +21,8 @@ parts_data = [
     ("L7", "Cancellation Leaf", 2, 1), ("SUB5A", "Composite Substitute A", 9, 1),
     ("SUB5B", "Composite Substitute B", 7, 1), ("SA3", "Deep Frame", 3, 3),
     ("SA4", "Deep Module", 2, 2),
+    ("L8", "Deep Capacity Leaf", 100, 1), ("L9", "Deep Shared Leaf", 100, 1),
+    ("SA5", "Multi-Parent Frame", 1, 2), ("SA6", "Multi-Parent Module", 0, 1),
     ("P1", "Product-BatchNet", 0, 1), ("P2", "Product-Aggregate", 0, 1),
     ("P3", "Product-Subst", 0, 1), ("P4", "Product-Limit", 0, 1),
     ("P5", "Product-Stateful", 0, 1), ("P_B", "Product-SubstTie", 0, 1),
@@ -27,6 +30,7 @@ parts_data = [
     ("P6", "Product-DeepCascade", 0, 1), ("P7", "Product-CrossOrder", 0, 1),
     ("P8", "Product-SubstituteCascade", 0, 1), ("P11", "Product-DeepCancel", 0, 1),
     ("P12", "Product-DeepAfterCancel", 0, 1),
+    ("P13", "Product-MultiParentCapacity", 0, 1), ("P14", "Product-AfterDeepCancel", 0, 1),
 ]
 
 bom_data = [
@@ -42,11 +46,15 @@ bom_data = [
     ("P6", "SA4", 1, 0.0, 0), ("P6", "SA3", 1, 0.0, 0), ("P6", "L5", 2, 0.0, 0),
     ("P7", "SA4", 1, 0.0, 0), ("P7", "L5", 5, 0.0, 0), ("P8", "L5", 6, 0.0, 0),
     ("P11", "L7", 1, 0.0, 0), ("P12", "L7", 1, 0.0, 0),
+    ("P13", "SA5", 2, 0.0, 0), ("P13", "SA6", 1, 0.0, 0),
+    ("SA6", "SA5", 1, 0.0, 0), ("SA6", "L9", 2, 0.0, 0),
+    ("SA5", "L8", 3, 0.0, 1), ("P14", "L9", 1, 0.0, 0),
 ]
 
 workcenters_data = [
     ("WC1", "Assembly", 80.0), ("WC2", "Testing", 100.0), ("WC_TIE", "Tie-Break WC", 17.0),
     ("WC3", "Deep Assembly", 50.0), ("WC4", "Deep Testing", 35.0),
+    ("WC5", "Multi-Parent Assembly", 15.0), ("WC6", "Multi-Parent Testing", 100.0),
 ]
 
 routing_data = [
@@ -55,6 +63,8 @@ routing_data = [
     ("P5", "WC1", 0.0, 1.0), ("P_B", "WC1", 0.0, 1.0), ("SA3", "WC3", 4.0, 1.5),
     ("SA4", "WC4", 3.0, 2.0), ("P6", "WC3", 1.0, 0.5), ("P7", "WC4", 1.0, 1.0),
     ("P8", "WC3", 0.0, 1.0), ("P11", "WC4", 0.0, 1.0), ("P12", "WC4", 0.0, 1.0),
+    ("SA5", "WC5", 1.0, 1.0), ("SA6", "WC6", 1.0, 1.0), ("P13", "WC5", 0.0, 0.2),
+    ("P14", "WC6", 0.0, 1.0),
 ]
 
 substitutes_data = [
@@ -68,6 +78,7 @@ orders_data = [
     ("O3b", "P_B", 10, 35), ("O4", "P4", 6, 40), ("O5", "P5", 15, 50),
     ("O6C", "P_CANCEL", 5, 60), ("O7", "P_AFTER", 2, 70), ("O8", "P6", 4, 80),
     ("O9", "P7", 6, 90), ("OA", "P8", 8, 100), ("OB", "P11", 5, 110), ("OC", "P12", 2, 120),
+    ("O10C", "P13", 7, 130), ("O11", "P14", 2, 140),
 ]
 
 
