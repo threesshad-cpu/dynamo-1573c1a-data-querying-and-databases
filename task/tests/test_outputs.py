@@ -5,12 +5,10 @@ REPORT_PATH = os.environ.get("TEST_REPORT_PATH", "/app/report.json")
 
 
 def test_file_exists_and_not_symlink():
-    """Verify that /app/report.json exists and is a regular file."""
     assert os.path.exists(REPORT_PATH) and not os.path.islink(REPORT_PATH)
 
 
 def test_report_schema_and_keys():
-    """Verify exact schema keys and value types in report.json."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
@@ -26,10 +24,9 @@ def test_report_schema_and_keys():
 
 
 def test_output_sorting():
-    """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "O10", "O11", "O12"]
+    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -96,7 +93,6 @@ def test_order_O7_proves_canceled_order_consumes_no_inventory():
 
 
 def test_order_O8_deep_shared_bom_aggregation():
-    """P6 reaches SA3 through both SA4 and a direct edge; shared demand must be aggregated."""
     m = _get_orders_map()
     assert m["O8"]["allocated_qty"] == 4
     assert m["O8"]["shortfall_qty"] == 0
@@ -104,32 +100,28 @@ def test_order_O8_deep_shared_bom_aggregation():
 
 
 def test_order_O9_carries_deep_subassembly_state_forward():
-    """O8 consumes all prebuilt SA4, forcing O9 to manufacture it and hit the shared L5 pool."""
     m = _get_orders_map()
     assert m["O9"]["allocated_qty"] == 0
     assert m["O9"]["shortfall_qty"] == 6
     assert m["O9"]["limiting_resource"] == "L5"
 
 
-def test_order_O10_equal_rank_substitutes_and_batch_rounding():
-    """O10 consumes L5 using both equal-rank substitutes in deterministic ID order."""
+def test_order_OA_equal_rank_substitutes_and_batch_rounding():
     m = _get_orders_map()
-    assert m["O10"]["allocated_qty"] == 4
-    assert m["O10"]["shortfall_qty"] == 4
-    assert m["O10"]["limiting_resource"] == "L5"
+    assert m["OA"]["allocated_qty"] == 4
+    assert m["OA"]["shortfall_qty"] == 4
+    assert m["OA"]["limiting_resource"] == "L5"
 
 
-def test_order_O11_deep_branch_cancellation():
-    """O11 can build only 2/5, so Rule 6 cancels it and reports the constraining leaf."""
+def test_order_OB_deep_branch_cancellation():
     m = _get_orders_map()
-    assert m["O11"]["allocated_qty"] == 0
-    assert m["O11"]["shortfall_qty"] == 5
-    assert m["O11"]["limiting_resource"] == "L7"
+    assert m["OB"]["allocated_qty"] == 0
+    assert m["OB"]["shortfall_qty"] == 5
+    assert m["OB"]["limiting_resource"] == "L7"
 
 
-def test_order_O12_proves_second_cancellation_is_side_effect_free():
-    """O12 immediately reuses the L7 stock that O11 was forbidden to consume."""
+def test_order_OC_proves_second_cancellation_is_side_effect_free():
     m = _get_orders_map()
-    assert m["O12"]["allocated_qty"] == 2
-    assert m["O12"]["shortfall_qty"] == 0
-    assert m["O12"]["limiting_resource"] is None
+    assert m["OC"]["allocated_qty"] == 2
+    assert m["OC"]["shortfall_qty"] == 0
+    assert m["OC"]["limiting_resource"] is None
