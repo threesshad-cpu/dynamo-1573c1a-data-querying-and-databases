@@ -10,12 +10,12 @@ def test_file_exists_and_not_symlink():
 
 
 def test_report_schema_and_keys():
-    """Verify the normative report schema, types, and 13-order cardinality."""
+    """Verify the normative report schema, types, and 15-order cardinality."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 13, "Expected 13 order results in report"
+    assert len(orders) == 15, "Expected 15 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys
@@ -29,7 +29,9 @@ def test_output_sorting():
     """Verify Rule 7 requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
+    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC", "O10C", "O11"]
+    # Lexicographic sorting places O10C/O11 before O1; verify the actual contract order below.
+    expected_ids = sorted(expected_ids)
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -141,3 +143,19 @@ def test_order_OC_proves_second_cancellation_is_side_effect_free():
     assert m["OC"]["allocated_qty"] == 2
     assert m["OC"]["shortfall_qty"] == 0
     assert m["OC"]["limiting_resource"] is None
+
+
+def test_order_O10C_multi_parent_bom_capacity_cancellation():
+    """Verify one target reaches SA5 through both direct and nested parents, aggregates the SA5 run once, and cancels when WC5 permits only 4 of 7 units."""
+    m = _get_orders_map()
+    assert m["O10C"]["allocated_qty"] == 0
+    assert m["O10C"]["shortfall_qty"] == 7
+    assert m["O10C"]["limiting_resource"] == "WC5"
+
+
+def test_order_O11_proves_O10C_consumed_no_state():
+    """Verify the canceled multi-parent order consumes no L9 stock or WC6 capacity needed by the immediate successor."""
+    m = _get_orders_map()
+    assert m["O11"]["allocated_qty"] == 2
+    assert m["O11"]["shortfall_qty"] == 0
+    assert m["O11"]["limiting_resource"] is None
