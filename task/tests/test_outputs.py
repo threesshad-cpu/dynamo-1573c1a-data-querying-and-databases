@@ -17,7 +17,7 @@ def test_report_schema_and_keys():
         "orders"
     }, "Top-level object must have exactly one key: 'orders'"
     orders = data.get("orders", [])
-    assert len(orders) == 6, "Expected 6 order results in report"
+    assert len(orders) == 8, "Expected 8 order results in report"
     expected_keys = {
         "order_id",
         "allocated_qty",
@@ -42,7 +42,7 @@ def test_output_sorting():
     """Verify that orders in /app/report.json are sorted by order_id ascending."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5"]
+    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -56,8 +56,8 @@ def test_order_O1_batch_rounding_and_parent_netting():
     """
     Verify Order 1 correctly applies Batch Rounding and Parent/SA Netting.
     O1 requests 12 P1. P1 needs SA1 (batch 2).
-    On-hand SA1 (3) is netted before propagation. 
-    Remaining 9 SA1 rounds up to 10 SA1. 
+    On-hand SA1 (3) is netted before propagation.
+    Remaining 9 SA1 rounds up to 10 SA1.
     This results in enough inventory to fulfill all 12 units.
     """
     m = _get_orders_map()
@@ -142,3 +142,29 @@ def test_order_O5_stateful_depletion():
     assert m["O5"]["allocated_qty"] == 9
     assert m["O5"]["shortfall_qty"] == 6
     assert m["O5"]["limiting_resource"] == "WC1"
+
+
+def test_order_O6C_positive_partial_build_is_canceled_without_consumption():
+    """
+    Verify Rule 6 on an order whose maximum buildable quantity is positive but below 50%.
+    O6C requests 5 P_CANCEL and only 2 L_CANCEL are available, so the maximum buildable
+    quantity is 2/5 = 40%. The order must be canceled with allocated_qty=0,
+    shortfall_qty=5, while still reporting L_CANCEL as the limiting resource.
+    """
+    m = _get_orders_map()
+    assert m["O6C"]["allocated_qty"] == 0
+    assert m["O6C"]["shortfall_qty"] == 5
+    assert m["O6C"]["limiting_resource"] == "L_CANCEL"
+
+
+def test_order_O7_proves_canceled_order_consumes_no_inventory():
+    """
+    Verify the cancellation has no side effects on later orders.
+    O6C would consume both L_CANCEL units if its positive partial build were committed,
+    but Rule 6 requires cancellation to consume nothing. O7 therefore still fulfills
+    its request for 2 P_AFTER from the original 2-unit L_CANCEL stock.
+    """
+    m = _get_orders_map()
+    assert m["O7"]["allocated_qty"] == 2
+    assert m["O7"]["shortfall_qty"] == 0
+    assert m["O7"]["limiting_resource"] is None
