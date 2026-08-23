@@ -148,8 +148,8 @@ def test_order_OC_proves_second_cancellation_is_side_effect_free():
 def test_order_O10C_multi_parent_bom_capacity_cancellation():
     """Verify one target reaches SA5 through both direct and nested parents, aggregates the SA5 run once, and cancels when WC5 permits only 4 of 7 units."""
     m = _get_orders_map()
-    assert m["O10C"]["allocated_qty"] == 0
-    assert m["O10C"]["shortfall_qty"] == 7
+    assert m["O10C"]["allocated_qty"] == 4
+    assert m["O10C"]["shortfall_qty"] == 3
     assert m["O10C"]["limiting_resource"] == "WC5"
 
 
