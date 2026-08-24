@@ -15,8 +15,8 @@ parts_data = [
     ("L1", "Bolt", 200, 10), ("L2", "Plate", 50, 5), ("L3", "Wire", 15, 1),
     ("L4", "Plastic", 25, 1), ("L_TIE", "Tie-Break Leaf", 17, 1),
     ("L_CANCEL", "Cancellation-Test Leaf", 2, 1), ("SA_LIMIT", "Limiting Subassembly", 2, 3),
-    ("SUB_L3_A", "Wire-Alloy", 12, 1), ("SUB_L3_B", "Wire-Copper", 8, 1),
-    ("SUB_SHARED", "Shared-Substitute", 20, 1), ("SA1", "Frame", 3, 2), ("SA2", "Module", 0, 4),
+    ("SUB_L3_A", "Wire-Alloy", 8, 1), ("SUB_L3_B", "Wire-Copper", 8, 1),
+    ("SUB_SHARED", "Shared-Substitute", 21, 1), ("SA1", "Frame", 3, 2), ("SA2", "Module", 0, 4),
     ("L5", "Composite Leaf", 30, 2), ("L6", "Fastener Leaf", 20, 1),
     ("L7", "Cancellation Leaf", 2, 1), ("SUB5A", "Composite Substitute A", 9, 1),
     ("SUB5B", "Composite Substitute B", 7, 1), ("SA3", "Deep Frame", 3, 3),
@@ -31,6 +31,8 @@ parts_data = [
     ("P8", "Product-SubstituteCascade", 0, 1), ("P11", "Product-DeepCancel", 0, 1),
     ("P12", "Product-DeepAfterCancel", 0, 1),
     ("P13", "Product-MultiParentCapacity", 0, 1), ("P14", "Product-AfterDeepCancel", 0, 1),
+    ("L_NEW", "New Leaf", 0, 1), ("SUB_NEW_A", "New Sub A", 5, 1), ("SUB_NEW_B", "New Sub B", 5, 1),
+    ("P_NEW_1", "Product New 1", 0, 1), ("P_NEW_2", "Product New 2", 0, 1),
 ]
 
 bom_data = [
@@ -49,6 +51,7 @@ bom_data = [
     ("P13", "SA5", 2, 0.0, 0), ("P13", "SA6", 1, 0.0, 0),
     ("SA6", "SA5", 1, 0.0, 0), ("SA6", "L9", 2, 0.0, 0),
     ("SA5", "L8", 3, 0.0, 1), ("P14", "L9", 1, 0.0, 0),
+    ("P_NEW_1", "L_NEW", 1, 0.0, 0), ("P_NEW_2", "SUB_NEW_B", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -71,10 +74,12 @@ substitutes_data = [
     ("L2", "SUB_SHARED", 1.0, 1), ("L3", "SUB_L3_A", 2.5, 1),
     ("L3", "SUB_L3_B", 1.0, 1), ("L3", "SUB_SHARED", 1.0, 1),
     ("L5", "SUB5A", 1.5, 1), ("L5", "SUB5B", 1.0, 1),
+    ("L_NEW", "SUB_NEW_A", 1.0, 1), ("L_NEW", "SUB_NEW_B", 1.0, 1),
 ]
 
 orders_data = [
     ("O1", "P1", 12, 10), ("O2", "P2", 10, 20), ("O3", "P3", 10, 30),
+    ("O3_N1", "P_NEW_1", 5, 31), ("O3_N2", "P_NEW_2", 5, 32),
     ("O3b", "P_B", 10, 35), ("O4", "P4", 6, 40), ("O5", "P5", 15, 50),
     ("O6C", "P_CANCEL", 5, 60), ("O7", "P_AFTER", 2, 70), ("O8", "P6", 4, 80),
     ("O9", "P7", 6, 90), ("OA", "P8", 8, 100), ("OB", "P11", 5, 110), ("OC", "P12", 2, 120),

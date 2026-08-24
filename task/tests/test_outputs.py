@@ -15,7 +15,7 @@ def test_report_schema_and_keys():
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 15, "Expected 15 order results in report"
+    assert len(orders) == 17, "Expected 17 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys
@@ -29,7 +29,7 @@ def test_output_sorting():
     """Verify Rule 7 requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC", "O10C", "O11"]
+    expected_ids = ["O1", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC", "O10C", "O11"]
     # Lexicographic sorting places O10C/O11 before O1; verify the actual contract order below.
     expected_ids = sorted(expected_ids)
     assert [x["order_id"] for x in data["orders"]] == expected_ids
@@ -63,6 +63,22 @@ def test_order_O3_deterministic_substitution():
     assert m["O3"]["allocated_qty"] == 6
     assert m["O3"]["shortfall_qty"] == 4
     assert m["O3"]["limiting_resource"] == "L3"
+
+
+def test_order_O3_N1_substitute_tie_break():
+    """Verify Rule 4 alphabetical tie-breaking among equal-rank substitutes for new coverage."""
+    m = _get_orders_map()
+    assert m["O3_N1"]["allocated_qty"] == 5
+    assert m["O3_N1"]["shortfall_qty"] == 0
+    assert m["O3_N1"]["limiting_resource"] is None
+
+
+def test_order_O3_N2_substitute_tie_break():
+    """Verify Rule 4 alphabetical tie-breaking side effect propagates to next order."""
+    m = _get_orders_map()
+    assert m["O3_N2"]["allocated_qty"] == 5
+    assert m["O3_N2"]["shortfall_qty"] == 0
+    assert m["O3_N2"]["limiting_resource"] is None
 
 
 def test_order_O3b_substitute_tie_break():
