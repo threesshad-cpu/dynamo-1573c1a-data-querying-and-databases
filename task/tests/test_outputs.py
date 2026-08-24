@@ -10,12 +10,12 @@ def test_file_exists_and_not_symlink():
 
 
 def test_report_schema_and_keys():
-    """Verify the normative report schema, types, and 18-order cardinality."""
+    """Verify the normative report schema, types, and 23-order cardinality."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 18, "Expected 18 order results in report"
+    assert len(orders) == 23, "Expected 23 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys
@@ -29,7 +29,7 @@ def test_output_sorting():
     """Verify output format requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O10C", "O11", "O12", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
+    expected_ids = ["O1", "O10C", "O11", "O12", "O15", "O15b", "O16", "O17", "O18", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
     # Verify the actual contract order below.
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
@@ -182,3 +182,38 @@ def test_order_O12_scrap_formula():
     assert m["O12"]["allocated_qty"] == 6
     assert m["O12"]["shortfall_qty"] == 4
     assert m["O12"]["limiting_resource"] == "L_SCRAP"
+
+def test_order_O15_boundary_cancellation_50():
+    """Verify an order at exactly 50 percent allocation does NOT cancel."""
+    m = _get_orders_map()
+    assert m["O15"]["allocated_qty"] == 5
+    assert m["O15"]["shortfall_qty"] == 5
+    assert m["O15"]["limiting_resource"] == "L15"
+
+def test_order_O15b_boundary_cancellation_below_50():
+    """Verify an order at 49 percent allocation DOES cancel."""
+    m = _get_orders_map()
+    assert m["O15b"]["allocated_qty"] == 0
+    assert m["O15b"]["shortfall_qty"] == 100
+    assert m["O15b"]["limiting_resource"] == "L15b"
+
+def test_order_O16_lexicographical_tiebreaker():
+    """Verify limiting resource tie-breaker correctly uses lexicographical string comparison (WC10 vs WC2_B)."""
+    m = _get_orders_map()
+    assert m["O16"]["allocated_qty"] == 5
+    assert m["O16"]["shortfall_qty"] == 5
+    assert m["O16"]["limiting_resource"] == "WC10"
+
+def test_order_O17_substitute_floor_semantics():
+    """Verify substitute quantity is determined using floor division."""
+    m = _get_orders_map()
+    assert m["O17"]["allocated_qty"] == 9
+    assert m["O17"]["shortfall_qty"] == 1
+    assert m["O17"]["limiting_resource"] == "L17"
+
+def test_order_O18_near_equal_bottlenecks():
+    """Verify limiting resource correctly identifies the true bottleneck based on exact fulfillment ratios."""
+    m = _get_orders_map()
+    assert m["O18"]["allocated_qty"] == 7
+    assert m["O18"]["shortfall_qty"] == 3
+    assert m["O18"]["limiting_resource"] == "L18A"

@@ -34,6 +34,11 @@ parts_data = [
     ("L_NEW", "New Leaf", 0, 1), ("SUB_NEW_A", "New Sub A", 5, 1), ("SUB_NEW_B", "New Sub B", 5, 1),
     ("P_NEW_1", "Product New 1", 0, 1), ("P_NEW_2", "Product New 2", 0, 1),
     ("P_SCRAP", "Product Scrap", 0, 1), ("L_SCRAP", "Leaf Scrap", 13, 1),
+    ("L15", "Leaf 15", 5, 1), ("P15", "Product 15", 0, 1),
+    ("L15b", "Leaf 15b", 49, 1), ("P15b", "Product 15b", 0, 1),
+    ("P16", "Product 16", 0, 1), ("L16", "Leaf 16", 1000, 1),
+    ("L17", "Leaf 17", 0, 1), ("SUB_L17", "Sub 17", 14, 1), ("P17", "Product 17", 0, 1),
+    ("L18A", "Leaf 18A", 23, 1), ("P18", "Product 18", 0, 1),
 ]
 
 bom_data = [
@@ -54,12 +59,18 @@ bom_data = [
     ("SA5", "L8", 3, 0.0, 1), ("P14", "L9", 1, 0.0, 0),
     ("P_NEW_1", "L_NEW", 1, 0.0, 0), ("P_NEW_2", "SUB_NEW_B", 1, 0.0, 0),
     ("P_SCRAP", "L_SCRAP", 1, 20.0, 5),
+    ("P15", "L15", 1, 0.0, 0), ("P15b", "L15b", 1, 0.0, 0),
+    ("P16", "L16", 1, 0.0, 0),
+    ("P17", "L17", 1, 0.0, 0),
+    ("P18", "L18A", 3, 0.0, 0),
 ]
 
 workcenters_data = [
     ("WC1", "Assembly", 80.0), ("WC2", "Testing", 100.0), ("WC_TIE", "Tie-Break WC", 17.0),
     ("WC3", "Deep Assembly", 50.0), ("WC4", "Deep Testing", 35.0),
     ("WC5", "Multi-Parent Assembly", 17.5), ("WC6", "Multi-Parent Testing", 100.0),
+    ("WC10", "Tie Break 10", 5.0), ("WC2_B", "Tie Break 2", 5.0),
+    ("WC18", "WC 18", 53.67),
 ]
 
 routing_data = [
@@ -70,6 +81,8 @@ routing_data = [
     ("P8", "WC3", 0.0, 1.0), ("P11", "WC4", 0.0, 1.0), ("P12", "WC4", 0.0, 1.0),
     ("SA5", "WC5", 1.0, 1.0), ("SA6", "WC6", 1.0, 1.0), ("P13", "WC5", 0.0, 0.2),
     ("P14", "WC6", 0.0, 1.0),
+    ("P16", "WC10", 0.0, 1.0), ("P16", "WC2_B", 0.0, 1.0),
+    ("P18", "WC18", 0.0, 7.0),
 ]
 
 substitutes_data = [
@@ -77,6 +90,7 @@ substitutes_data = [
     ("L3", "SUB_L3_B", 1.0, 1), ("L3", "SUB_SHARED", 1.0, 1),
     ("L5", "SUB5A", 1.5, 1), ("L5", "SUB5B", 1.0, 1),
     ("L_NEW", "SUB_NEW_A", 1.0, 1), ("L_NEW", "SUB_NEW_B", 1.0, 1),
+    ("L17", "SUB_L17", 1.5, 1),
 ]
 
 orders_data = [
@@ -86,6 +100,8 @@ orders_data = [
     ("O6C", "P_CANCEL", 5, 60), ("O7", "P_AFTER", 2, 70), ("O8", "P6", 4, 80),
     ("O9", "P7", 6, 90), ("OA", "P8", 8, 100), ("OB", "P11", 5, 110), ("OC", "P12", 2, 120),
     ("O10C", "P13", 10, 130), ("O11", "P14", 100, 140), ("O12", "P_SCRAP", 10, 150),
+    ("O15", "P15", 10, 160), ("O15b", "P15b", 100, 165),
+    ("O16", "P16", 10, 170), ("O17", "P17", 10, 180), ("O18", "P18", 10, 190),
 ]
 
 
