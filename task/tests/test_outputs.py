@@ -5,12 +5,12 @@ REPORT_PATH = os.environ.get("TEST_REPORT_PATH", "/app/report.json")
 
 
 def test_file_exists_and_not_symlink():
-    """Verify Rule 7 output artifact exists as a regular file."""
+    """Verify output format output artifact exists as a regular file."""
     assert os.path.exists(REPORT_PATH) and not os.path.islink(REPORT_PATH)
 
 
 def test_report_schema_and_keys():
-    """Verify the normative report schema, types, and 15-order cardinality."""
+    """Verify the normative report schema, types, and 18-order cardinality."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
@@ -26,7 +26,7 @@ def test_report_schema_and_keys():
 
 
 def test_output_sorting():
-    """Verify Rule 7 requires results sorted ascending by order_id."""
+    """Verify output format requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     expected_ids = ["O1", "O10C", "O11", "O12", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
