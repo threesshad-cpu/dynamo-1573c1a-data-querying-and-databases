@@ -146,16 +146,16 @@ def test_order_OC_proves_second_cancellation_is_side_effect_free():
 
 
 def test_order_O10C_multi_parent_bom_capacity_cancellation():
-    """Verify one target reaches SA5 through both direct and nested parents, aggregates the SA5 run once, and cancels when WC5 permits only 4 of 7 units."""
+    """Verify one target reaches SA5 through both direct and nested parents, aggregates the SA5 run once, and DOES NOT cancel when WC5 permits exactly 5 of 10 units."""
     m = _get_orders_map()
-    assert m["O10C"]["allocated_qty"] == 4
-    assert m["O10C"]["shortfall_qty"] == 3
+    assert m["O10C"]["allocated_qty"] == 5
+    assert m["O10C"]["shortfall_qty"] == 5
     assert m["O10C"]["limiting_resource"] == "WC5"
 
 
-def test_order_O11_proves_O10C_consumed_no_state():
-    """Verify the canceled multi-parent order consumes no L9 stock or WC6 capacity needed by the immediate successor."""
+def test_order_O11_proves_O10C_consumed_state():
+    """Verify the multi-parent order consumed L9 stock, limiting the immediate successor to 90 units."""
     m = _get_orders_map()
-    assert m["O11"]["allocated_qty"] == 2
-    assert m["O11"]["shortfall_qty"] == 0
-    assert m["O11"]["limiting_resource"] is None
+    assert m["O11"]["allocated_qty"] == 90
+    assert m["O11"]["shortfall_qty"] == 10
+    assert m["O11"]["limiting_resource"] == "L9"

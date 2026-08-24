@@ -54,7 +54,7 @@ bom_data = [
 workcenters_data = [
     ("WC1", "Assembly", 80.0), ("WC2", "Testing", 100.0), ("WC_TIE", "Tie-Break WC", 17.0),
     ("WC3", "Deep Assembly", 50.0), ("WC4", "Deep Testing", 35.0),
-    ("WC5", "Multi-Parent Assembly", 15.0), ("WC6", "Multi-Parent Testing", 100.0),
+    ("WC5", "Multi-Parent Assembly", 17.5), ("WC6", "Multi-Parent Testing", 100.0),
 ]
 
 routing_data = [
@@ -78,7 +78,7 @@ orders_data = [
     ("O3b", "P_B", 10, 35), ("O4", "P4", 6, 40), ("O5", "P5", 15, 50),
     ("O6C", "P_CANCEL", 5, 60), ("O7", "P_AFTER", 2, 70), ("O8", "P6", 4, 80),
     ("O9", "P7", 6, 90), ("OA", "P8", 8, 100), ("OB", "P11", 5, 110), ("OC", "P12", 2, 120),
-    ("O10C", "P13", 7, 130), ("O11", "P14", 2, 140),
+    ("O10C", "P13", 10, 130), ("O11", "P14", 100, 140),
 ]
 
 
