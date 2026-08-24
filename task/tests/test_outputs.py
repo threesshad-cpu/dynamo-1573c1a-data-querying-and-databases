@@ -15,7 +15,7 @@ def test_report_schema_and_keys():
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 17, "Expected 17 order results in report"
+    assert len(orders) == 18, "Expected 18 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys
@@ -29,9 +29,8 @@ def test_output_sorting():
     """Verify Rule 7 requires results sorted ascending by order_id."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC", "O10C", "O11"]
-    # Lexicographic sorting places O10C/O11 before O1; verify the actual contract order below.
-    expected_ids = sorted(expected_ids)
+    expected_ids = ["O1", "O10C", "O11", "O12", "O2", "O3", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
+    # Verify the actual contract order below.
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -175,3 +174,11 @@ def test_order_O11_proves_O10C_consumed_state():
     assert m["O11"]["allocated_qty"] == 90
     assert m["O11"]["shortfall_qty"] == 10
     assert m["O11"]["limiting_resource"] == "L9"
+
+
+def test_order_O12_scrap_formula():
+    """Verify Rule 2 scrap formula application order."""
+    m = _get_orders_map()
+    assert m["O12"]["allocated_qty"] == 6
+    assert m["O12"]["shortfall_qty"] == 4
+    assert m["O12"]["limiting_resource"] == "L_SCRAP"

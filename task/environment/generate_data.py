@@ -33,6 +33,7 @@ parts_data = [
     ("P13", "Product-MultiParentCapacity", 0, 1), ("P14", "Product-AfterDeepCancel", 0, 1),
     ("L_NEW", "New Leaf", 0, 1), ("SUB_NEW_A", "New Sub A", 5, 1), ("SUB_NEW_B", "New Sub B", 5, 1),
     ("P_NEW_1", "Product New 1", 0, 1), ("P_NEW_2", "Product New 2", 0, 1),
+    ("P_SCRAP", "Product Scrap", 0, 1), ("L_SCRAP", "Leaf Scrap", 13, 1),
 ]
 
 bom_data = [
@@ -52,6 +53,7 @@ bom_data = [
     ("SA6", "SA5", 1, 0.0, 0), ("SA6", "L9", 2, 0.0, 0),
     ("SA5", "L8", 3, 0.0, 1), ("P14", "L9", 1, 0.0, 0),
     ("P_NEW_1", "L_NEW", 1, 0.0, 0), ("P_NEW_2", "SUB_NEW_B", 1, 0.0, 0),
+    ("P_SCRAP", "L_SCRAP", 1, 20.0, 5),
 ]
 
 workcenters_data = [
@@ -83,7 +85,7 @@ orders_data = [
     ("O3b", "P_B", 10, 35), ("O4", "P4", 6, 40), ("O5", "P5", 15, 50),
     ("O6C", "P_CANCEL", 5, 60), ("O7", "P_AFTER", 2, 70), ("O8", "P6", 4, 80),
     ("O9", "P7", 6, 90), ("OA", "P8", 8, 100), ("OB", "P11", 5, 110), ("OC", "P12", 2, 120),
-    ("O10C", "P13", 10, 130), ("O11", "P14", 100, 140),
+    ("O10C", "P13", 10, 130), ("O11", "P14", 100, 140), ("O12", "P_SCRAP", 10, 150),
 ]
 
 
