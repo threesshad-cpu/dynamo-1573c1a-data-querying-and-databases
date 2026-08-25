@@ -12,6 +12,7 @@ from pathlib import Path
 # 8. Multi-parent deep BOM with shared sub-assembly production and capacity
 # 9. Global shared-substitute contention across two or more primary leaves
 # 10. Fractional substitute ratios, multi-leaf matching, and batch/cancellation interactions
+# 11. Late-order regression families combining global matching, batch capacity, and generated subassembly stock
 
 parts_data = [
     ("L1", "Bolt", 200, 10), ("L2", "Plate", 50, 5), ("L3", "Wire", 15, 1),
@@ -58,6 +59,15 @@ parts_data = [
     ("SUB28", "Deep Shared Stock", 3, 1), ("SUB28_PRIVATE", "Deep Private Fallback", 1, 1),
     ("SA28A", "Deep Shared Assembly A", 0, 1), ("SA28B", "Deep Shared Assembly B", 0, 1),
     ("P28", "Product Deep Shared Contention", 0, 1),
+    ("L35A", "Late Matching Leaf A", 3, 1), ("L35B", "Late Matching Leaf B", 0, 1),
+    ("SUB35", "Late Shared Substitute", 6, 1), ("SUB35P", "Late Private Fallback", 2, 1),
+    ("SA35", "Late Matching Assembly", 0, 1), ("P35", "Late Matching Product", 0, 1),
+    ("L36A", "Late Deep Leaf A", 0, 1), ("L36B", "Late Deep Leaf B", 0, 1),
+    ("SUB36", "Late Deep Shared Substitute", 5, 1), ("SUB36P", "Late Deep Private Fallback", 1, 1),
+    ("SA36A", "Late Deep Assembly A", 0, 1), ("SA36B", "Late Deep Assembly B", 0, 1), ("P36", "Late Deep Product", 0, 2),
+    ("L37", "Late Capacity Leaf", 5, 1), ("P37", "Late Capacity Product", 0, 2),
+    ("SA38", "Late Stock Assembly", 1, 2), ("L38", "Late Scrap Leaf", 10, 1),
+    ("SUB38", "Late Scrap Substitute", 6, 1), ("P38", "Late Stock Product", 0, 1),
 ]
 
 bom_data = [
@@ -88,6 +98,11 @@ bom_data = [
     ("P27", "L27A", 1, 0.0, 0), ("P27", "L27B", 1, 0.0, 0),
     ("P28", "SA28A", 1, 0.0, 0), ("P28", "SA28B", 1, 0.0, 0),
     ("SA28A", "L28A", 2, 0.0, 0), ("SA28B", "L28B", 2, 0.0, 0),
+    ("P35", "SA35", 1, 0.0, 0), ("SA35", "L35A", 2, 10.0, 1), ("SA35", "L35B", 1, 0.0, 0),
+    ("P36", "SA36A", 1, 0.0, 0), ("P36", "SA36B", 1, 0.0, 0),
+    ("SA36A", "L36A", 2, 0.0, 0), ("SA36B", "L36B", 1, 0.0, 0),
+    ("P37", "L37", 1, 0.0, 0),
+    ("P38", "SA38", 2, 0.0, 0), ("SA38", "L38", 3, 20.0, 1),
 ]
 
 workcenters_data = [
@@ -95,6 +110,8 @@ workcenters_data = [
     ("WC3", "Deep Assembly", 50.0), ("WC4", "Deep Testing", 35.0),
     ("WC5", "Multi-Parent Assembly", 17.5), ("WC6", "Multi-Parent Testing", 100.0),
     ("WC10", "Tie Break 10", 5.0), ("WC2_B", "Tie Break 2", 5.0), ("WC18", "WC 18", 53.67),
+    ("WC35", "Late Matching Cell", 20.0), ("WC36", "Late Deep Cell", 30.0),
+    ("WC37", "Late Capacity Cell", 5.5), ("WC38", "Late Stock Cell", 30.0),
 ]
 
 routing_data = [
@@ -106,6 +123,9 @@ routing_data = [
     ("SA5", "WC5", 1.0, 1.0), ("SA6", "WC6", 1.0, 1.0), ("P13", "WC5", 0.0, 0.2),
     ("P14", "WC6", 0.0, 1.0), ("P16", "WC10", 0.0, 1.0), ("P16", "WC2_B", 0.0, 1.0),
     ("P18", "WC18", 0.0, 7.0),
+    ("SA35", "WC35", 2.0, 1.0), ("P35", "WC35", 1.0, 0.5),
+    ("SA36A", "WC36", 1.0, 0.5), ("SA36B", "WC36", 1.0, 0.5), ("P36", "WC36", 1.0, 0.5),
+    ("P37", "WC37", 1.0, 1.0), ("SA38", "WC38", 2.0, 1.0), ("P38", "WC38", 1.0, 0.5),
 ]
 
 substitutes_data = [
@@ -119,6 +139,9 @@ substitutes_data = [
     ("L26A", "SUB26", 1.0, 1), ("L26A", "SUB26_PRIVATE", 1.0, 2), ("L26B", "SUB26", 1.0, 1), ("L26C", "SUB26", 1.0, 1),
     ("L27A", "SUB27", 1.0, 1), ("L27B", "SUB27", 1.0, 1),
     ("L28A", "SUB28", 1.0, 1), ("L28A", "SUB28_PRIVATE", 1.0, 2), ("L28B", "SUB28", 1.0, 1),
+    ("L35A", "SUB35", 1.0, 1), ("L35A", "SUB35P", 1.0, 2), ("L35B", "SUB35", 1.0, 1),
+    ("L36A", "SUB36", 1.0, 1), ("L36A", "SUB36P", 1.0, 2), ("L36B", "SUB36", 1.0, 1),
+    ("L38", "SUB38", 1.5, 1),
 ]
 
 orders_data = [
@@ -133,6 +156,8 @@ orders_data = [
     ("O26", "P26", 2, 230), ("O27", "P27", 5, 240), ("O28", "P28", 2, 250),
     ("O29", "P23", 2, 260), ("O30", "P24", 4, 270), ("O31", "P25", 3, 280),
     ("O32", "P26", 3, 290), ("O33", "P27", 5, 300), ("O34", "P28", 3, 310),
+    ("O35", "P35", 3, 320), ("O36", "P35", 2, 321), ("O37", "P36", 2, 330), ("O38", "P36", 2, 331),
+    ("O39", "P37", 4, 340), ("O40", "P37", 4, 341), ("O41", "P38", 2, 350), ("O42", "P38", 1, 351),
 ]
 
 
