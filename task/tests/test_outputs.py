@@ -15,7 +15,7 @@ def test_report_schema_and_keys():
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 35, "Expected 35 order results in report"
+    assert len(orders) == 43, "Expected 43 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys
@@ -29,7 +29,7 @@ def test_output_sorting():
     """Verify orders are sorted by order_id as required by the output specification."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
-    expected_ids = ["O1", "O10C", "O11", "O12", "O15", "O15b", "O16", "O17", "O18", "O2", "O23", "O24", "O25", "O26", "O27", "O28", "O29", "O3", "O30", "O31", "O32", "O33", "O34", "O3_N1", "O3_N2", "O3b", "O4", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
+    expected_ids = ["O1", "O10C", "O11", "O12", "O15", "O15b", "O16", "O17", "O18", "O2", "O23", "O24", "O25", "O26", "O27", "O28", "O29", "O3", "O30", "O31", "O32", "O33", "O34", "O35", "O36", "O37", "O38", "O39", "O3_N1", "O3_N2", "O3b", "O4", "O40", "O41", "O42", "O5", "O6C", "O7", "O8", "O9", "OA", "OB", "OC"]
     assert [x["order_id"] for x in data["orders"]] == expected_ids
 
 
@@ -136,7 +136,7 @@ def test_order_O31_repeated_ranked_pool_is_depleted():
     m = _get_orders_map(); assert m["O31"] == {"order_id":"O31","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L25A"}
 
 def test_order_O32_repeated_three_way_pool_is_depleted():
-    """After O26 consumes SUB26 and SUB26_PRIVATE, O32 has an all-zero leaf tie; Rule 5 selects lexicographically smallest L26A."""
+    """After O26 consumes the shared pools, Rule 5's zero-ratio tie must select L26A."""
     m = _get_orders_map(); assert m["O32"] == {"order_id":"O32","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L26A"}
 
 def test_order_O33_repeated_cancellation_state_is_preserved():
@@ -144,3 +144,31 @@ def test_order_O33_repeated_cancellation_state_is_preserved():
 
 def test_order_O34_repeated_deep_pool_is_depleted():
     m = _get_orders_map(); assert m["O34"] == {"order_id":"O34","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L28A"}
+
+def test_order_O35_late_global_matching_with_private_fallback():
+    """Two primary leaves compete for one shared pool; private stock must be reserved for the leaf that cannot use another pool."""
+    m = _get_orders_map(); assert m["O35"] == {"order_id":"O35","allocated_qty":3,"shortfall_qty":0,"limiting_resource":None}
+
+def test_order_O36_late_matching_pool_depletion():
+    m = _get_orders_map(); assert m["O36"] == {"order_id":"O36","allocated_qty":0,"shortfall_qty":2,"limiting_resource":"L35A"}
+
+def test_order_O37_late_deep_three_way_consumption():
+    """A batch-sized multi-parent order must split a shared substitute pool across two deep branches."""
+    m = _get_orders_map(); assert m["O37"] == {"order_id":"O37","allocated_qty":2,"shortfall_qty":0,"limiting_resource":None}
+
+def test_order_O38_late_deep_pool_depletion():
+    m = _get_orders_map(); assert m["O38"] == {"order_id":"O38","allocated_qty":0,"shortfall_qty":2,"limiting_resource":"L36A"}
+
+def test_order_O39_late_workcenter_state():
+    m = _get_orders_map(); assert m["O39"] == {"order_id":"O39","allocated_qty":4,"shortfall_qty":0,"limiting_resource":None}
+
+def test_order_O40_late_workcenter_cancellation():
+    """The second order sees only 0.5 hours left, so even its first batch is impossible and WC37 is limiting."""
+    m = _get_orders_map(); assert m["O40"] == {"order_id":"O40","allocated_qty":0,"shortfall_qty":4,"limiting_resource":"WC37"}
+
+def test_order_O41_late_batch_generated_subassembly_boundary():
+    """Using one stocked assembly plus a batch-produced assembly lands exactly at the 50-percent boundary."""
+    m = _get_orders_map(); assert m["O41"] == {"order_id":"O41","allocated_qty":1,"shortfall_qty":1,"limiting_resource":"L38"}
+
+def test_order_O42_late_generated_subassembly_carryover():
+    m = _get_orders_map(); assert m["O42"] == {"order_id":"O42","allocated_qty":1,"shortfall_qty":0,"limiting_resource":None}
