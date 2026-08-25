@@ -10,6 +10,7 @@ from pathlib import Path
 # 6. Cancellation without state consumption
 # 7. Multi-order state carried through deeper shared BOM branches
 # 8. Multi-parent deep BOM with shared sub-assembly production and capacity
+# 9. Global shared-substitute contention across two primary leaves
 
 parts_data = [
     ("L1", "Bolt", 200, 10), ("L2", "Plate", 50, 5), ("L3", "Wire", 15, 1),
@@ -39,6 +40,9 @@ parts_data = [
     ("P16", "Product 16", 0, 1), ("L16", "Leaf 16", 1000, 1),
     ("L17", "Leaf 17", 0, 1), ("SUB_L17", "Sub 17", 14, 1), ("P17", "Product 17", 0, 1),
     ("L18A", "Leaf 18A", 23, 1), ("P18", "Product 18", 0, 1),
+    ("L23A", "Shared Allocation Leaf", 0, 1), ("L23B", "Constrained Allocation Leaf", 0, 1),
+    ("SUB23_SHARED", "Shared Substitute 23", 1, 1), ("SUB23_A", "Private Substitute 23", 1, 1),
+    ("P23", "Product Shared-Contention", 0, 1),
 ]
 
 bom_data = [
@@ -63,6 +67,7 @@ bom_data = [
     ("P16", "L16", 1, 0.0, 0),
     ("P17", "L17", 1, 0.0, 0),
     ("P18", "L18A", 3, 0.0, 0),
+    ("P23", "L23A", 1, 0.0, 0), ("P23", "L23B", 1, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -91,6 +96,8 @@ substitutes_data = [
     ("L5", "SUB5A", 1.5, 1), ("L5", "SUB5B", 1.0, 1),
     ("L_NEW", "SUB_NEW_A", 1.0, 1), ("L_NEW", "SUB_NEW_B", 1.0, 1),
     ("L17", "SUB_L17", 1.5, 1),
+    ("L23A", "SUB23_SHARED", 1.0, 1), ("L23A", "SUB23_A", 1.0, 2),
+    ("L23B", "SUB23_SHARED", 1.0, 1),
 ]
 
 orders_data = [
@@ -102,6 +109,7 @@ orders_data = [
     ("O10C", "P13", 10, 130), ("O11", "P14", 100, 140), ("O12", "P_SCRAP", 10, 150),
     ("O15", "P15", 10, 160), ("O15b", "P15b", 100, 165),
     ("O16", "P16", 10, 170), ("O17", "P17", 10, 180), ("O18", "P18", 10, 190),
+    ("O23", "P23", 1, 200),
 ]
 
 
