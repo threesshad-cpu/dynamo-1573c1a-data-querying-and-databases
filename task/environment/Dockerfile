@@ -8,5 +8,5 @@ RUN pip install --no-cache-dir \
 
 RUN mkdir -p /app/data /data /app
 
-COPY generate_data.py /tmp/generate_data.py
-RUN python3 /tmp/generate_data.py && rm /tmp/generate_data.py
+COPY generate_data.py /app/generate_data.py
+RUN python3 /app/generate_data.py
