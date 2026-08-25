@@ -33,7 +33,8 @@ def allocate_leaf_requirements(db, remaining, inv_snapshot, inv_consumed):
         # We need to fulfill 'rem' using a combination of substitutes.
         # Since a leaf can use multiple substitutes, we need to partition 'rem' across available subs.
         # To make exhaustive search simple, we can recursively assign units from each substitute.
-        subs = leaf_choices[leaf]
+        subs = list(leaf_choices[leaf])
+        subs.sort(key=lambda x: (x[2], -current_inv.get(x[0], 0), x[0]))
         
         def partition_rem(sub_idx, rem_to_fill, sub_alloc, temp_inv):
             if rem_to_fill == 0:

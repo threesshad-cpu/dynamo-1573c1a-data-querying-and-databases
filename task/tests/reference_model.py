@@ -38,7 +38,7 @@ class DatabaseState:
     def close(self):
         self.conn.close()
 
-def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
+def simulate_production_run(db, product_id, target_units, inv_state, wc_state, last_order_wcs):
     if target_units == 0:
         return True, {}, {}, {}, {}, {}
 
@@ -77,7 +77,11 @@ def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
         rem_needed = qty_needed - use_primary
 
         if rem_needed > 0 and parent_id in db.substitutes:
-            for sub_id, ratio, rank in db.substitutes[parent_id]:
+            def sub_sort_key(sub_info):
+                s_id, _, s_rank = sub_info
+                avail = inv_snapshot.get(s_id, 0) - inv_consumed.get(s_id, 0)
+                return (s_rank, -avail, s_id)
+            for sub_id, ratio, rank in sorted(db.substitutes[parent_id], key=sub_sort_key):
                 avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
                 buildable = math.floor(avail_sub / ratio)
                 use_sub = min(rem_needed, buildable)
@@ -94,7 +98,8 @@ def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
 
             if parent_id in db.routing:
                 for wc_id, setup_h, run_h in db.routing[parent_id]:
-                    req_h = setup_h + (build_qty * run_h)
+                    eff_setup = 0.0 if wc_id in last_order_wcs else setup_h
+                    req_h = eff_setup + (build_qty * run_h)
                     wc_consumed[wc_id] += req_h
                     gross_wc_demand[wc_id] += req_h
 
@@ -126,7 +131,7 @@ def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
 
     return True, inv_consumed, sub_created, wc_consumed, gross_leaf_demand, gross_wc_demand
 
-def process_order(db, order_id, product_id, requested_qty, inv_state, wc_state):
+def process_order(db, order_id, product_id, requested_qty, inv_state, wc_state, last_order_wcs):
     bs = db.parts[product_id]["batch_size"]
     
     allocated_qty = 0
@@ -139,7 +144,7 @@ def process_order(db, order_id, product_id, requested_qty, inv_state, wc_state):
     for batches in range(1, max_possible_batches + 1):
         target = batches * bs
         possible, inv_cons, sub_created, wc_cons, _, _ = simulate_production_run(
-            db, product_id, target, inv_state, wc_state
+            db, product_id, target, inv_state, wc_state, last_order_wcs
         )
         if possible:
             allocated_qty = target
@@ -155,7 +160,7 @@ def process_order(db, order_id, product_id, requested_qty, inv_state, wc_state):
     if shortfall_qty > 0:
         next_target = allocated_qty + bs
         _, _, _, _, leaf_req, wc_req = simulate_production_run(
-            db, product_id, next_target, inv_state, wc_state
+            db, product_id, next_target, inv_state, wc_state, last_order_wcs
         )
         ratios = []
         for leaf_id in db.leaf_parts:
@@ -203,8 +208,9 @@ def run_all_orders(db_path):
     wc_state = {w: db.workcenters[w] for w in db.workcenters}
     
     results = {}
+    last_order_wcs = set()
     for order_id, product_id, requested_qty, priority in db.orders:
-        res = process_order(db, order_id, product_id, requested_qty, inv_state, wc_state)
+        res = process_order(db, order_id, product_id, requested_qty, inv_state, wc_state, last_order_wcs)
         
         if res["inv_cons"]:
             for p, q in res["inv_cons"].items():
@@ -213,8 +219,11 @@ def run_all_orders(db_path):
             for p, q in res["sub_created"].items():
                 inv_state[p] += q
         if res["wc_cons"]:
+            last_order_wcs = set(w for w, h in res["wc_cons"].items() if h > 0)
             for w, h in res["wc_cons"].items():
                 wc_state[w] -= h
+        else:
+            last_order_wcs = set()
                 
         results[order_id] = {
             "order_id": res["order_id"],

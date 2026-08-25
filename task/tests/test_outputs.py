@@ -18,7 +18,7 @@ def test_report_schema_and_keys():
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 43, "Expected 43 order results in report"
+    assert len(orders) == 47, "Expected 47 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys

@@ -68,6 +68,10 @@ parts_data = [
     ("L37", "Late Capacity Leaf", 5, 1), ("P37", "Late Capacity Product", 0, 2),
     ("SA38", "Late Stock Assembly", 1, 2), ("L38", "Late Scrap Leaf", 10, 1),
     ("SUB38", "Late Scrap Substitute", 6, 1), ("P38", "Late Stock Product", 0, 1),
+    ("P43", "Setup Waiver Product", 0, 1),
+    ("L45", "Tie-Breaker Leaf", 0, 1), ("SUB45_A", "Tie-Breaker Sub A", 2, 1),
+    ("SUB45_B", "Tie-Breaker Sub B", 5, 1), ("P45", "Tie-Breaker Product", 0, 1),
+    ("P46", "Tie-Breaker Target Product", 0, 1),
 ]
 
 bom_data = [
@@ -103,6 +107,7 @@ bom_data = [
     ("SA36A", "L36A", 2, 0.0, 0), ("SA36B", "L36B", 1, 0.0, 0),
     ("P37", "L37", 1, 0.0, 0),
     ("P38", "SA38", 2, 0.0, 0), ("SA38", "L38", 3, 20.0, 1),
+    ("P45", "L45", 3, 0.0, 0), ("P46", "SUB45_B", 4, 0.0, 0),
 ]
 
 workcenters_data = [
@@ -112,6 +117,7 @@ workcenters_data = [
     ("WC10", "Tie Break 10", 5.0), ("WC2_B", "Tie Break 2", 5.0), ("WC18", "WC 18", 53.67),
     ("WC35", "Late Matching Cell", 20.0), ("WC36", "Late Deep Cell", 30.0),
     ("WC37", "Late Capacity Cell", 5.5), ("WC38", "Late Stock Cell", 30.0),
+    ("WC43", "Setup Waiver Cell", 11.0),
 ]
 
 routing_data = [
@@ -124,8 +130,10 @@ routing_data = [
     ("P14", "WC6", 0.0, 1.0), ("P16", "WC10", 0.0, 1.0), ("P16", "WC2_B", 0.0, 1.0),
     ("P18", "WC18", 0.0, 7.0),
     ("SA35", "WC35", 2.0, 1.0), ("P35", "WC35", 1.0, 0.5),
-    ("SA36A", "WC36", 1.0, 0.5), ("SA36B", "WC36", 1.0, 0.5), ("P36", "WC36", 1.0, 0.5),
-    ("P37", "WC37", 1.0, 1.0), ("SA38", "WC38", 2.0, 1.0), ("P38", "WC38", 1.0, 0.5),
+    ("SA36A", "WC36", 1.0, 0.5), ("SA36B", "WC36", 1.0, 0.5), ("SA36B", "WC1", 1.0, 1.0),
+    ("P37", "WC37", 2.0, 1.0),
+    ("P38", "WC38", 2.0, 1.0),
+    ("P43", "WC43", 5.0, 2.0),
 ]
 
 substitutes_data = [
@@ -142,6 +150,7 @@ substitutes_data = [
     ("L35A", "SUB35", 1.0, 1), ("L35A", "SUB35P", 1.0, 2), ("L35B", "SUB35", 1.0, 1),
     ("L36A", "SUB36", 1.0, 1), ("L36A", "SUB36P", 1.0, 2), ("L36B", "SUB36", 1.0, 1),
     ("L38", "SUB38", 1.5, 1),
+    ("L45", "SUB45_A", 1.0, 1), ("L45", "SUB45_B", 1.0, 1),
 ]
 
 orders_data = [
@@ -158,6 +167,8 @@ orders_data = [
     ("O32", "P26", 3, 290), ("O33", "P27", 5, 300), ("O34", "P28", 3, 310),
     ("O35", "P35", 3, 320), ("O36", "P35", 2, 321), ("O37", "P36", 2, 330), ("O38", "P36", 2, 331),
     ("O39", "P37", 4, 340), ("O40", "P37", 4, 341), ("O41", "P38", 2, 350), ("O42", "P38", 1, 351),
+    ("O43", "P43", 1, 360), ("O44", "P43", 2, 361),
+    ("O45", "P45", 1, 370), ("O46", "P46", 1, 371),
 ]
 
 
