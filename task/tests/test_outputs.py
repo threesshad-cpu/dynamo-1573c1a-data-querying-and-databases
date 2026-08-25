@@ -136,7 +136,8 @@ def test_order_O31_repeated_ranked_pool_is_depleted():
     m = _get_orders_map(); assert m["O31"] == {"order_id":"O31","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L25A"}
 
 def test_order_O32_repeated_three_way_pool_is_depleted():
-    m = _get_orders_map(); assert m["O32"] == {"order_id":"O32","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L26B"}
+    """After O26 consumes SUB26 and SUB26_PRIVATE, O32 has an all-zero leaf tie; Rule 5 selects lexicographically smallest L26A."""
+    m = _get_orders_map(); assert m["O32"] == {"order_id":"O32","allocated_qty":0,"shortfall_qty":3,"limiting_resource":"L26A"}
 
 def test_order_O33_repeated_cancellation_state_is_preserved():
     m = _get_orders_map(); assert m["O33"] == {"order_id":"O33","allocated_qty":0,"shortfall_qty":5,"limiting_resource":"L27B"}
