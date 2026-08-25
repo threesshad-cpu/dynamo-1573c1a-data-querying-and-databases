@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from tests.reference_model import run_all_orders
+from reference_model import run_all_orders
 
 REPORT_PATH = os.environ.get("TEST_REPORT_PATH", "/app/report.json")
 DB_PATH = Path("/app/manufacturing.db")

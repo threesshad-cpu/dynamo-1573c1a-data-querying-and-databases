@@ -1,7 +1,7 @@
 import pytest
 import sqlite3
 from pathlib import Path
-from tests.reference_model import process_order, simulate_production_run
+from reference_model import process_order, simulate_production_run
 
 class MockDB:
     def __init__(self):

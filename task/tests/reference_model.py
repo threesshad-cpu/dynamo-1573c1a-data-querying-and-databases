@@ -106,7 +106,7 @@ def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
         if req_qty > 0:
             gross_leaf_demand[leaf_id] = gross_leaf_demand.get(leaf_id, 0) + req_qty
 
-    from tests.allocator import allocate_leaf_requirements
+    from allocator import allocate_leaf_requirements
     
     remaining_leaves = {leaf_id: req_qty for leaf_id, req_qty in needed_parts.items() if req_qty > 0}
     for leaf_id, req_qty in list(remaining_leaves.items()):
