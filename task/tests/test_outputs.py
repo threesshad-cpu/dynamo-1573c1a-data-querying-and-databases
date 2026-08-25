@@ -112,7 +112,7 @@ def test_order_O24_fractional_shared_ratio_contention():
     m = _get_orders_map(); assert m["O24"] == {"order_id":"O24","allocated_qty":2,"shortfall_qty":1,"limiting_resource":None}
 
 def test_order_O25_ranked_shared_pool_with_private_fallback():
-    m = _get_orders_map(); assert m["O25"] == {"order_id":"O25","allocated_qty":1,"shortfall_qty":1,"limiting_resource":None}
+    m = _get_orders_map(); assert m["O25"] == {"order_id":"O25","allocated_qty":2,"shortfall_qty":0,"limiting_resource":None}
 
 def test_order_O26_three_way_shared_matching():
     m = _get_orders_map(); assert m["O26"] == {"order_id":"O26","allocated_qty":1,"shortfall_qty":1,"limiting_resource":None}
