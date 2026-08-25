@@ -140,8 +140,8 @@ def test_order_O24_fractional_shared_ratio_contention():
     m = _get_orders_map(); assert m["O24"] == {"order_id":"O24","allocated_qty":2,"shortfall_qty":1,"limiting_resource":None}
 
 def test_order_O25_ranked_shared_pool_with_private_fallback():
-    """Verify rule 7 balances ranked shared stock against a private fallback leaf."""
-    m = _get_orders_map(); assert m["O25"] == {"order_id":"O25","allocated_qty":2,"shortfall_qty":0,"limiting_resource":None}
+    """Verify rule 7 respects the shared pool: O25 can build only one unit because the two leaves compete for SUB25 and the private fallback covers only one L25B unit."""
+    m = _get_orders_map(); assert m["O25"] == {"order_id":"O25","allocated_qty":1,"shortfall_qty":1,"limiting_resource":None}
 
 def test_order_O26_three_way_shared_matching():
     """Verify rule 7 finds a globally feasible allocation across three competing leaves."""
