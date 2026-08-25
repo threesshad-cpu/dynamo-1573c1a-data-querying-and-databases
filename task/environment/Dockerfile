@@ -10,3 +10,6 @@ RUN mkdir -p /app/data /data /app
 
 COPY generate_data.py /tmp/generate_data.py
 RUN python3 /tmp/generate_data.py && rm /tmp/generate_data.py
+
+COPY extra_complexity.py /tmp/extra_complexity.py
+RUN python3 /tmp/extra_complexity.py && rm /tmp/extra_complexity.py
