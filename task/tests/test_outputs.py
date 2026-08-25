@@ -13,12 +13,12 @@ def test_file_exists_and_not_symlink():
     assert os.path.exists(REPORT_PATH) and not os.path.islink(REPORT_PATH)
 
 def test_report_schema_and_keys():
-    """Verify the normative report schema, types, and 27-order cardinality."""
+    """Verify the normative report schema, types, and 43-order cardinality."""
     with open(REPORT_PATH, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert set(data.keys()) == {"orders"}
     orders = data.get("orders", [])
-    assert len(orders) == 27, "Expected 27 order results in report"
+    assert len(orders) == 43, "Expected 43 order results in report"
     expected_keys = {"order_id", "allocated_qty", "shortfall_qty", "limiting_resource"}
     for x in orders:
         assert isinstance(x, dict) and set(x.keys()) == expected_keys

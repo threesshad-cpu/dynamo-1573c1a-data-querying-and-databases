@@ -106,27 +106,16 @@ def simulate_production_run(db, product_id, target_units, inv_state, wc_state):
         if req_qty > 0:
             gross_leaf_demand[leaf_id] = gross_leaf_demand.get(leaf_id, 0) + req_qty
 
-    leaf_feasible = True
-    for leaf_id, req_qty in needed_parts.items():
-        if req_qty <= 0: continue
-        rem_req = req_qty
+    from tests.allocator import allocate_leaf_requirements
+    
+    remaining_leaves = {leaf_id: req_qty for leaf_id, req_qty in needed_parts.items() if req_qty > 0}
+    for leaf_id, req_qty in list(remaining_leaves.items()):
         avail_prim = inv_snapshot.get(leaf_id, 0) - inv_consumed[leaf_id]
-        use_prim = min(avail_prim, rem_req)
+        use_prim = min(avail_prim, req_qty)
         inv_consumed[leaf_id] += use_prim
-        rem_req -= use_prim
-
-        if rem_req > 0 and leaf_id in db.substitutes:
-            for sub_id, ratio, rank in db.substitutes[leaf_id]:
-                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
-                buildable = math.floor(avail_sub / ratio)
-                use_sub = min(rem_req, buildable)
-                if use_sub > 0:
-                    inv_consumed[sub_id] += use_sub * ratio
-                    rem_req -= use_sub
-                if rem_req == 0:
-                    break
-        if rem_req > 0:
-            leaf_feasible = False
+        remaining_leaves[leaf_id] -= use_prim
+        
+    leaf_feasible = allocate_leaf_requirements(db, remaining_leaves, inv_snapshot, inv_consumed)
 
     if not leaf_feasible:
         return False, inv_consumed, sub_created, wc_consumed, gross_leaf_demand, gross_wc_demand
