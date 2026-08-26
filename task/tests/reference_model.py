@@ -75,7 +75,9 @@ def compute_reference(db_path=DB_PATH):
             for leaf, _, units, _ in allocation:
                 totals[leaf] += units
             primary = tuple(totals[leaf] for leaf in needed)
-            detail = tuple(sorted((rank, sub, leaf, -units) for leaf, sub, units, rank in allocation))
+            # Rule 4/7: after preference rank, prefer the substitute with
+            # the highest remaining inventory, then alphabetical order.
+            detail = tuple(sorted((rank, -initial.get(sub, 0), sub, leaf, -units) for leaf, sub, units, rank in allocation))
             return total_rank, primary, detail
 
         best = min(solutions, key=score)[1]
