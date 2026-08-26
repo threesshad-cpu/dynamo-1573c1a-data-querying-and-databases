@@ -72,116 +72,90 @@ leaf_parts = {part_id for part_id in parts if part_id not in parents_set}
 
 
 def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
-    """Allocate primary and substitute stock globally for one candidate run.
-
-    A substitute can be shared by several primary leaves. Backtracking prevents
-    a locally attractive substitute choice from stranding another required leaf.
-    """
     remaining = {}
     for leaf_id, req_qty in leaf_demands.items():
         if req_qty <= 0:
             continue
-        avail_primary = inv_snapshot.get(leaf_id, 0) - inv_consumed[leaf_id]
+        avail_primary = inv_snapshot.get(leaf_id, 0) - inv_consumed.get(leaf_id, 0)
         use_primary = min(avail_primary, req_qty)
-        inv_consumed[leaf_id] += use_primary
+        inv_consumed[leaf_id] = inv_consumed.get(leaf_id, 0) + use_primary
         remaining[leaf_id] = req_qty - use_primary
 
-    if not any(remaining.values()):
+    if all(v == 0 for v in remaining.values()):
         return True
 
-    sub_ids = sorted(
-        {
-            sub_id
-            for leaf_id, rem in remaining.items()
-            if rem > 0
-            for sub_id, _, _ in substitutes.get(leaf_id, [])
-        },
-        key=lambda sub_id: (
-            min(
-                rank
-                for leaf_id, rem in remaining.items()
-                if rem > 0
-                for candidate_sub, _, rank in substitutes.get(leaf_id, [])
-                if candidate_sub == sub_id
-            ),
-            sub_id,
-        ),
-    )
+    leaves = sorted([leaf for leaf, rem in remaining.items() if rem > 0])
+    
+    leaf_choices = {}
+    for leaf in leaves:
+        choices = []
+        if leaf in substitutes:
+            for sub_id, ratio, rank in substitutes[leaf]:
+                avail = inv_snapshot.get(sub_id, 0) - inv_consumed.get(sub_id, 0)
+                choices.append((sub_id, ratio, rank, avail))
+        leaf_choices[leaf] = choices
 
-    def search_substitute(index, rem_state, allocations):
-        if index == len(sub_ids):
-            return allocations if all(v == 0 for v in rem_state.values()) else None
+    valid_allocations = []
+    
+    def search(leaf_idx, current_alloc, current_inv):
+        if leaf_idx == len(leaves):
+            valid_allocations.append(list(current_alloc))
+            return
+            
+        leaf = leaves[leaf_idx]
+        rem = remaining[leaf]
+        
+        subs = list(leaf_choices[leaf])
+        subs.sort(key=lambda x: (x[2], -current_inv.get(x[0], 0), x[0]))
+        
+        def partition_rem(sub_idx, rem_to_fill, sub_alloc, temp_inv):
+            if rem_to_fill == 0:
+                search(leaf_idx + 1, current_alloc + sub_alloc, temp_inv)
+                return
+            if sub_idx == len(subs):
+                return
+                
+            sub_id, ratio, rank, _ = subs[sub_idx]
+            avail_sub = temp_inv.get(sub_id, 0)
+            max_primary_units = min(rem_to_fill, math.floor(avail_sub / ratio))
+            
+            for units in range(max_primary_units, -1, -1):
+                next_inv = dict(temp_inv)
+                next_inv[sub_id] -= units * ratio
+                next_alloc = list(sub_alloc)
+                if units > 0:
+                    next_alloc.append((leaf, sub_id, units, rank))
+                partition_rem(sub_idx + 1, rem_to_fill - units, next_alloc, next_inv)
+                
+        partition_rem(0, rem, [], current_inv)
 
-        sub_id = sub_ids[index]
-        stock = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
-        eligible = [
-            (leaf_id, ratio, rank)
-            for leaf_id, rem in rem_state.items()
-            if rem > 0
-            for candidate_sub, ratio, rank in substitutes.get(leaf_id, [])
-            if candidate_sub == sub_id
-        ]
-        if not eligible or stock <= 0:
-            return search_substitute(index + 1, rem_state, allocations)
-
-        eligible.sort(
-            key=lambda x: (
-                sum(
-                    1
-                    for candidate_sub, _, _ in substitutes.get(x[0], [])
-                    if candidate_sub in sub_ids[index:]
-                ),
-                x[0],
-            )
-        )
-
-        def enumerate_alloc(pos, stock_left, local_alloc):
-            if pos == len(eligible):
-                next_rem = dict(rem_state)
-                for leaf_id, units in local_alloc.items():
-                    ratio = next(r for l, r, _ in eligible if l == leaf_id)
-                    next_rem[leaf_id] -= units
-                next_allocs = dict(allocations)
-                if local_alloc:
-                    next_allocs[sub_id] = dict(local_alloc)
-                return search_substitute(index + 1, next_rem, next_allocs)
-
-            leaf_id, ratio, _ = eligible[pos]
-            max_units = min(
-                rem_state[leaf_id],
-                math.floor((stock_left + 1e-9) / ratio),
-            )
-            for units in range(max_units, -1, -1):
-                local_alloc[leaf_id] = units
-                result = enumerate_alloc(
-                    pos + 1,
-                    stock_left - units * ratio,
-                    local_alloc,
-                )
-                if result is not None:
-                    return result
-            local_alloc.pop(leaf_id, None)
-            return None
-
-        return enumerate_alloc(0, stock, {})
-
-    plan = search_substitute(0, remaining, {})
-    if plan is None:
+    temp_inv = {p: inv_snapshot.get(p, 0) - inv_consumed.get(p, 0) for p in parts}
+    search(0, [], temp_inv)
+    
+    if not valid_allocations:
         return False
-
-    for sub_id, leaf_alloc in plan.items():
-        for leaf_id, units in leaf_alloc.items():
-            ratio = next(
-                ratio
-                for candidate_sub, ratio, _ in substitutes[leaf_id]
-                if candidate_sub == sub_id
-            )
-            inv_consumed[sub_id] += units * ratio
-
+        
+    def score_alloc(alloc):
+        total_rank = sum(units * rank for leaf, sub, units, rank in alloc)
+        alloc_tuple = tuple(sorted([
+            (rank, sub, leaf, -units) 
+            for leaf, sub, units, rank in alloc if units > 0
+        ]))
+        return (total_rank, alloc_tuple)
+        
+    best_alloc = min(valid_allocations, key=score_alloc)
+    
+    for leaf, sub, units, rank in best_alloc:
+        ratio = next(r for s, r, rnk in substitutes[leaf] if s == sub)
+        inv_consumed[sub] = inv_consumed.get(sub, 0) + units * ratio
+        
     return True
 
 
-def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
+
+
+
+def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, last_order_wcs):
     if target_units == 0:
         return True, {}, {}, {}, {}, {}
 
@@ -224,8 +198,12 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
         rem_needed = qty_needed - use_primary
 
         if rem_needed > 0 and parent_id in substitutes:
-            for sub_id, ratio, rank in substitutes[parent_id]:
-                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed[sub_id]
+            def sub_sort_key(sub_info):
+                s_id, _, s_rank = sub_info
+                avail = inv_snapshot.get(s_id, 0) - inv_consumed.get(s_id, 0)
+                return (s_rank, -avail, s_id)
+            for sub_id, ratio, rank in sorted(substitutes[parent_id], key=sub_sort_key):
+                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed.get(sub_id, 0)
                 buildable = math.floor(avail_sub / ratio)
                 use_sub_units = min(rem_needed, buildable)
                 if use_sub_units > 0:
@@ -243,7 +221,8 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours):
 
             if parent_id in routing:
                 for wc_id, setup_h, run_h in routing[parent_id]:
-                    req_h = setup_h + (build_qty * run_h)
+                    eff_setup = 0.0 if wc_id in last_order_wcs else setup_h
+                    req_h = eff_setup + (build_qty * run_h)
                     wc_consumed[wc_id] += req_h
                     gross_wc_demand[wc_id] += req_h
 
@@ -304,6 +283,7 @@ curr_wc_hours = {w: workcenters[w]["available_hours"] for w in workcenters}
 sorted_orders = sorted(orders_raw, key=lambda x: x[3])
 
 results = []
+last_order_wcs = set()
 for order_id, product_id, requested_qty, priority in sorted_orders:
     bs = parts[product_id]["batch_size"]
 
@@ -319,7 +299,7 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
         mid = (low + high) // 2
         u = mid * bs
         possible, inv_cons, sub_created, wc_cons, _, _ = simulate_explosion(
-            product_id, u, curr_inv, curr_wc_hours
+            product_id, u, curr_inv, curr_wc_hours, last_order_wcs
         )
         if possible:
             allocated_qty = u
@@ -336,7 +316,7 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
     if shortfall_qty > 0:
         next_target = allocated_qty + bs
         _, _, _, _, leaf_req, wc_req = simulate_explosion(
-            product_id, next_target, curr_inv, curr_wc_hours
+            product_id, next_target, curr_inv, curr_wc_hours, last_order_wcs
         )
 
         ratios = []
@@ -377,8 +357,11 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
         for p, q in best_sub_created.items():
             curr_inv[p] += q
     if best_wc_cons:
+        last_order_wcs = set(w for w, h in best_wc_cons.items() if h > 0)
         for w, h in best_wc_cons.items():
             curr_wc_hours[w] -= h
+    else:
+        last_order_wcs = set()
 
     results.append(
         {
