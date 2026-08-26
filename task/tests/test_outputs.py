@@ -80,7 +80,7 @@ def test_against_reference_model():
         "O43": {"order_id": "O43", "allocated_qty": 0, "shortfall_qty": 1, "limiting_resource": "P43"},
         "O44": {"order_id": "O44", "allocated_qty": 0, "shortfall_qty": 2, "limiting_resource": "P43"},
         "O45": {"order_id": "O45", "allocated_qty": 1, "shortfall_qty": 0, "limiting_resource": None},
-        "O46": {"order_id": "O46", "allocated_qty": 1, "shortfall_qty": 0, "limiting_resource": None},
+        "O46": {"order_id": "O46", "allocated_qty": 0, "shortfall_qty": 1, "limiting_resource": "SUB45_B"},
         "O5": {"order_id": "O5", "allocated_qty": 10, "shortfall_qty": 5, "limiting_resource": "L4"},
         "O6C": {"order_id": "O6C", "allocated_qty": 0, "shortfall_qty": 5, "limiting_resource": "L_CANCEL"},
         "O7": {"order_id": "O7", "allocated_qty": 2, "shortfall_qty": 0, "limiting_resource": None},

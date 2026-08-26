@@ -138,7 +138,7 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
     def score_alloc(alloc):
         total_rank = sum(units * rank for leaf, sub, units, rank in alloc)
         alloc_tuple = tuple(sorted([
-            (rank, sub, leaf, -units) 
+            (rank, -temp_inv.get(sub, 0), sub, leaf, -units) 
             for leaf, sub, units, rank in alloc if units > 0
         ]))
         return (total_rank, alloc_tuple)
