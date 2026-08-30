@@ -85,7 +85,6 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
         return True
 
     leaves = sorted([leaf for leaf, rem in remaining.items() if rem > 0])
-    
     leaf_choices = {}
     for leaf in leaves:
         choices = []
@@ -96,29 +95,28 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
         leaf_choices[leaf] = choices
 
     valid_allocations = []
-    
+
     def search(leaf_idx, current_alloc, current_inv):
         if leaf_idx == len(leaves):
             valid_allocations.append(list(current_alloc))
             return
-            
+
         leaf = leaves[leaf_idx]
         rem = remaining[leaf]
-        
         subs = list(leaf_choices[leaf])
         subs.sort(key=lambda x: (x[2], -current_inv.get(x[0], 0), x[0]))
-        
+
         def partition_rem(sub_idx, rem_to_fill, sub_alloc, temp_inv):
             if rem_to_fill == 0:
                 search(leaf_idx + 1, current_alloc + sub_alloc, temp_inv)
                 return
             if sub_idx == len(subs):
                 return
-                
+
             sub_id, ratio, rank, _ = subs[sub_idx]
             avail_sub = temp_inv.get(sub_id, 0)
             max_primary_units = min(rem_to_fill, math.floor(avail_sub / ratio))
-            
+
             for units in range(max_primary_units, -1, -1):
                 next_inv = dict(temp_inv)
                 next_inv[sub_id] -= units * ratio
@@ -126,33 +124,34 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
                 if units > 0:
                     next_alloc.append((leaf, sub_id, units, rank))
                 partition_rem(sub_idx + 1, rem_to_fill - units, next_alloc, next_inv)
-                
+
         partition_rem(0, rem, [], current_inv)
 
     temp_inv = {p: inv_snapshot.get(p, 0) - inv_consumed.get(p, 0) for p in parts}
     search(0, [], temp_inv)
-    
+
     if not valid_allocations:
         return False
-        
+
     def score_alloc(alloc):
         total_rank = sum(units * rank for leaf, sub, units, rank in alloc)
+        primary_totals = {leaf: 0 for leaf in leaves}
+        for leaf, _, units, _ in alloc:
+            primary_totals[leaf] += units
+        primary_allocation = tuple(primary_totals[leaf] for leaf in leaves)
         alloc_tuple = tuple(sorted([
-            (rank, -temp_inv.get(sub, 0), sub, leaf, -units) 
+            (rank, -temp_inv.get(sub, 0), sub, leaf, -units)
             for leaf, sub, units, rank in alloc if units > 0
         ]))
-        return (total_rank, alloc_tuple)
-        
+        return (total_rank, primary_allocation, alloc_tuple)
+
     best_alloc = min(valid_allocations, key=score_alloc)
-    
+
     for leaf, sub, units, rank in best_alloc:
         ratio = next(r for s, r, rnk in substitutes[leaf] if s == sub)
         inv_consumed[sub] = inv_consumed.get(sub, 0) + units * ratio
-        
+
     return True
-
-
-
 
 
 def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, last_order_wcs):
@@ -165,7 +164,6 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, 
     sub_created = {p: 0 for p in parts}
 
     needed_parts = {product_id: target_units}
-
     gross_leaf_demand = {p: 0 for p in leaf_parts}
     gross_wc_demand = {w: 0.0 for w in workcenters}
 
@@ -226,15 +224,11 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, 
                     wc_consumed[wc_id] += req_h
                     gross_wc_demand[wc_id] += req_h
 
-            for child_id, qty_per, scrap_pct, setup_scrap in bom.get(
-                parent_id, []
-            ):
+            for child_id, qty_per, scrap_pct, setup_scrap in bom.get(parent_id, []):
                 gross_qty = setup_scrap + math.ceil(
                     build_qty * qty_per * (1.0 + scrap_pct / 100.0)
                 )
-                needed_parts[child_id] = (
-                    needed_parts.get(child_id, 0) + gross_qty
-                )
+                needed_parts[child_id] = needed_parts.get(child_id, 0) + gross_qty
 
     for leaf_id, req_qty in needed_parts.items():
         if req_qty > 0:
@@ -247,46 +241,24 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, 
     )
 
     if not leaf_feasible:
-        return (
-            False,
-            inv_consumed,
-            sub_created,
-            wc_consumed,
-            gross_leaf_demand,
-            gross_wc_demand,
-        )
+        return False, inv_consumed, sub_created, wc_consumed, gross_leaf_demand, gross_wc_demand
 
     for wc_id, req_h in wc_consumed.items():
         if req_h > current_wc_hours.get(wc_id, 0.0) + 1e-9:
-            return (
-                False,
-                inv_consumed,
-                sub_created,
-                wc_consumed,
-                gross_leaf_demand,
-                gross_wc_demand,
-            )
+            return False, inv_consumed, sub_created, wc_consumed, gross_leaf_demand, gross_wc_demand
 
-    return (
-        True,
-        inv_consumed,
-        sub_created,
-        wc_consumed,
-        gross_leaf_demand,
-        gross_wc_demand,
-    )
+    return True, inv_consumed, sub_created, wc_consumed, gross_leaf_demand, gross_wc_demand
 
 
 curr_inv = {p: parts[p]["on_hand_qty"] for p in parts}
 curr_wc_hours = {w: workcenters[w]["available_hours"] for w in workcenters}
 
 sorted_orders = sorted(orders_raw, key=lambda x: x[3])
-
 results = []
 last_order_wcs = set()
+
 for order_id, product_id, requested_qty, priority in sorted_orders:
     bs = parts[product_id]["batch_size"]
-
     allocated_qty = 0
     best_inv_cons = None
     best_sub_created = None
@@ -294,7 +266,6 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
 
     low = 0
     high = requested_qty // bs
-
     while low <= high:
         mid = (low + high) // 2
         u = mid * bs
@@ -318,7 +289,6 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
         _, _, _, _, leaf_req, wc_req = simulate_explosion(
             product_id, next_target, curr_inv, curr_wc_hours, last_order_wcs
         )
-
         ratios = []
 
         for leaf_id in leaf_parts:
@@ -363,26 +333,23 @@ for order_id, product_id, requested_qty, priority in sorted_orders:
     else:
         last_order_wcs = set()
 
-    results.append(
-        {
-            "order_id": order_id,
-            "allocated_qty": allocated_qty,
-            "shortfall_qty": shortfall_qty,
-            "limiting_resource": limiting_resource,
-        }
-    )
+    results.append({
+        "order_id": order_id,
+        "allocated_qty": allocated_qty,
+        "shortfall_qty": shortfall_qty,
+        "limiting_resource": limiting_resource,
+    })
 
 results.sort(key=lambda x: x["order_id"])
-
 report_data = {"orders": results}
 written_file = None
+
 for report_path in [
     Path("/app/report.json"),
     Path(__file__).resolve().parent.parent.parent / "report.json",
 ]:
     try:
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        results.sort(key=lambda x: x["order_id"])
         report_data = {"orders": results}
         with open(report_path, "w", encoding="utf-8") as f:
             json.dump(report_data, f, indent=2)
@@ -393,8 +360,6 @@ for report_path in [
         continue
 
 if not written_file:
-    raise RuntimeError(
-        "Failed to generate report.json at /app/report.json or local fallback"
-    )
+    raise RuntimeError("Failed to generate report.json at /app/report.json or local fallback")
 
 print(f"Generated report successfully at {written_file}.")
