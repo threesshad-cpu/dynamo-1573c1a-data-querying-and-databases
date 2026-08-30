@@ -91,7 +91,7 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
         if leaf in substitutes:
             for sub_id, ratio, rank in substitutes[leaf]:
                 avail = inv_snapshot.get(sub_id, 0) - inv_consumed.get(sub_id, 0)
-                choices.append((sub_id, ratio, rank, avail))
+                choices.append((sub_id, ratio, rank, max(0, avail)))
         leaf_choices[leaf] = choices
 
     valid_allocations = []
@@ -114,7 +114,9 @@ def allocate_leaf_requirements(leaf_demands, inv_snapshot, inv_consumed):
                 return
 
             sub_id, ratio, rank, _ = subs[sub_idx]
-            avail_sub = temp_inv.get(sub_id, 0)
+            # A shared substitute pool can never contribute negative capacity
+            # after earlier leaf allocations have consumed it.
+            avail_sub = max(0, temp_inv.get(sub_id, 0))
             max_primary_units = min(rem_to_fill, math.floor(avail_sub / ratio))
 
             for units in range(max_primary_units, -1, -1):
@@ -201,7 +203,7 @@ def simulate_explosion(product_id, target_units, current_inv, current_wc_hours, 
                 avail = inv_snapshot.get(s_id, 0) - inv_consumed.get(s_id, 0)
                 return (s_rank, -avail, s_id)
             for sub_id, ratio, rank in sorted(substitutes[parent_id], key=sub_sort_key):
-                avail_sub = inv_snapshot.get(sub_id, 0) - inv_consumed.get(sub_id, 0)
+                avail_sub = max(0, inv_snapshot.get(sub_id, 0) - inv_consumed.get(sub_id, 0))
                 buildable = math.floor(avail_sub / ratio)
                 use_sub_units = min(rem_needed, buildable)
                 if use_sub_units > 0:
