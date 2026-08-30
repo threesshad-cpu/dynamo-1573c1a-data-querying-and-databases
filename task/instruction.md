@@ -1,33 +1,28 @@
-You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing bill-of-materials (BOM) system with routing, workcenter capacity, scrap, and substitute part rules across the following tables:
+You are given a SQLite database at `/app/manufacturing.db` containing a multi-level manufacturing BOM system with routing, workcenter capacity, scrap, substitutes, and production orders.
 
-- `parts(part_id, name, on_hand_qty, batch_size)`: Inventory stock for leaf raw materials, sub-assemblies, and finished products. `batch_size` is the minimum manufacturing lot size (units must be produced in integer multiples of this value).
-- `bom(parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty)`: Bill-of-materials component graph. Each row defines how many units of `child_part_id` are needed per unit of `parent_part_id` (`qty_per`), plus a percentage-based running scrap rate (`scrap_rate_pct`) and a fixed per-batch setup scrap quantity (`setup_scrap_qty`) that is incurred once regardless of build quantity.
-- `workcenters(workcenter_id, name, available_hours)`: Finite shared capacity pools of labor/machine hours.
-- `routing(parent_part_id, workcenter_id, setup_hours, run_hours_per_unit)`: Workcenter time requirements for manufacturing a parent part. Each manufacturing run of $U > 0$ units of `parent_part_id` consumes `setup_hours` plus `U * run_hours_per_unit` from the workcenter's shared `available_hours` pool.
-- `substitutes(primary_part_id, substitute_part_id, qty_ratio, preference_rank)`: Substitute parts that can replace a primary part when its on-hand stock is insufficient. Each unit of `primary_part_id` demand requires `qty_ratio` units of `substitute_part_id`. Lower `preference_rank` substitutes are used first. Primary stock is always consumed before substitutes.
-- `orders(order_id, product_part_id, requested_qty, priority)`: Production orders for finished products.
+Tables:
+- `parts(part_id, name, on_hand_qty, batch_size)`: stock and minimum manufacturing lot size.
+- `bom(parent_part_id, child_part_id, qty_per, scrap_rate_pct, setup_scrap_qty)`: component requirements, running scrap, and fixed per-batch setup scrap.
+- `workcenters(workcenter_id, name, available_hours)`: shared labor/machine capacity.
+- `routing(parent_part_id, workcenter_id, setup_hours, run_hours_per_unit)`: setup plus run time for manufacturing a parent.
+- `substitutes(primary_part_id, substitute_part_id, qty_ratio, preference_rank)`: replacement stock; lower rank is preferred.
+- `orders(order_id, product_part_id, requested_qty, priority)`: finished-product orders.
 
-Definitions used by this task are determined from the schema, not from routing metadata: a **leaf part** is a part with no row in `bom` where it appears as `parent_part_id`; a routing row alone does not make a part non-leaf or make it a manufacturable parent. A **production run** means one manufacturing batch of a part within the current candidate order allocation. A **shared substitute pool** is the single remaining inventory quantity of one substitute part when that substitute is listed for multiple primary leaves; those units may be consumed only once during an actual candidate run.
+Definitions: a **leaf part** has no row in `bom` with it as `parent_part_id`; a routing row alone does not make it non-leaf. A **production run** is one manufacturing batch within the current candidate order allocation. A **shared substitute pool** is the remaining inventory of one substitute listed for multiple primary leaves; those units may be consumed only once per candidate run.
 
-Process production orders one by one, starting with the lowest `priority` number. For each order, follow these 7 rules:
+Process orders by increasing `priority` and apply these rules:
+1. **Sub-assemblies first:** use stocked sub-assemblies before manufacturing their difference or calculating leaf demand.
+2. **Batch & scrap:** manufacture only integer multiples of `batch_size`. Extra units remain in inventory. For each BOM component, required material is `ceil(base_qty*(1+scrap_rate_pct/100)) + setup_scrap_qty`.
+3. **Single runs:** aggregate repeated demand for a component within an order and manufacture it in one run, applying fixed setup once. If the current order uses the same workcenter as the immediately preceding production order, waive that workcenter's `setup_hours`; canceled orders do not count as preceding production orders.
+4. **Substitutes:** consume primary stock first. Then use lower `preference_rank`; for equal rank choose highest remaining inventory, then alphabetically. Use floor division for replacement capacity from `qty_ratio`.
+5. **Limiting resource:** maximize `allocated_qty` in product `batch_size` multiples. If short, evaluate the gross requirements for `allocated_qty + batch_size` before raw-stock netting (sub-assembly inventory is still netted). For each resource use `total available / gross requirement`; a leaf's availability is its stock plus all equivalent substitute stock, counted independently for this ratio. Shared-pool no-double-counting applies only to actual feasibility. Choose the lowest ratio strictly below 1.0, breaking ties by lexicographically smallest resource ID. Use `null` when the order is fully fulfilled or no ratio is below 1.0.
+6. **Cancellation:** if `allocated_qty / requested_qty < 0.5`, cancel: report `allocated_qty=0`, full shortfall, and consume no inventory or workcenter hours. Still report the resource that originally constrained the order.
+7. **Shared substitute contention:** within one candidate run, each substitute is one shared pool across all primary leaves. Never consume it twice. Choose the allocation maximizing total primary units fulfilled; on ties minimize total preference rank, then choose the lexicographically smallest primary-part allocation.
 
-1. **Use Sub-Assemblies First**: Before you calculate how many raw materials (leaf components, which are parts with no child components in the BOM) you need, always use up any sub-assemblies you already have in stock. You only need to manufacture the difference.
-2. **Batch Rounding & Scrap**: Whenever you manufacture a part, you must build it in multiples of its `batch_size`. Any extra units go into inventory for future orders. When calculating the materials needed, multiply the base requirement by `(1 + scrap_rate_pct / 100)` and round up to the next whole number. Then, add the fixed `setup_scrap_qty`.
-3. **Single Production Runs**: If a component is required in multiple places within the same order, aggregate its total net requirement and manufacture it in a single production run for that order, applying fixed setup constraints exactly once. If an order uses the exact same Workcenter as the immediately preceding order, the fixed `setup_hours` for that Workcenter are waived for the current order. A canceled order does not count as a preceding production order for this setup-hours waiver.
-4. **Using Substitutes**: If you run out of a leaf part, you can use its substitutes. Always use substitutes with a lower `preference_rank` first. If two substitutes share the same rank, break the tie by picking the one that has the highest remaining inventory quantity at that exact moment. If they have the same inventory, break the tie alphabetically. Use floor division to determine how many primary units a substitute can replace based on its `qty_ratio`. Primary stock is always consumed before substitute stock.
-5. **Finding the Limiting Resource**: Find the maximum `allocated_qty` you can successfully build (which must be a multiple of the product's batch size). If you can't fulfill the entire requested quantity, you must identify the single `limiting_resource` that stopped you from building just one more batch (or `null` if no ratio is strictly below 1.0):
-   - Figure out the **gross requirement** of leaf components and workcenter hours needed to build `allocated_qty + batch_size` units. Gross requirements reflect the total component demand required to manufacture the target quantity, before accounting for any raw material inventory on hand (though any sub-assembly inventory is still netted out normally).
-   - For each resource, compute its fulfillment ratio: `total available / gross requirement`. For leaves, "total available" includes its own stock plus any equivalent stock from all of its substitutes. For the `limiting_resource` ratio, each leaf's "total available" counts its own stock plus its full substitute pool **independently** (the same substitute units may be counted toward more than one leaf); Rule 7's shared-pool no-double-counting applies **only** to actual allocation/feasibility, never to this ratio.
-   - The resource with the lowest ratio strictly below 1.0 is the `limiting_resource`.
-   - If multiple resources tie for the lowest ratio, break the tie by picking the resource with the lexicographically smallest ID.
-   - If you fulfill the entire order (`shortfall_qty == 0`), or if all resources have a ratio >= 1.0, set `limiting_resource` to `null`.
-6. **Cancellation Conditions**: An order is unviable and must be canceled if the maximum `allocated_qty` you can build is less than 50% of the `requested_qty` (i.e., `allocated_qty / requested_qty < 0.5`). If an order is canceled, you must set `allocated_qty` to 0 and `shortfall_qty` to the full `requested_qty`, and consume NO inventory or workcenter hours. You must still compute and report the `limiting_resource` that originally constrained the order.
-7. **Shared Substitute Contention**: Within one candidate production run, each substitute part is one shared inventory pool across every primary leaf that lists it. Never count or consume the same substitute units twice for different primary leaves. If several leaves compete for the same substitute, choose an allocation that maximizes the total number of primary units that can be fulfilled for the candidate run. If multiple allocations achieve the same maximum, prefer lower total `preference_rank` usage, then the lexicographically smallest primary-part allocation. A locally greedy choice that strands another required leaf is incorrect.
+After each order, update shared inventory and workcenter capacity.
 
-Update the shared inventory and workcenter pools after each order is processed.
-
-Write the result to `/app/report.json`:
+Write `/app/report.json` as:
 ```json
 {"orders": [{"order_id": str, "allocated_qty": int, "shortfall_qty": int, "limiting_resource": str|null}, ...]}
 ```
-Sort the `orders` array by `order_id` ascending.
+Sort `orders` by `order_id` ascending.
