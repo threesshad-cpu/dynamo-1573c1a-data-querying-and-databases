@@ -25,7 +25,7 @@ if [[ "$ACTUAL_GENERATOR_BLOB" != "$EXPECTED_GENERATOR_BLOB" ]]; then
     echo "Generator integrity check failed" >&2
     echo "expected: $EXPECTED_GENERATOR_BLOB" >&2
     echo "actual:   $ACTUAL_GENERATOR_BLOB" >&2
-    echo "1" > /logs/verifier/reward.txt
+    echo "0" > /logs/verifier/reward.txt
     exit 1
 fi
 
