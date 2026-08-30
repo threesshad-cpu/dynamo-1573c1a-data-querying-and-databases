@@ -1,1 +1,0 @@
-The solution implements the documented BOM/MRP rules generically from SQLite rather than relying on fixed order identifiers. It is intentionally kept independent from the verifier fixtures so additional task orders exercise the same implementation paths.
