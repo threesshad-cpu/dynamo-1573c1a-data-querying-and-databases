@@ -19,8 +19,6 @@ Process orders by increasing `priority` and apply these rules:
 6. **Cancellation:** if `allocated_qty / requested_qty < 0.5`, cancel: report `allocated_qty=0`, full shortfall, and consume no inventory or workcenter hours. Still report the resource that originally constrained the order.
 7. **Shared substitute contention:** within one candidate run, each substitute is one shared pool across all primary leaves. Never consume it twice. Choose the allocation maximizing total primary units fulfilled; on ties minimize total preference rank, then choose the lexicographically smallest primary-part allocation tuple defined above.
 
-A reliable implementation order is to derive the leaf-part set **only from the `bom` table** before using routing or workcenter data: `leaf_parts = all part_id values from parts that never appear as bom.parent_part_id`. Routing information must never change that classification. Then process the order stream sequentially, keeping inventory, workcenter capacity, and the immediately-preceding production-order state separate and explicit. For substitute contention, treat each substitute part as one shared inventory pool within a candidate run and evaluate globally rather than allocating each leaf independently. Before finalizing, compare the generated report against the stated schema, order sorting, requested = allocated + shortfall, batch-multiple, and limiting-resource rules.
-
 After each order, update shared inventory and workcenter capacity.
 
 Write `/app/report.json` as:
