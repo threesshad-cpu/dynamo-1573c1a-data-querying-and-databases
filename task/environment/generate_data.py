@@ -18,7 +18,7 @@ parts_data = [
     ("L1", "Bolt", 200, 10), ("L2", "Plate", 50, 5), ("L3", "Wire", 15, 1),
     ("L4", "Plastic", 25, 1), ("L_TIE", "Tie-Break Leaf", 17, 1),
     ("L_CANCEL", "Cancellation-Test Leaf", 2, 1), ("SA_LIMIT", "Limiting Subassembly", 2, 3),
-    ("SUB_L3_A", "Wire-Alloy", 8, 1), ("SUB_L3_B", "Wire-Copper", 8, 1),
+    ("SUB_L3_A", "Wire-Alloy", 65, 1), ("SUB_L3_B", "Wire-Copper", 15, 1),
     ("SUB_SHARED", "Shared-Substitute", 21, 1), ("SA1", "Frame", 3, 2), ("SA2", "Module", 0, 4),
     ("L5", "Composite Leaf", 30, 2), ("L6", "Fastener Leaf", 20, 1),
     ("L7", "Cancellation Leaf", 2, 1), ("SUB5A", "Composite Substitute A", 9, 1),
