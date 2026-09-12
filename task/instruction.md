@@ -35,12 +35,12 @@ Write your final output to `/app/report.json`.
        }
      ],
      "summary": {
-       "total_entities_analyzed": 8,
+       "total_entities_analyzed": 20,
        "flagged_subsidiaries_count": 1
      }
    }
    ```
-   - Note: `total_entities_analyzed` is the total count of all entity nodes (`ex:Company`) in the graph, including both top-level parents and target subsidiaries.
+   - Note: `total_entities_analyzed` is the total count of all entity nodes (`ex:Company`) in the graph, including both top-level parents and target subsidiaries. The supplied graph contains 20 entity nodes.
 
 6. **Sorting and Formatting Rules:**
    - `high_risk_subsidiaries` must be sorted by `effective_ownership` in descending order. If values match, sort by `entity_id` in ascending ASCII order.
